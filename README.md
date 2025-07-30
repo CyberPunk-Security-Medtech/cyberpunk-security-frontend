@@ -1,4 +1,4 @@
-# OptivaHR Setup Guide
+# CyberPunk Medtech Setup Guide
 
 Welcome to CyberPunk-Security Frontend repository! This guide will help you clone, set up, and run the project properly.
 

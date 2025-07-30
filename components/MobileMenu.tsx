@@ -16,7 +16,7 @@ import React, {
     SetStateAction,
     memo,
 } from 'react';
-import logo from '@public/dashboard_logo.svg';
+import logo from '@public/logo.svg';
 import Image from 'next/image';
 
 interface MobileMenuProps {
