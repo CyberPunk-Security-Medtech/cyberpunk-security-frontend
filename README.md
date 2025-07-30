@@ -19,7 +19,7 @@ Before you begin, ensure you have the following installed:
 ### 1️⃣ Clone the Repository
 
 ```sh
-git clone https://github.com/optivahr-tech/optivahr-frontend.git
+git clone https://github.com/CyberPunk-Security-Medtech/cyberpunk-security-frontend.git
 cd cybersecurity-security-frontend
 ```
 
