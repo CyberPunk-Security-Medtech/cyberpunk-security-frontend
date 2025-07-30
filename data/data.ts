@@ -11,17 +11,17 @@ import {
   ShieldCheckIcon,
   UserGroupIcon,
 } from "@heroicons/react/16/solid";
-import text from "@public/text.svg";
-import textArea from "@public/paragraph.svg";
-import tel from "@public/tel.svg";
-import radio from "@public/radio.svg";
-import checkbox from "@public/check.svg";
-import attachment from "@public/attachment.svg";
-import select from "@public/select.svg";
+// import text from "@public/text.svg";
+// import textArea from "@public/paragraph.svg";
+// import tel from "@public/tel.svg";
+// import radio from "@public/radio.svg";
+// import checkbox from "@public/check.svg";
+// import attachment from "@public/attachment.svg";
+// import select from "@public/select.svg";
 
 export const formElements = [
   {
-    icon: text,
+    // icon: text,
     title: "Text Field",
     structure: {
       name: "Text",
@@ -29,7 +29,7 @@ export const formElements = [
     },
   },
   {
-    icon: textArea,
+    // icon: textArea,
     title: "Paragraph",
     structure: {
       name: "Paragraph",
@@ -38,7 +38,7 @@ export const formElements = [
   },
 
   {
-    icon: radio,
+    // icon: radio,
     title: "Email",
     structure: {
       name: "Email",
@@ -47,7 +47,7 @@ export const formElements = [
   },
 
   {
-    icon: tel,
+    // icon: tel,
     title: "Phone Number",
     structure: {
       name: "Phone Number",
@@ -56,7 +56,7 @@ export const formElements = [
   },
 
   {
-    icon: select,
+    // icon: select,
     title: "Dropdown",
     structure: {
       name: "Dropdown",
@@ -65,7 +65,7 @@ export const formElements = [
     },
   },
   {
-    icon: attachment,
+    // icon: attachment,
     title: "Attachment",
     structure: {
       name: "Attachment",

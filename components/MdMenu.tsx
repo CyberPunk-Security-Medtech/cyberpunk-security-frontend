@@ -6,7 +6,7 @@ import { navigation } from '@data/data';
 import Link from 'next/link';
 import { classNames } from '@utils/helper';
 import Image from 'next/image';
-import logo from '@public/dashboard_logo.svg';
+import logo from '@public/logo.svg';
 
 interface MdMenuProps {
     sidebarMinimize: boolean;
@@ -27,17 +27,17 @@ function MdMenu({
                 transition={{ type: 'spring' }}
                 className="hidden md:flex md:w-full md:flex-col md:inset-y-0 h-[100vh]"
             >
-                <div className="flex-1 flex flex-col min-h-0 bg-primary-400">
+                <div className="flex-1 flex flex-col min-h-0 bg-primary-800">
                     <div className="flex items-center justify-between h-16 flex-shrink-0 px-2">
                         <section className="">
                             <Image
                                 onClick={() => {
                                     setSidebarMinimize(!sidebarMinimize);
                                 }}
-                                className="rounded-md cursor-pointer p-2 bg-green-100"
+                                className="rounded-md w-[100px] h-[80px] cursor-pointer p-2"
                                 src={logo}
-                                width={40}
-                                height={40}
+                                width={100}
+                                height={80}
                                 alt="logo"
                             />
                         </section>
