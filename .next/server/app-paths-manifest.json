@@ -1,0 +1,13 @@
+{
+  "/auth/login/page": "app/auth/login/page.js",
+  "/auth/signup/page": "app/auth/signup/page.js",
+  "/dashboard/task/page": "app/dashboard/task/page.js",
+  "/dashboard/patients/page": "app/dashboard/patients/page.js",
+  "/dashboard/compliance/page": "app/dashboard/compliance/page.js",
+  "/dashboard/appointments/page": "app/dashboard/appointments/page.js",
+  "/dashboard/reports/page": "app/dashboard/reports/page.js",
+  "/dashboard/lab/page": "app/dashboard/lab/page.js",
+  "/dashboard/pharmacy/page": "app/dashboard/pharmacy/page.js",
+  "/dashboard/procedure/page": "app/dashboard/procedure/page.js",
+  "/dashboard/billing/page": "app/dashboard/billing/page.js"
+}
