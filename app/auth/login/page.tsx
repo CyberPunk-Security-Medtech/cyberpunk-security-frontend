@@ -9,6 +9,9 @@ import useFormHook from '@hooks/useFormHook';
 import Button from '@components/Button';
 import Link from 'next/link';
 import { useAuth } from '@context/AuthContext';
+import logo from '@public/auth_logo.svg';
+import Image from 'next/image';
+
 
 const LoginPage = () => {
     const router = useRouter();
@@ -41,11 +44,20 @@ const LoginPage = () => {
     });
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+            {/* Logo above the card */}
+            <div className="p-[37px] flex justify-center">
+                <Image
+                    src={logo}
+                    alt="logo"
+                    width={91}
+                    height={75}
+                    className="w-[91px] h-[75px]"
+                />
+            </div>
             <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
                 {/* Header */}
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-primary-600">PrivaCure</h1>
                     <p className="text-gray-500">Sign in to your account</p>
                 </div>
 
@@ -82,12 +94,6 @@ const LoginPage = () => {
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
-                            <Link
-                                href="/forgot-password"
-                                className="text-sm font-medium text-primary-600 hover:text-primary-500"
-                            >
-                                Forgot password?
-                            </Link>
                         </div>
                         <input
                             id="password"
@@ -103,23 +109,31 @@ const LoginPage = () => {
                     </div>
 
                     {/* Remember Me */}
-                    <div className="flex items-center">
-                        <input
-                            id="rememberMe"
-                            {...register("rememberMe")}
-                            type="checkbox"
-                            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
-                            Remember me
-                        </label>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            <input
+                                id="rememberMe"
+                                {...register("rememberMe")}
+                                type="checkbox"
+                                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700">
+                                Remember me
+                            </label>
+                        </div>
+                        <Link
+                            href="/forgot-password"
+                            className="text-sm font-medium text-error hover:text-primary-700 ml-4"
+                        >
+                            Forgot password?
+                        </Link>
                     </div>
 
                     {/* Submit Button */}
                     <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
+                        className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
                     >
                         {isSubmitting ? (
                             <span className="flex items-center">
@@ -138,9 +152,9 @@ const LoginPage = () => {
                     Don&apos;t have an account?{' '}
                     <Link
                         href="/signup"
-                        className="font-medium text-primary-600 hover:text-primary-500"
+                        className="font-medium text-primary-600 hover:text-primary-700"
                     >
-                        Sign up
+                        Sign Up
                     </Link>
                 </div>
             </div>
