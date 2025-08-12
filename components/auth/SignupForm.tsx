@@ -1,5 +1,5 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import { SignupFormData } from "@types/forms";
+import { SignupFormData } from "forms/forms";
 import Button from "@components/Button";
 
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema, paymentSchema } from "@schemas/schemas";
-import { SignupFormData, PaymentFormActivationData } from "@types/forms";
+import { SignupFormData, PaymentFormActivationData } from "@forms/forms";
 // import { Button } from "@components/Button";
 import { PaymentForm } from "@components/auth/PaymentActivationForm";
 import { SignupForm } from "@components/auth/SignupForm";

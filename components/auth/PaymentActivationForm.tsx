@@ -1,5 +1,5 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import { PaymentFormActivationData } from "@types/forms";
+import { PaymentFormActivationData } from "forms/forms";
 import Button from "@components/Button";
 
 interface PaymentFormProps {

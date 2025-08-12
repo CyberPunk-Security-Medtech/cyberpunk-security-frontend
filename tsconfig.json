@@ -29,7 +29,7 @@
       "@redux/*": ["redux/*"],
       "@context/*": ["context/*"],
       "@services/*": ["services/*"],
-      "@types/*": ["types/*"],
+      "@forms/*": ["forms/*"],
       "@schemas/*": ["schemas/*"]
     }
   },
