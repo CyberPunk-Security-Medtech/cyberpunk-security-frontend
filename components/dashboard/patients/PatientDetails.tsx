@@ -40,7 +40,7 @@
 "use client";
 
 import Modal from "@components/Modal";
-import { Patient } from "@types/forms";
+import { Patient } from "@/types/forms";
 
 interface PatientDetailsProps {
     patient: Patient;

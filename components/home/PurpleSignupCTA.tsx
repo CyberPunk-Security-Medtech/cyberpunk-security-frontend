@@ -36,7 +36,7 @@ const formChildrenStagger: Variants = {
 
 export default function PurpleSignupCTA() {
     return (
-        <section className="relative bg-[#3F34D0] text-white py-20">
+        <section id="signup" className="relative bg-[#3F34D0] text-white py-20">
             <div className="max-w-6xl mx-auto px-6">
                 {/* Top Section */}
                 <div className="mx-auto max-w-5xl text-center mb-8">
@@ -175,7 +175,7 @@ export default function PurpleSignupCTA() {
                                     Join the Waitlist
                                 </motion.button>
                             </motion.form>
-                            <p className="text-white font-sm">We respect your privacy. Your information will only be used to contact you about Privacure updates</p>
+                            <p className="text-white/80 text-xs text-center leading-relaxed mt-6 font-sm">We respect your privacy. Your information will only be used to contact you about Privacure updates</p>
 
                         </div>
                     </motion.div>

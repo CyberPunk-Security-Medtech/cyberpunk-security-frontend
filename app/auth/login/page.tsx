@@ -11,7 +11,8 @@ import Link from 'next/link';
 import { useAuth } from '@context/AuthContext';
 import logo from '@public/auth_logo.svg';
 import Image from 'next/image';
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
     const router = useRouter();
@@ -21,30 +22,42 @@ const LoginPage = () => {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-        submitError,
         setSubmitError,
     } = useFormHook(loginSchema, async (data) => {
         try {
             const response = await authService.login({
-                login: data.login,
+                email: data.email,
                 password: data.password,
             });
 
-            setUser({
-                id: response.user.id,
-                email: response.user.email,
-                name: response.user.name,
-                token: response.token,
-            });
-
-            router.push('/dashboard');
+            // Check backend response
+            if (response?.access && response?.refresh) {
+                setUser({
+                    // id: response.user.id,
+                    email: data.email,
+                    // name: response.user.name,
+                    refreshToken: response.refresh,
+                    token: response.access,
+                });
+                toast.success('Login successful!', {
+                    autoClose: 1500,
+                    onClose: () => router.push('/dashboard/compliance'),
+                });
+            } else {
+                const message = response?.message || 'Login failed. Please try again.';
+                setSubmitError(message);
+                toast.error(message);
+            }
         } catch (error: any) {
-            setSubmitError(error.response?.data?.message || 'Login failed. Please try again.');
+            const message = error.response?.data?.message || 'Login failed. Please try again.';
+            setSubmitError(message);
+            toast.error(message);
         }
     });
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+            <ToastContainer position="top-right" autoClose={5000} />
             {/* Logo above the card */}
             <div className="p-[37px] flex justify-center">
                 <Image
@@ -61,30 +74,30 @@ const LoginPage = () => {
                     <p className="text-gray-500">Sign in to your account</p>
                 </div>
 
-                {/* Error Message */}
+                {/* Error Message
                 {submitError && (
                     <div className="p-3 bg-error/10 text-error rounded-lg text-sm">
                         {submitError}
                     </div>
-                )}
+                )} */}
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Email/Username Field */}
                     <div>
-                        <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
                             Email or Username
                         </label>
                         <input
-                            id="login"
-                            {...register("login")}
+                            id="email"
+                            {...register("email")}
                             type="text"
-                            className={`w-full px-4 py-2.5 border ${errors.login ? 'border-error' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
+                            className={`w-full px-4 py-2.5 border ${errors.email ? 'border-error' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                             placeholder="Enter your email or username"
                             autoComplete="username"
                         />
-                        {errors.login && (
-                            <p className="mt-1.5 text-sm text-error">{errors.login.message}</p>
+                        {errors.email && (
+                            <p className="mt-1.5 text-sm text-error">{errors.email.message}</p>
                         )}
                     </div>
 

@@ -92,9 +92,21 @@ export default function ComparisonSection() {
                             </div>
 
                             {/* This line now shows on ALL cards */}
-                            <p className="mt-4 text-sm font-semibold">
+                            {/* <p className="mt-4 text-sm font-semibold">
                                 <span className="text-[#FC4321]">100%</span> Compliance Ready
-                            </p>
+                            </p> */}
+
+                            {["Internationally Compliant",
+                                "AI-Powered accuracy",
+                                "Locally Relevant",
+                                "Patient-Centered",]
+                            [i] && (
+                                    <p className="mt-4 text-sm font-semibold"><span className="text-[#FC4321]">100%</span> {""} {["Internationally Compliant",
+                                        "AI-Powered accuracy",
+                                        "Locally Relevant",
+                                        "Patient-Centered",]
+                                    [i]}</p>
+                                )}
                         </motion.div>
                     ))}
                 </motion.div>

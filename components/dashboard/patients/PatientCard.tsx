@@ -1,4 +1,4 @@
-import { Patient } from "@types/forms";
+import { Patient } from "@/types/forms";
 
 interface PatientCardProps {
     patient: Patient;

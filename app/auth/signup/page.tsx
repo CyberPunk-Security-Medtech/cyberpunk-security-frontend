@@ -7,6 +7,8 @@ import Button from "@components/Button";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@public/auth_logo.svg";
+import { authService } from "@services/api";
+import { toast } from "react-toastify";
 
 const SignupPage = () => {
     const router = useRouter();
@@ -19,7 +21,8 @@ const SignupPage = () => {
         setSubmitError,
     } = useFormHook(signupSchema, async (data) => {
         try {
-            console.log("Signup form submitted", data);
+            const response = await authService.signup(data);
+            toast.success("Signup successful");
             router.push("/dashboard");
         } catch (error: any) {
             setSubmitError("Signup failed. Please try again.");

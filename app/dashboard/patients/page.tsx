@@ -4,7 +4,7 @@ import { useState } from "react";
 import PatientCard from "@components/dashboard/patients/PatientCard";
 import PatientDetails from "@components/dashboard/patients/PatientDetails";
 import AddPatientModal from "@components/dashboard/patients/AddPatientModal";
-import { Patient } from "@types/forms";
+import { Patient } from "@/types/forms";
 
 const mockPatients: Patient[] = [
     {

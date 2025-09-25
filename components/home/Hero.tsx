@@ -11,7 +11,7 @@ export default function HeroSection() {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 lg:py-28">
                 <div className="flex justify-center mb-8">
-                    <img src="/logo.svg" alt="PrivaCure" className="h-12 w-auto" />
+                    <img src="/auth_logo.svg" alt="PrivaCure" className="h-12 w-auto" />
                 </div>
 
 
@@ -29,7 +29,7 @@ export default function HeroSection() {
 
                     <div className="mt-8 flex items-center justify-center gap-4">
                         <a
-                            href="#early"
+                            href="#signup"
                             className="inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full px-6 py-3 shadow"
                         >
                             Join the Waitlist

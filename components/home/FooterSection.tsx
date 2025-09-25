@@ -44,7 +44,7 @@ const Footer: React.FC<FooterProps> = () => {
                     >
                         <motion.div className="flex items-center space-x-3" variants={logoVariants}>
                             <div className="w-12 h-12 relative">
-                                <Image src="/logo.svg" alt="Privacure Logo" fill style={{ objectFit: "contain" }} />
+                                <Image src="/auth_logo.svg" alt="Privacure Logo" fill style={{ objectFit: "contain" }} />
                             </div>
                             <h3 className="text-xl font-bold text-white">Privacure</h3>
                         </motion.div>
@@ -64,15 +64,15 @@ const Footer: React.FC<FooterProps> = () => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <span>📧</span>
-                                <span>gmail.com</span>
+                                <a href="mailto:privacuremedtech@gmail.com" className="text-gray-300 hover:text-white transition-colors duration-200">Email us</a>
                             </div>
                         </motion.div>
                     </motion.div>
 
                     {/* Product Section */}
-                    <motion.div className="space-y-6" variants={itemVariants}>
-                        <h4 className="text-lg font-semibold text-white mb-4">Product</h4>
-                        <div className="space-y-3">
+                    <motion.div variants={itemVariants}>
+                        <h4 className="text-lg font-semibold text-white mb-1 mt-3">Product</h4>
+                        <div className="space-y-2">
                             {["Features", "Security", "Integrations", "API Documentation", "Pricing"].map((label) => (
                                 <motion.a
                                     key={label}
@@ -88,9 +88,10 @@ const Footer: React.FC<FooterProps> = () => {
                     </motion.div>
 
                     {/* Company Section */}
-                    <motion.div className="space-y-6" variants={itemVariants}>
-                        <h4 className="text-lg font-semibold text-white mb-4">Company</h4>
-                        <div className="space-y-3">
+
+                    <motion.div variants={itemVariants}>
+                        <h4 className="text-lg font-semibold text-white mb-1 mt-3">Company</h4>
+                        <div className="space-y-2">
                             {["About Us", "Careers", "Press", "Blog", "Contact"].map((label) => (
                                 <motion.a
                                     key={label}
@@ -106,9 +107,9 @@ const Footer: React.FC<FooterProps> = () => {
                     </motion.div>
 
                     {/* Resources Section */}
-                    <motion.div className="space-y-6" variants={itemVariants}>
-                        <h4 className="text-lg font-semibold text-white mb-4">Resources</h4>
-                        <div className="space-y-3">
+                    <motion.div variants={itemVariants}>
+                        <h4 className="text-lg font-semibold text-white mb-1 mt-3">Resources</h4>
+                        <div className="space-y-2">
                             {["Case Studies", "White Papers", "Webinars", "Help Center", "Community"].map((label) => (
                                 <motion.a
                                     key={label}
@@ -124,9 +125,9 @@ const Footer: React.FC<FooterProps> = () => {
                     </motion.div>
 
                     {/* Legal Section */}
-                    <motion.div className="space-y-6" variants={itemVariants}>
-                        <h4 className="text-lg font-semibold text-white mb-4">Legal</h4>
-                        <div className="space-y-3">
+                    <motion.div variants={itemVariants}>
+                        <h4 className="text-lg font-semibold text-white mb-1 mt-3">Legal</h4>
+                        <div className="space-y-2">
                             {["Privacy Policy", "Terms of Service", "Compliance", "Security"].map((label) => (
                                 <motion.a
                                     key={label}

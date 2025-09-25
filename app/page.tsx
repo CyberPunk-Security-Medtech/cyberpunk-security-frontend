@@ -13,7 +13,7 @@ import VisionSection from "@components/home/VisionSection";
 
 export default function Home() {
     return (
-        <div className="antialiased text-sans">
+        <div className="antialiased text-sans overflow-x-hidden">
             <HeroSection />
             <ProblemSection />
             <SolutionSection />

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.privacure.example.com";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,13 +12,13 @@ export const api = axios.create({
 
 // Auth endpoints
 export const authService = {
-  login: async (credentials: { login: string; password: string }) => {
-    const response = await api.post("/auth/login", credentials);
+  login: async (credentials: { email: string; password: string }) => {
+    const response = await api.post("/api/v1/users/login/", credentials);
     return response.data;
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: async (userData: any) => {
-    const response = await api.post("/auth/register", userData);
+  signup: async (userData: any) => {
+    const response = await api.post("/api/v1/users/signup/", userData);
     return response.data;
   },
   forgotPassword: async (email: string) => {
