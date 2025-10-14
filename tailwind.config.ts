@@ -52,9 +52,10 @@ export default {
         error: "#EF4444",
         warning: "#F59E0B",
       },
-      fontFamily: {
-        sans: ["var(--font-plus-jakarta-sans)"],
-      },
+    fontFamily: {
+  sans: ["var(--font-nunito-sans)", "sans-serif"],
+},
+
       fontSize: {
         xxs: "0.625rem", // 10px
         tiny: "0.7rem", // 11.2px

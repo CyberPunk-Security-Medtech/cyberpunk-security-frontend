@@ -1,13 +1,11 @@
-
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Nunito_Sans } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@context/AuthContext';
 
-
-const plusJakartaSans = Plus_Jakarta_Sans({
+const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
-  variable: '--font-plus-jakarta-sans',
+  variable: '--font-nunito-sans',
 });
 
 export const metadata: Metadata = {
@@ -22,7 +20,7 @@ export default function RootLayout({
 }>): React.ReactNode {
   return (
     <html lang="en">
-      <body className={`${plusJakartaSans.variable} font-sans `}>
+      <body className={`${nunitoSans.variable} font-sans`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

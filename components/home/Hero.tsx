@@ -1,57 +1,118 @@
 "use client";
 
-import React from "react";
-import HeroPartnersCard from "./HeroPartnersCard";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 
 export default function HeroSection() {
-    return (
-        <header className="relative bg-[url('/bg_img.jpg')] bg-center bg-cover">
-            <div className="absolute inset-0 bg-white/60"></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 lg:py-28">
-                <div className="flex justify-center mb-8">
-                    <img src="/auth_logo.svg" alt="PrivaCure" className="h-12 w-auto" />
-                </div>
+  const router = useRouter();
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#15BDB0]/20 via-[#F8FCFF]/40 to-white pt-24 pb-16 sm:pt-32 sm:pb-24">
+      <div className="mx-auto flex max-w-7xl flex-col-reverse md:flex-row items-center justify-between px-4 sm:px-8 md:px-12 gap-10 sm:gap-16 md:gap-20">
+        {/* LEFT TEXT COLUMN */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="max-w-xl text-center md:text-left"
+        >
+          <h1 className="text-[1.9rem] sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            Building Africa’s Most Trusted{" "}
+            <span className="text-[#0066CC]">Healthcare Data</span>{" "}
+            Infrastructure.
+          </h1>
 
+          <p className="mt-4 sm:mt-6 text-gray-600 leading-relaxed text-[0.9rem] sm:text-base">
+            Privacure combines cutting-edge technology with healthcare expertise
+            to deliver a comprehensive platform that addresses Africa’s unique
+            healthcare challenges.
+          </p>
 
-                <div className="text-center max-w-3xl mx-auto">
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
-                        Building Africa’s Most Trusted <br />
-                        <span className="text-primary-600">Healthcare Data</span>{" "}
-                        Infrastructure
-                    </h1>
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-6 w-full sm:w-auto items-center justify-center md:justify-start">
+            <button className="w-full sm:w-auto rounded-[15px] bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base">
+              Join the Waitlist
+            </button>
+            <button
+            onClick={() => router.push("/auth/login")}
+             className="w-full sm:w-auto rounded-[15px] border border-[#00A9B7] px-6 py-3 font-semibold text-black hover:bg-[#00A9B710] transition text-sm sm:text-base">
+              Login
+            </button>
+          </div>
+        </motion.div>
 
-                    <p className="mt-6 text-gray-600 text-lg md:text-xl">
-                        Privacure combines cutting-edge technology with healthcare expertise to deliver a
-                        comprehensive platform that addresses Africa’s unique healthcare challenges.
-                    </p>
+        {/* RIGHT VISUAL AREA (Hidden on Mobile) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="relative hidden md:flex items-center justify-center w-full md:w-[50%] mt-10 md:mt-0"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{
+              duration: 40,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className="relative flex items-center justify-center w-[320px] h-[320px] md:w-[420px] md:h-[420px]"
+          >
+            <Image src="/orbit1.svg" alt="orbit line 1" fill className="object-contain" />
+            <Image src="/orbit2.svg" alt="orbit line 2" fill className="object-contain opacity-90 scale-75" />
 
-                    <div className="mt-8 flex items-center justify-center gap-4">
-                        <a
-                            href="#signup"
-                            className="inline-flex items-center gap-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full px-6 py-3 shadow"
-                        >
-                            Join the Waitlist
-                            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                                <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </a>
+            <Image
+              src="/outer-male-doc.svg"
+              alt="Doctor 1"
+              width={100}
+              height={100}
+              className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full border-4 border-white shadow-lg"
+            />
+            <Image
+              src="/outer-female-doc.svg"
+              alt="Doctor 3"
+              width={100}
+              height={100}
+              className="absolute top-1/2 left-0 -translate-y-1/2 rounded-full border-4 border-white shadow-lg"
+            />
+            <Image
+              src="/inner-female-doc.svg"
+              alt="Doctor 4"
+              width={100}
+              height={100}
+              className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full border-4 border-white shadow-lg"
+            />
+            <Image
+              src="/inner-female-doc-2.svg"
+              alt="Doctor 5"
+              width={100}
+              height={100}
+              className="absolute top-[18%] left-[15%] rounded-full border-4 border-white shadow-lg"
+            />
 
-                        <a
-                            href="#signup"
-                            className="inline-flex items-center gap-3 bg-white border border-gray-200 text-gray-800 font-semibold rounded-full px-6 py-3"
-                        >
-                            Request Early Access
-                        </a>
-                    </div>
-                </div>
+            <Image
+              src="/testimonial-hero.svg"
+              alt="Badge"
+              width={250}
+              height={88}
+              className="absolute bottom-[10%] right-[10%]"
+            />
+          </motion.div>
 
-
-                <div className="mt-12">
-                    <HeroPartnersCard />
-                </div>
-            </div>
-        </header>
-    );
+          {/* Center Cube */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Image
+              src="/center-cube.svg"
+              alt="Cube"
+              width={150}
+              height={150}
+              className="z-20"
+            />
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
 }
