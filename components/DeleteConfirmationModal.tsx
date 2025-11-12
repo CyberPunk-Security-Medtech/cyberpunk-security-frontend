@@ -28,10 +28,10 @@ function DeleteConfirmationModal({
     };
 
     return (
-        <Modal open={open} setOpen={setOpen}>
+        <Modal title={`Delete ${resourceType}`} isOpen={open} onClose={() => setOpen(false)}>
             <div className="bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full sm:p-6">
                 <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"> 
                         {/* Warning Icon */}
                         <svg
                             className="h-6 w-6 text-red-600"
