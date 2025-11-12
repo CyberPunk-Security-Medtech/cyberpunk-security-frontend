@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function BookAppointmentSection() {
   return (
@@ -53,9 +54,9 @@ export default function BookAppointmentSection() {
           <p className="text-sm sm:text-[15px] text-gray-700 mb-5">
             Available to 97% of our customers
           </p>
-          <button className="rounded-[30px] bg-black text-white px-6 py-2.5 text-sm sm:text-base font-medium hover:bg-[black] transition">
+          <Link href="/home/book-now" className="rounded-[30px] bg-black text-white px-6 py-2.5 text-sm sm:text-base font-medium hover:bg-[black] transition">
             Book now
-          </button>
+          </Link>
         </motion.div>
 
         {/* SECONDARY CARD */}

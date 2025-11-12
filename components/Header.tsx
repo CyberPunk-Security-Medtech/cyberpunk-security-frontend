@@ -1,145 +1,86 @@
-import {
-    ArrowUturnLeftIcon,
-    Bars3Icon,
-    BellIcon,
-    GiftIcon,
-    QuestionMarkCircleIcon,
-    UserIcon,
-} from '@heroicons/react/16/solid';
-import React, {
-    Dispatch,
-    Fragment,
-    ReactNode,
-    SetStateAction,
-    memo,
-} from 'react';
-import {
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-    Transition,
-} from '@headlessui/react';
-import { userNavigation } from '@data/data';
-import { classNames } from '@utils/helper';
-import Button from '@components/Button';
-import Search from '@components/dashboard/Search';
+'use client';
+
+import { Bell, Search, Menu } from 'lucide-react';
+import Image from 'next/image';
 
 interface HeaderProps {
-    setSidebarOpen: Dispatch<SetStateAction<boolean>>;
+  setSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  title?: string;
+  user?: {
+    name: string;
+    role: string;
+    avatar?: string;
+  };
+  showSearch?: boolean;
 }
-function Header({ setSidebarOpen }: HeaderProps): ReactNode {
-    return (
-        <>
-            <div className="sticky top-0 z-10 py-2 flex-shrink-0 flex h-16 bg-white shadow md:shadow-none">
-                <button
-                    type="button"
-                    className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
-                    onClick={() => setSidebarOpen(true)}
-                >
-                    <span className="sr-only">Open sidebar</span>
-                    <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                </button>
-                <div className="flex-1 flex justify-between gap-4">
-                    <div className="flex-1 flex ">
-                        <Search />
-                    </div>
 
-                    <section className="xl:flex xl:flex-row gap-4 hidden">
-                        <Button
-                            type="button"
-                            className="border border-gray-300 py-2 px-4 text-xs shadow-md rounded-md bg-secondary-200 hover:bg-secondary-300"
-                        >
-                            Watch demo
-                        </Button>
+export default function Header({
+  setSidebarOpen,
+  title = 'Sisyphus Medical Center',
+  user = { name: 'Dr. Alex', role: 'Physician', avatar: '' },
+  showSearch = true,
+}: HeaderProps) {
+  return (
+    <header className="w-full flex items-center justify-between px-4 md:px-8 py-4 border-b border-gray-100 bg-white sticky top-0 z-40">
+      {/* Left Section */}
+      <div className="flex items-center gap-3">
+        {/* Mobile Menu Toggle */}
+        {setSidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden rounded-md p-2 hover:bg-gray-100 transition"
+          >
+            <Menu size={20} className="text-[#1A2380]" />
+          </button>
+        )}
+        <h2 className="text-lg font-semibold text-[#1A2380] truncate">{title}</h2>
+      </div>
 
-                        <Button
-                            type="button"
-                            className="bg-primary-100 text-secondary-100 px-4 rounded-md"
-                        >
-                            <ArrowUturnLeftIcon className="w-4" />
-                        </Button>
-                        <Button
-                            type="button"
-                            className="border border-gray-300 py-2 px-4 text-xs shadow-md rounded-md bg-secondary-200 hover:bg-secondary-300"
-                        >
-                            Upgrade account
-                        </Button>
-                    </section>
-                    <div className="ml-4 border shadow-md rounded-md flex items-center justify-center p-2 gap-6 md:ml-6">
-                        <Button
-                            type="button"
-                            className="bg-white p-1 rounded-full hidden md:inline text-primary-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            <span className="sr-only">View notifications</span>
-                            <QuestionMarkCircleIcon
-                                className="h-6 w-6 text-primary-300"
-                                aria-hidden="true"
-                            />
-                        </Button>
+      {/* Right Section */}
+      <div className="flex items-center gap-5">
+        {/* Search Bar */}
+        {showSearch && (
+          <div className="relative hidden md:block">
+            <Search
+              size={18}
+              className="absolute left-3 top-2.5 text-gray-400 pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Search patient or record"
+              className="w-64 rounded-full border border-gray-200 pl-9 pr-3 py-2 text-sm focus:ring-1 focus:ring-[#00B8A8] focus:border-[#00B8A8] outline-none"
+            />
+          </div>
+        )}
 
-                        <Button
-                            type="button"
-                            className="bg-white p-1 rounded-full hidden md:inline text-primary-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            <span className="sr-only">View notifications</span>
-                            <GiftIcon
-                                className="h-6 w-6 text-primary-300"
-                                aria-hidden="true"
-                            />
-                        </Button>
+        {/* Notification */}
+        <button className="relative p-2 rounded-md hover:bg-gray-100 transition">
+          <Bell size={20} className="text-gray-500" />
+          <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-[#00B8A8]" />
+        </button>
 
-                        <Button
-                            type="button"
-                            className="bg-white p-1 rounded-full hidden md:inline text-primary-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            <span className="sr-only">View notifications</span>
-                            <BellIcon
-                                className="h-6 w-6 text-primary-300"
-                                aria-hidden="true"
-                            />
-                        </Button>
-
-                        <Menu as="div" className="relative">
-                            <div>
-                                <MenuButton className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <span className="sr-only">Open user menu</span>
-                                    <UserIcon className="w-8 rounded-full text-primary-300" />
-                                </MenuButton>
-                            </div>
-                            <Transition
-                                as={Fragment}
-                                enter="transition ease-out duration-100"
-                                enterFrom="transform opacity-0 scale-95"
-                                enterTo="transform opacity-100 scale-100"
-                                leave="transition ease-in duration-75"
-                                leaveFrom="transform opacity-100 scale-100"
-                                leaveTo="transform opacity-0 scale-95"
-                            >
-                                <MenuItems className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                    {userNavigation.map((item) => (
-                                        <MenuItem key={item.name}>
-                                            {({ active }) => (
-                                                <a
-                                                    href={item.href}
-                                                    className={classNames(
-                                                        active ? 'bg-gray-100' : '',
-                                                        'block px-4 py-2 text-sm text-gray-700'
-                                                    )}
-                                                >
-                                                    {item.name}
-                                                </a>
-                                            )}
-                                        </MenuItem>
-                                    ))}
-                                </MenuItems>
-                            </Transition>
-                        </Menu>
-                    </div>
-                </div>
+        {/* User Info */}
+        <div className="flex items-center gap-2">
+          {user.avatar ? (
+            <Image
+              src={user.avatar}
+              alt={user.name}
+              width={36}
+              height={36}
+              className="rounded-full"
+            />
+          ) : (
+            <div className="h-9 w-9 rounded-full bg-[#1A2380] flex items-center justify-center text-white text-sm font-semibold">
+              {user.name.charAt(0).toUpperCase()}
             </div>
-        </>
-    );
-}
+          )}
 
-export default memo(Header);
+          <div className="hidden md:block">
+            <p className="text-sm font-medium text-[#1A2380]">{user.name}</p>
+            <p className="text-xs text-gray-500">{user.role}</p>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}

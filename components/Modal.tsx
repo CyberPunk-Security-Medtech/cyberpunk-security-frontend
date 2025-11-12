@@ -1,128 +1,50 @@
-// import {
-//     Dialog,
-//     DialogPanel,
-//     Transition,
-//     TransitionChild,
-// } from '@headlessui/react';
-// import React, { Dispatch, Fragment, SetStateAction, useRef } from 'react';
+import { X } from "lucide-react";
+import { ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-// interface ModalPropTypes {
-//     open: boolean;
-//     setOpen: Dispatch<SetStateAction<boolean>>;
-//     children: React.ReactNode;
-// }
-// function Modal({ open, setOpen, children }: ModalPropTypes): React.ReactNode {
-//     const cancelButtonRef = useRef(null);
-
-//     return (
-//         <section>
-//             <Transition show={open} as={Fragment}>
-//                 <Dialog
-//                     as="div"
-//                     className="fixed z-[100000] inset-0 overflow-y-auto"
-//                     open={open}
-//                     initialFocus={cancelButtonRef}
-//                     onClose={() => {
-//                         setOpen(false);
-//                     }}
-//                 >
-//                     <div className="flex font-sans items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-//                         <TransitionChild
-//                             as="div"
-//                             enter="ease-out duration-300"
-//                             enterFrom="opacity-0"
-//                             enterTo="opacity-100"
-//                             leave="ease-in duration-200"
-//                             leaveFrom="opacity-100"
-//                             leaveTo="opacity-0"
-//                         >
-//                             {/* <DialogBackdrop className="fixed inset-0  bg-opacity-100 backdrop-blur-sm transition-opacity" /> */}
-//                         </TransitionChild>
-
-//                         <DialogPanel
-//                             as="div"
-//                             className="h-screen w-full flex flex-row justify-center items-center"
-//                         >
-//                             <TransitionChild
-//                                 as="div"
-//                                 enter=""
-//                                 enterFrom=""
-//                                 enterTo="opacity-100 translate-y-0 sm:scale-100"
-//                                 leave="ease-in duration-200"
-//                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-//                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-//                             >
-//                                 {children}
-//                             </TransitionChild>
-//                         </DialogPanel>
-//                     </div>
-//                 </Dialog>
-//             </Transition>
-//         </section>
-//     );
-// }
-
-// export default Modal;
-
-
-import {
-    Dialog,
-    DialogPanel,
-    Transition,
-    TransitionChild,
-} from "@headlessui/react";
-import React, { Dispatch, Fragment, SetStateAction, useRef } from "react";
-
-interface ModalPropTypes {
-    open: boolean;
-    setOpen: Dispatch<SetStateAction<boolean>>;
-    children: React.ReactNode;
+interface ModalProps {
+  title: string;
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+  className?: string;
 }
 
-function Modal({ open, setOpen, children }: ModalPropTypes) {
-    const cancelButtonRef = useRef(null);
+export default function Modal({
+  title,
+  isOpen,
+  onClose,
+  children,
+  className,
+}: ModalProps) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        >
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            className={`bg-white rounded-xl shadow-lg w-[95%] max-w-3xl max-h-[95vh] flex flex-col ${className ?? ""}`}
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center bg-[#1A2380] text-white px-6 py-4 sticky top-0 z-10">
+              <h3 className="text-base font-semibold">{title}</h3>
+              <button onClick={onClose} className="hover:opacity-80">
+                <X size={18} />
+              </button>
+            </div>
 
-    return (
-        <Transition show={open} as={Fragment}>
-            <Dialog
-                as="div"
-                className="fixed inset-0 z-[100000] overflow-y-auto"
-                initialFocus={cancelButtonRef}
-                open={open}
-                onClose={() => setOpen(false)}
-            >
-                {/* 🔹 BACKDROP WITH BLUR */}
-                <TransitionChild
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity" />
-                </TransitionChild>
-
-                {/* 🔹 MODAL CONTENT */}
-                <div className="flex items-center justify-center min-h-screen px-4 text-center">
-                    <TransitionChild
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        enterTo="opacity-100 translate-y-0 sm:scale-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                        leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    >
-                        <DialogPanel className="relative w-full max-w-lg p-6">
-                            {children}
-                        </DialogPanel>
-                    </TransitionChild>
-                </div>
-            </Dialog>
-        </Transition>
-    );
+            {/* Body */}
+            <div className="p-6 overflow-y-auto">{children}</div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
-
-export default Modal;

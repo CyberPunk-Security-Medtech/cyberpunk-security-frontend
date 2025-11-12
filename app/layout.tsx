@@ -9,7 +9,7 @@ const nunitoSans = Nunito_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'CyberPunk',
+  title: 'PrivaCure',
   description: '',
 };
 

@@ -81,7 +81,7 @@ import { MapPin, Mail, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden pt-20 pb-12">
+    <footer className="relative overflow-visible pt-20 pb-12">
       {/* Background side vectors */}
       
       <Image
@@ -91,7 +91,13 @@ export default function Footer() {
         height={320}
         className="pointer-events-none absolute bottom-0 right-0"
       />
-
+  <Image
+        src="/footer-leftside.svg"
+        alt="footer splash"
+        width={280}
+        height={280}
+       className="absolute left-0 -top-24 md:-top-32 opacity-40 pointer-events-none"
+      />
       {/* Glass container */}
       <div
         className="

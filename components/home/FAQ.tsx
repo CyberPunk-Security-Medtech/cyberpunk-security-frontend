@@ -27,13 +27,13 @@ export default function FAQSection() {
       />
 
       {/* Footer left-side decorative splash */}
-      <Image
+      {/* <Image
         src="/footer-leftside.svg"
         alt="footer splash"
         width={280}
         height={280}
         className="absolute left-0 top-[65%] opacity-40 pointer-events-none"
-      />
+      /> */}
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Centered Header */}
