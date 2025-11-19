@@ -1,63 +1,105 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import logo from '@public/auth_logo.svg';
-import Image from 'next/image';
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { authService } from "@services/api";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import auth_logo from "@public/auth_logo.svg";
 
-export default function ForgotPassword() {
-    const { register, handleSubmit, formState: { errors } } = useForm<{ emailOrPhone: string }>();
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-    const onSubmit = (data: { emailOrPhone: string }) => {
-        console.log("Send reset code to:", data.emailOrPhone);
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-            {/* <div className="flex flex-col items-center"> */}
-            {/* Logo outside card */}
-            <div className="p-[37px] flex justify-center">
-                <Image
-                    src={logo}
-                    alt="logo"
-                    width={91}
-                    height={75}
-                    className="w-[91px] h-[75px]"
-                />
-            </div>
+    if (!email.trim()) {
+      toast.error("Email is required");
+      return;
+    }
 
-            {/* Card */}
-            <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
-                <h2 className="text-xl font-semibold mb-2">Forgot Password</h2>
-                <p className="text-gray-500 text-sm mb-6">
-                    Please enter your mail or your mobile number
-                </p>
+    try {
+      setLoading(true);
+      await authService.requestPasswordReset(email);
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <input
-                        {...register("emailOrPhone", { required: "Email or phone is required" })}
-                        placeholder="Mail/Mobile No"
-                        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    />
-                    {errors.emailOrPhone && (
-                        <p className="text-red-500 text-sm">{errors.emailOrPhone.message}</p>
-                    )}
+      toast.success("Password reset instructions sent to your email");
+        router.push(`/auth/forgot_password/otp_verification?email=${encodeURIComponent(email)}`);
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message || "Failed to send reset instructions"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-700 text-white py-2 rounded-lg hover:bg-indigo-800 transition"
-                    >
-                        Send code
-                    </button>
-                </form>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-start pt-12 bg-white">
+      {/* Top Left Logo */}
+      <div className="absolute top-8 left-8 flex items-center gap-2">
+       <Image src={auth_logo} alt="PrivaCure" width={110} height={70} />
+                  </div>
 
-                <p className="mt-6 text-center text-sm text-gray-500">
-                    Already have an account?{" "}
-                    <a href="/auth/login" className="text-indigo-700 font-medium hover:underline">
-                        Login
-                    </a>
-                </p>
-            </div>
+      {/* Centered Content */}
+      <div className="flex flex-col items-center text-center mt-20 w-full">
+        {/* Icon */}
+        <div className="mb-6">
+          <Image
+            src="/icons/forgotpassword-icon.svg"
+            alt="Forgot Password Icon"
+            width={56}
+            height={56}
+          />
         </div>
-        // </div>
-    );
+
+        {/* Title */}
+        <h2 className="text-3xl font-bold text-[#0A0A0A]">Forgot password?</h2>
+
+        {/* Subtitle */}
+        <p className="text-gray-500 mt-2 mb-10">
+          No worries, we’ll send you reset instructions.
+        </p>
+
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-md flex flex-col gap-5"
+        >
+          {/* Staff ID */}
+          <div className="text-left">
+            <label className="text-sm font-medium text-gray-700">
+              Email addresss
+            </label>
+            <input
+              type="text"
+              placeholder="Enter email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#1E237E] transition"
+            />
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#1E237E] text-white py-3 rounded-full font-semibold hover:bg-[#151b5e] transition disabled:opacity-50"
+          >
+            {loading ? "Sending..." : "Reset Password"}
+          </button>
+        </form>
+
+        {/* Back link */}
+        <Link
+          href="/auth/login"
+          className="mt-8 flex items-center gap-2 text-gray-600 hover:underline"
+        >
+          ← Back to log in
+        </Link>
+      </div>
+    </div>
+  );
 }

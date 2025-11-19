@@ -1,114 +1,101 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import logo from '@public/auth_logo.svg';
-import Image from 'next/image';
+import { Suspense, useState } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
+import OTPInput from "@components/OTPInput";
+import auth_logo from "@public/auth_logo.svg";
+import { authService } from "@services/api";
+import { toast } from "react-toastify";
 
-interface OtpFormData {
-    password: string;
-    confirmPassword: string;
+export default function ResetVerifyPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ResetVerifyContent />
+    </Suspense>
+  );
 }
 
-export default function OtpVerification() {
-    const { register, handleSubmit, formState: { errors } } = useForm<OtpFormData>();
-    const [otp, setOtp] = useState(["", "", "", ""]);
-    const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+function ResetVerifyContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-    const handleOtpChange = (index: number, value: string) => {
-        if (/^[0-9]?$/.test(value)) {
-            const newOtp = [...otp];
-            newOtp[index] = value;
-            setOtp(newOtp);
+  const email = searchParams.get("email") || "";
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
 
-            // Auto move forward
-            if (value && index < otp.length - 1) {
-                inputsRef.current[index + 1]?.focus();
-            }
-            // Auto move back on delete
-            if (!value && index > 0) {
-                inputsRef.current[index - 1]?.focus();
-            }
-        }
-    };
+  const handleVerify = async () => {
+    const code = otp.join("");
+    if (code.length < 6) {
+      toast.error("Enter the full verification code");
+      return;
+    }
 
-    const onSubmit = (data: OtpFormData) => {
-        console.log("OTP:", otp.join(""), "Password:", data.password);
-    };
+    try {
+      setLoading(true);
 
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-            {/* Logo outside card */}
-            <div className="p-[37px] flex justify-center">
-                <Image
-                    src={logo}
-                    alt="logo"
-                    width={91}
-                    height={75}
-                    className="w-[91px] h-[75px]"
-                />
-            </div>
+      await authService.verifyPasswordReset(code, email);
 
-            {/* Card */}
-            <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
-                <h2 className="text-xl font-semibold mb-4">OTP Verification</h2>
+      toast.success("Code verified. You can now reset your password.");
+      router.push(`/auth/forgot_password/new_password?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                {/* OTP Input */}
-                <div className="flex justify-between mb-6">
-                    {otp.map((digit, idx) => (
-                        <input
-                            key={idx}
-                            type="text"
-                            maxLength={1}
-                            value={digit}
-                            ref={(el) => {
-                                inputsRef.current[idx] = el;
-                            }}
-                            onChange={(e) => handleOtpChange(idx, e.target.value)}
-                            className="w-12 h-12 text-center border rounded-lg focus:ring-2 focus:ring-indigo-600"
-                        />
-                    ))}
-                </div>
-                <button className="text-sm text-indigo-600 mb-6 hover:underline">
-                    Resend OTP
-                </button>
+  const resendCode = async () => {
+    try {
+      await authService.requestPasswordReset(email);
+      toast.success("Code resent!");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to resend code");
+    }
+  };
 
-                {/* Password Reset Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <input
-                        {...register("password", {
-                            required: "Password is required",
-                            minLength: { value: 8, message: "Min length is 8" },
-                        })}
-                        type="password"
-                        placeholder="Password"
-                        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    />
-                    {errors.password && (
-                        <p className="text-red-500 text-sm">{errors.password.message}</p>
-                    )}
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen flex flex-col items-center justify-center px-6 bg-white"
+    >
+      <div className="absolute top-8 left-8 flex items-center space-x-2">
+        <Image src={auth_logo} alt="PrivaCure" width={110} height={70} />
+      </div>
 
-                    <input
-                        {...register("confirmPassword", {
-                            required: "Confirm your password",
-                        })}
-                        type="password"
-                        placeholder="Confirm password"
-                        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    />
-                    {errors.confirmPassword && (
-                        <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
-                    )}
+      <div className="flex flex-col items-center text-center space-y-6 w-full">
+        <h2 className="text-2xl font-bold text-gray-900">Password reset</h2>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-700 text-white py-2 rounded-lg hover:bg-indigo-800 transition"
-                    >
-                        Get Started
-                    </button>
-                </form>
-            </div>
-        </div>
-        // </div>
-    );
+        <p className="text-gray-500 text-sm">
+          We sent a reset code to{" "}
+          <span className="text-blue-700 font-medium">{email}</span>
+        </p>
+
+        <OTPInput otp={otp} setOtp={setOtp} />
+
+        <button
+          onClick={handleVerify}
+          disabled={loading}
+          className="w-full md:w-64 bg-blue-900 text-white py-2 rounded-full font-semibold hover:bg-blue-800 transition"
+        >
+          {loading ? "Verifying..." : "Continue"}
+        </button>
+
+        <p className="text-gray-500 text-sm">
+          Didn’t receive the email?{" "}
+          <button onClick={resendCode} className="text-blue-700 font-medium hover:underline">
+            Click to resend
+          </button>
+        </p>
+
+        <Link href="/auth/login" className="text-gray-600 text-sm mt-4 hover:underline">
+          ← Back to sign in
+        </Link>
+      </div>
+    </motion.div>
+  );
 }

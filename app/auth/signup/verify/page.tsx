@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,7 +8,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import OTPInput from "@components/OTPInput";
 import auth_logo from "@public/auth_logo.svg";
 import { useAuth } from "@context/AuthContext";
-
+import { authService } from "@services/api";
+import { toast } from "react-toastify";
+import { verify } from "crypto";
 
 export default function VerifyPage() {
   return (
@@ -18,51 +20,45 @@ export default function VerifyPage() {
   );
 }
 
-
 function VerifyPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const email = searchParams.get("email") || "";
-  const [otp, setOtp] = useState(["", "", "", ""]);
-  const [loading, setLoading] = useState(false);
-  const { setUser } = useAuth ? useAuth() : { setUser: (u: any) => {} };
 
-  useEffect(() => {
-    if (!email) {
-      router.replace("/auth/signup");
-    }
-  }, [email, router]);
+  const email = searchParams.get("email") || "";
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const { setUser } = useAuth();
 
   const handleVerify = async () => {
     const code = otp.join("");
-    if (code.length < 4) {
-      return alert("Please enter the full verification code.");
+    if (code.length < 6) {
+    toast.error("Enter the full verification code");
     }
-    setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || ""}/api/auth/verify-email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
-      });
+      setLoading(true);
 
-      if (!res.ok) throw new Error(await res.text() || "Invalid or expired code");
+      const data = await authService.verifyEmail(code, email);
 
-      const data = await res.json();
-      if (data.token && data.user) {
+      if (data.user && data.token) {
         setUser({
           id: data.user.id,
           email: data.user.email,
           name: data.user.name,
-          refreshToken: data.refreshToken ?? "",
           token: data.token,
+          refreshToken: data.refreshToken ?? "",
         });
       }
 
-      router.push(data.firstTimeLogin ? "/onboarding/hospital-info" : "/dashboard/admin");
+      // router.push(
+      //   data.firstTimeLogin
+      //     ? "/onboarding/hospital-info"
+      //     : "/dashboard/admin"
+      // );
+
+      router.push("/auth/signup/verify/successPage")
     } catch (err: any) {
-      alert(err.message || "Verification failed");
+      toast.error(err?.response?.data?.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -70,15 +66,10 @@ function VerifyPageContent() {
 
   const resendCode = async () => {
     try {
-      const res = await fetch("https://your-api-url.com/api/auth/resend-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (!res.ok) throw new Error("Failed to resend code");
-      alert("Verification code resent!");
+      await authService.resendOtp(email);
+      toast.success("Verification code resent!");
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err?.response?.data?.message || "Failed to resend code");
     }
   };
 
@@ -89,13 +80,13 @@ function VerifyPageContent() {
       transition={{ duration: 0.6 }}
       className="min-h-screen flex flex-col items-center justify-center px-6 bg-white"
     >
-      {/* Logo */}
       <div className="absolute top-8 left-8 flex items-center space-x-2">
         <Image src={auth_logo} alt="PrivaCure" width={110} height={70} />
       </div>
 
       <div className="flex flex-col items-center text-center space-y-6">
         <h2 className="text-2xl font-bold text-gray-900">Check your email</h2>
+
         <p className="text-gray-500 text-sm">
           We sent a verification code to{" "}
           <span className="text-blue-700 font-medium">{email}</span>
