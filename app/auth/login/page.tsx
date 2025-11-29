@@ -40,9 +40,9 @@ export default function LoginPage() {
           alt="Lab Image"
           // width={720}
           // height={960}
-          fill
-        //   className="object-cover"
-          priority
+         fill
+         priority
+         unoptimized
         />
       </motion.div>
     </div>

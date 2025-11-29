@@ -20,6 +20,8 @@ export default function SignupPage() {
           src={left_signup_img}
           alt="Surgery background"
           fill
+          priority
+          unoptimized
       
           />
       </motion.div>
