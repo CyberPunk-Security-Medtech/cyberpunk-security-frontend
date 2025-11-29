@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import SignupForm from "@components/auth/SignupForm";
 import auth_logo from "@public/auth_logo.svg"
-import left_signup_img from "@public/left_signup_image.jpg"
+// import left_signup_img from "@public/left_signup_image.jpg"
 
 export default function SignupPage() {
   return (
@@ -17,12 +17,10 @@ export default function SignupPage() {
         className="relative w-full md:w-1/2 h-64 md:h-auto"
       >
         <Image
-          src={left_signup_img}
+          src="left_signup_image.jpg"
           alt="Surgery background"
           fill
           priority
-          unoptimized
-      
           />
       </motion.div>
 
