@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import LoginForm from "@components/auth/LoginForm";
 import auth_logo from "@public/auth_logo.svg";
-import surgery_signup_img from "@public/surgery_signup_image.jpg"
+
 
 export default function LoginPage() {
   return (
@@ -36,7 +36,7 @@ export default function LoginPage() {
         className="relative w-full md:w-1/2 h-64 md:h-auto"
       >
         <Image
-          src={surgery_signup_img}
+          src="/surgery_signup_img.jpg"
           alt="Lab Image"
           // width={720}
           // height={960}
