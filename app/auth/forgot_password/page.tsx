@@ -39,9 +39,9 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start pt-12 bg-white">
       {/* Top Left Logo */}
-      <div className="absolute top-8 left-8 flex items-center gap-2">
-       <Image src={auth_logo} alt="PrivaCure" width={110} height={70} />
-                  </div>
+   <div className="flex items-center gap-2 mb-10 md:mb-0 md:absolute md:top-8 md:left-8">
+  <Image src={auth_logo} alt="PrivaCure" width={110} height={70} />
+</div>
 
       {/* Centered Content */}
       <div className="flex flex-col items-center text-center mt-20 w-full">
@@ -103,3 +103,4 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
+

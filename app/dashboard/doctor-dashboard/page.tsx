@@ -1,6 +1,5 @@
 import OverviewCards from "@components/dashboard/doctor-dashboard/OverviewCards";
 import TodayAppointments from "@components/dashboard/doctor-dashboard/TodaysAppointment";
-import DashboardLayout from "../layout";
 import LabTest from "@components/dashboard/doctor-dashboard/LabTest";
 
 

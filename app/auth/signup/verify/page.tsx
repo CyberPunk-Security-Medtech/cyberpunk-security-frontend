@@ -10,7 +10,6 @@ import auth_logo from "@public/auth_logo.svg";
 import { useAuth } from "@context/AuthContext";
 import { authService } from "@services/api";
 import { toast } from "react-toastify";
-import { verify } from "crypto";
 
 export default function VerifyPage() {
   return (

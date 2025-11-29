@@ -29,7 +29,7 @@ function ResetPasswordForm() {
   const router = useRouter();
 
   const email = searchParams.get("email") || "";
-  const code = searchParams.get("code") || ""; // If backend requires token from URL
+  const code = searchParams.get("code") || ""; 
 
   const [new_password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
