@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -11,28 +15,58 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-     "baseUrl": "./",
+    "baseUrl": "./",
     "paths": {
-        "@components/*": ["components/*"],
-      "@app/*": ["app/*"],
-      "@utils/*": ["utils/*"],
-      "@public/*": ["public/*"],
-      "@data/*": ["data/*"],
-      "@hooks/*": ["hooks/*"],
-      "@redux/*": ["redux/*"],
-      "@context/*": ["context/*"],
-      "@services/*": ["services/*"],
-      "@/types/*": ["types/*"],
-      "@schemas/*": ["schemas/*"]
+      "@components/*": [
+        "components/*"
+      ],
+      "@app/*": [
+        "app/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@public/*": [
+        "public/*"
+      ],
+      "@data/*": [
+        "data/*"
+      ],
+      "@hooks/*": [
+        "hooks/*"
+      ],
+      "@redux/*": [
+        "redux/*"
+      ],
+      "@context/*": [
+        "context/*"
+      ],
+      "@services/*": [
+        "services/*"
+      ],
+      "@/types/*": [
+        "types/*"
+      ],
+      "@schemas/*": [
+        "schemas/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

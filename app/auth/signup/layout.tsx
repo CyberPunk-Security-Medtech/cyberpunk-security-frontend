@@ -1,5 +1,6 @@
 "use client";
 
+
 import {SignUpProvider, UserData} from "@context/SignUpContext";
 
 
@@ -11,4 +12,5 @@ export default function SignupLayout({
 }) {
 
   return <SignUpProvider> {children}</SignUpProvider>;
+  
 }
