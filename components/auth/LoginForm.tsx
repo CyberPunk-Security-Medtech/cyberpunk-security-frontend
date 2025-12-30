@@ -1,13 +1,10 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { api, authService } from "@services/api";
+import { organizationService, authService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
-import { useRoleRedirect } from "@hooks/useRoleRedirect";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
@@ -15,42 +12,65 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   const { setAuthData } = useAuth();
-  // const { redirectUser } = useRoleRedirect();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    await authService.login({ email, password });
-    toast.success("Login successful!");
+    try {
+      // 1️⃣ Log in
+      await authService.login({ email, password });
 
-    // await authService.refresh();
-    await new Promise((res) => setTimeout(res, 50));
+      // 2️⃣ Fetch current user
+      const meRes = await authService.getMe();
+      const me = meRes?.data || meRes;
+      setUser(me);
 
-    const user = await authService.getMe(); 
-    const workspaces = await authService.getOrganizations();
+      // 3️⃣ Fetch user's organizations
+      const orgRes = await organizationService.getOrganizations();
+      const orgs = Array.isArray(orgRes) ? orgRes : orgRes?.data || [];
 
-    if (!user) throw new Error("Failed to load user");
-    if (!workspaces) throw new Error("Failed to load workspace");
+      // 4️⃣ Update AuthContext
+      setAuthData(me, orgs, orgs[0] || null);
 
-    setAuthData(user, workspaces, workspaces.length === 1 ? workspaces[0] : null);
+      toast.success("Login successful!");
+    localStorage.setItem("email", email)
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Login failed. Check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  
-   router.push("/auth/workspace-select");
-    
+  // Redirect based on organization existence
+  useEffect(() => {
+    if (!user) return;
 
-  } catch (err: any) {
-    console.error("LOGIN ERROR:", err);
-    toast.error(err?.message || "Invalid login credentials");
-  } finally {
-    setLoading(false);
-  }
-};
+    const checkOrganization = async () => {
+      try {
+        const orgs = await organizationService.getOrganizations();
+        const myOrgs = Array.isArray(orgs) ? orgs : orgs?.data || [];
 
+        if (myOrgs.length === 0) {
+          // No org → first admin onboarding
+          router.replace("/onboarding/hospital-info");
+        } else {
+          // Org exists → normal user dashboard
+          router.replace("/auth/workspace-select");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Error checking organization.");
+      }
+    };
+
+    checkOrganization();
+  }, [user, router]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -72,7 +92,6 @@ export default function LoginForm() {
           placeholder="Password"
           required
         />
-
         <button
           type="button"
           className="absolute right-3 top-2.5"
@@ -89,20 +108,21 @@ export default function LoginForm() {
         {loading ? "Signing in..." : "Sign in"}
       </button>
 
-         <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm">
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"
             name="remember"
-            // checked={formData.remember}
-            // onChange={handleChange}
             className="rounded border-gray-300 text-blue-600"
           />
           <span>Remember for 30 days</span>
         </label>
-        <Link href="/auth/forgot_password" className="text-blue-700 hover:underline">
+        <a
+          href="/auth/forgot_password"
+          className="text-blue-700 hover:underline"
+        >
           Forgot password
-        </Link>
+        </a>
       </div>
     </form>
   );

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import auth_logo from "@public/auth_logo.svg";
+
 
 export default function SuccessScreen({ onDashboard, onAddStaff }: any) {
   return (
@@ -12,8 +12,7 @@ export default function SuccessScreen({ onDashboard, onAddStaff }: any) {
       exit={{ opacity: 0, scale: 0.9 }}
       className="flex flex-col items-center text-center space-y-6"
     >
-      {/* Logo */}
-      <Image src={auth_logo} alt="Privacure logo" width={100} height={60} />
+    
 
       {/* Confetti emoji */}
       <motion.div

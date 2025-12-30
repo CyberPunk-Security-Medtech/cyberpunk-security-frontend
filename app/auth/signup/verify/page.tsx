@@ -1,61 +1,73 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import OTPInput from "@components/OTPInput";
+import { authService } from "@services/api";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-import OTPInput from "@components/OTPInput";
 import auth_logo from "@public/auth_logo.svg";
-import { useAuth } from "@context/AuthContext";
-import { authService } from "@services/api";
-import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function VerifyPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-      <VerifyPageContent />
-    </Suspense>
-  );
-}
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
-function VerifyPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const email = searchParams.get("email") || "";
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [loading, setLoading] = useState(false);
-  const { setUser } = useAuth();
+  // Load email safely
+  useEffect(() => {
+    const qEmail = searchParams.get("email");
+    const stored = typeof window !== "undefined"
+      ? localStorage.getItem("signupEmail")
+      : "";
+
+    const finalEmail = qEmail || stored || "";
+    setEmail(finalEmail);
+
+    if (!finalEmail) router.push("/auth/signup");
+  }, [searchParams, router]);
+
+  // const handleVerify = async () => {
+  //   const code = otp.join("");
+  //   if (code.length < 6) return toast.error("Enter full code");
+
+  //   try {
+  //     setLoading(true);
+
+  //     const data = await authService.verifyEmail(code, email);
+
+  //     // Redirect ALWAYS when successful
+  //     localStorage.setItem("verifiedEmail", email);
+
+  //     router.replace("/auth/signup/verify/successPage");
+  //   } catch (err: any) {
+  //     toast.error(err?.response?.data?.message || "Verification failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleVerify = async () => {
     const code = otp.join("");
-    if (code.length < 6) {
-    toast.error("Enter the full verification code");
-    }
+    if (code.length < 6) return toast.error("Enter full verification code");
 
     try {
       setLoading(true);
-
       const data = await authService.verifyEmail(code, email);
 
-      if (data.user && data.token) {
-        setUser({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          token: data.token,
-          refreshToken: data.refreshToken ?? "",
-        });
-      }
+      // Clear old user/workspaces
+      localStorage.removeItem("user");
+      localStorage.removeItem("workspaces");
+      localStorage.removeItem("activeWorkspace");
 
-      // router.push(
-      //   data.firstTimeLogin
-      //     ? "/onboarding/hospital-info"
-      //     : "/dashboard/admin"
-      // );
+      //  Mark verified for onboarding
+      localStorage.setItem("verifiedEmail", email);
 
-      router.push("/auth/signup/verify/successPage")
+      router.replace("/auth/signup/verify/successPage");
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Verification failed");
     } finally {
@@ -63,7 +75,10 @@ function VerifyPageContent() {
     }
   };
 
+
   const resendCode = async () => {
+    if (!email) return;
+
     try {
       await authService.resendOtp(email);
       toast.success("Verification code resent!");
@@ -72,6 +87,7 @@ function VerifyPageContent() {
     }
   };
 
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}

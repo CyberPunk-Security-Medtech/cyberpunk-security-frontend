@@ -7,7 +7,6 @@ interface StepIndicatorProps {
 const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   const steps = [
     "Hospital\nInformation",
-    "Admin\nAccount",
     "Compliance &\nAuthorization",
   ];
 

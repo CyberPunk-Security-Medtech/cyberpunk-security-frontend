@@ -1,12 +1,14 @@
-// app/onboarding/layout.tsx
 "use client";
 
-import { SignupProvider } from "@context/SignUpContext";
+import {SignUpProvider} from "@context/SignUpContext";
 
-export default function OnboardingLayout({
+
+
+export default function HospitalinfoLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <SignupProvider>{children}</SignupProvider>;
+
+  return <SignUpProvider> {children}</SignUpProvider>;
 }

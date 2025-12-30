@@ -12,7 +12,7 @@ export default function StaffManagementPage() {
 
   return (
     <div className="min-h-screen flex bg-slate-50 text-slate-900">
-      <Sidebar />
+      <Sidebar/>
 
       <main className="flex-1 flex flex-col">
         <Header />

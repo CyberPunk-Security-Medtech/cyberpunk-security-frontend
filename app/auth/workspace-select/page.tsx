@@ -3,15 +3,30 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@context/AuthContext";
+import { formatDistanceToNow } from "date-fns";
 
 export default function WorkspaceSelectPage() {
   const router = useRouter();
-  const { user, workspaces, setWorkspace } = useAuth();
+  const {
+    user,
+    workspaces,
+    authLoading,
+    workspaceLoading,
+    setWorkspace,
+  } = useAuth();
+
+  if (authLoading || workspaceLoading) {
+    return <div className="p-10">Loading workspaces...</div>;
+  }
+
+
 
   const handleSelect = (workspace: any) => {
     setWorkspace(workspace);
     router.push(`/dashboard/${workspace.role}-dashboard`);
   };
+
+
 
   return (
     <div className="min-h-screen w-full bg-white px-6 md:px-[140px] lg:px-[160px] py-12">
@@ -37,8 +52,8 @@ export default function WorkspaceSelectPage() {
       </p>
 
       {/* Workspace Cards */}
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {workspaces.map((ws: any) => (
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
+     {workspaces.map((ws) => (
           <div
             key={ws.id}
             onClick={() => handleSelect(ws)}
@@ -65,15 +80,16 @@ export default function WorkspaceSelectPage() {
             <div className="text-[14px] text-gray-600 mb-6">
               <div className="flex justify-between mb-1">
                 <span className="text-gray-500">Role</span>
-                <span className="font-medium">{ws.role}</span>
+                <span className="font-medium capitalize">  {ws.role}</span>
               </div>
 
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-gray-500">Last Active</span>
                 <span className="font-medium">
-                  {ws.lastActive || "Last visited 2 days ago"}
+                  {formatDistanceToNow(new Date(ws.lastActive), {addSuffix: true} )}
+                  
                 </span>
-              </div>
+              </div> */}
             </div>
 
             {/* CTA */}
@@ -97,3 +113,5 @@ export default function WorkspaceSelectPage() {
     </div>
   );
 }
+
+

@@ -17,7 +17,7 @@ export default function SignupPage() {
         className="relative w-full md:w-1/2 h-64 md:h-auto"
       >
         <Image
-          src="left_signup_image.jpg"
+          src="/left_signup_image.jpg"
           alt="Surgery background"
           fill
           priority

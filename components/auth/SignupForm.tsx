@@ -34,42 +34,41 @@ export default function SignupForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+  e.preventDefault();
+  setError("");
+  setSuccess("");
 
-    // if (formData.password !== formData.confirmPassword) {
-    //   setError("Passwords do not match.");
-    //   return;
-    // }
+  try {
+    setLoading(true);
 
-    try {
-      setLoading(true);
+    const userDataPayload = {
+      email: formData.email,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      password: formData.password,
+    };
 
-      const userData = {
-        email: formData.email,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        password: formData.password,
-      };
+    const response = await authService.signup(userDataPayload);
 
-      const response = await authService.signup(userData);
+    // Save only to localStorage for verification page
+    localStorage.setItem("signupEmail", formData.email);
+    localStorage.removeItem("user");
+    localStorage.removeItem("workspaces");
+    localStorage.removeItem("activeWorkspace");
+    localStorage.removeItem("verifiedEmail");
 
-      setSuccess("Account created successfully!");
-      console.log("Signup successful:", response);
+  localStorage.clear()
+    // Redirect to verify page
+    router.push(`/auth/signup/verify?email=${formData.email}`);
+  } catch (err: any) {
+    setError(err?.response?.data?.message || "Signup failed. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
-     router.push(`/auth/signup/verify?email=${formData.email}`);
-
-
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Signup failed. Try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
+return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Email */}
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}

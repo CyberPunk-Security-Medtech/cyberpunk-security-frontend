@@ -11,6 +11,20 @@ export const api = axios.create({
       withCredentials: true,
 });
 
+export type InviteDetailsResponse = {
+  email: string;
+  role: string;
+  user_exists: boolean;
+  organization: {
+    id: string;
+    name: string;
+    slug: string;
+    image_url: string | null;
+};
+
+};
+
+
 // Auth endpoints
 export const authService = {
   login: async (credentials: { email: string; password: string }) => {
@@ -57,11 +71,95 @@ export const authService = {
     });
     return response.data
   },
-  getOrganizations: async() => {
-    const response = await api.get("/api/v1/organizations/", {
-      withCredentials: true,
-    });
-    return response.data
+};
+
+
+
+export interface CreateOrganizationPayload {
+  name: string;
+  image_url?: string | null;
+}
+
+export const organizationService = {
+  createOrganization: async (  payload: CreateOrganizationPayload) => {
+    const response = await api.post("/api/v1/organizations/", payload, {
+    withCredentials: true,
+  })
+    return response.data;
+  },
+
+  getOrganizations: async () => {
+    const response = await api.get("/api/v1/organizations/");
+    return response.data;
+  },
+
+  getMyMembership: async(org_id: string) => {
+  const response = await api.get(`/api/v1/membership/${org_id}/`);
+  return response.data?.data
+},
+
+};
+
+
+
+export const uploadService = {
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post(
+      "/api/v1/organizations/{org_id}/image/",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data; 
+  },
+};
+
+
+export const invitationService = {
+  async sendInvitation(email: string, role: string, org_id: string) {
+    const res = await api.post(`/api/v1/organizations/${org_id}/invitations`,{ email, role }); ;
+    return res.data; // should include invitation.id
+  },
+    // 1️⃣ Fetch invitation details (used when page loads)
+  async getInviteDetails(invitation_id: string): Promise<InviteDetailsResponse> {
+    const res = await api.get(`api/v1/invitations/${invitation_id}`);
+    return res.data.data;
+  },
+
+  // 2️⃣ Accept invitation
+  async acceptInvite(invitation_id: string): Promise<void> {
+    await api.post(`api/v1/invitations/${invitation_id}/accept`);
+  },
+
+  async revokeInvitation(org_id: string, inv_id: string) {
+  await api.post(
+    `/api/v1/organizations/${org_id}/invitations/${inv_id}/revoke`
+  );
+},
+
+
+  async registerInvitedUser(invitation_id: string,  payload: {
+    email: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+  }): Promise<void>{
+    await api.post(`/api/v1/invitations/${invitation_id}/register-user` , payload)
+  },
+
+  async getOrganizationInvitations(orgId: string) {
+    const res = await api.get(
+      `/api/v1/organizations/${orgId}/invitations`
+    );
+    return res.data.data;
   }
 };
+
 
