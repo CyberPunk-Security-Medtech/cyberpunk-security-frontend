@@ -415,7 +415,7 @@ export default function AcceptInvitationPage() {
   const router = useRouter();
 
   // IMPORTANT: Auth context MUST expose loading state
-  const { user, isLoading, refreshWorkspaces } = useAuth();
+  const { user, hydrated, authLoading, refreshWorkspaces } = useAuth();
 
   const [invite, setInvite] = useState<InviteData | null>(null);
   const [error, setError] = useState("");
@@ -451,14 +451,14 @@ export default function AcceptInvitationPage() {
 
     if (!invite.user_exists) return "set-password";
 
-    if (isLoading) return "loading";
+    if (!hydrated) return "loading";
 
     if (!user) return "login";
 
     if (user.email !== invite.email) return "login";
 
     return "accept";
-  }, [invite, user, isLoading, status]);
+  }, [invite, user, hydrated, status]);
 
   /* -----------------------------
      Accept invitation
