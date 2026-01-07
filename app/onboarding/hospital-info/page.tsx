@@ -19,44 +19,42 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [hospitalData, setHospitalData] = useState<{ name?: string; image_url?: string }>({});
-  const [user, setUser] = useState<{ email: string } | null>(null);
+ const { user, hydrated } = useAuth(); // use AuthContext
 
 useEffect(() => {
-  localStorage.removeItem("user")
-  localStorage.removeItem("workspaces")
-    const storedUser = localStorage.getItem("email");
-    if (!storedUser) {
-      router.replace("/auth/signup");
-      return;
-    }
-    setUser({email: storedUser});
-  }, [router]);
+  if (!hydrated) return; 
+
+  if (!user) {
+    router.replace("/auth/signup"); 
+  }
+}, [user, hydrated, router]);
 
   const handleNextFromHospital = (data: any) => {
     setHospitalData(data);
     setStep(2);
   };
 
-  const handleFinish = async () => {
-    try {
-      if (!user) throw new Error("User not available");
+ const handleFinish = async () => {
+  try {
+    if (!user) throw new Error("User not available");
 
-      await organizationService.createOrganization({
-        name: hospitalData.name!,
-        image_url: hospitalData.image_url || null,
-        // user_id: user.id, // ✅ assign to correct user
-      });
+    await organizationService.createOrganization({
+      name: hospitalData.name!,
+      image_url: hospitalData.image_url || null,
+      // user_id: user.id, // ✅ assign to correct user
+    });
 
-      localStorage.removeItem("verifiedEmail");
-      localStorage.removeItem("signupEmail")
-      setIsSuccess(true);
-      router.replace("/auth/workspace-select");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to complete onboarding");
-    }
-  };
+    // Mark onboarding as complete (optional)
+    const updatedUser = { ...user, onboarding_completed: true };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
 
+    setIsSuccess(true);
+    router.replace("/auth/workspace-select");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to complete onboarding");
+  }
+};
  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">

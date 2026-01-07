@@ -495,10 +495,407 @@
 //   return ctx;
 // };
 
+// "use client";
+
+// import React, { createContext, useContext, useEffect, useState } from "react";
+// import { authService, organizationService } from "@services/api";
+
+// export interface Workspace {
+//   id: string;
+//   name: string;
+//   role: string;
+//   img: string;
+//   lastActive?: string;
+// }
+
+// export interface User {
+//   id: string;
+//   email: string;
+//   first_name?: string;
+//   last_name?: string;
+// }
+
+// interface AuthContextType {
+//   user: User | null;
+//   workspaces: Workspace[];
+//   activeWorkspace: Workspace | null;
+//   authLoading: boolean;
+//   workspaceLoading: boolean;
+//   isLoading: boolean;
+//   setWorkspace: (ws: Workspace) => void;
+//   refreshWorkspaces: () => Promise<void>;
+//   setAuthData: (userData: User, workspacesData?: Workspace[], workspace?: Workspace | null) => Promise<void>;
+//   logout: () => void;
+// }
+
+// const AuthContext = createContext<AuthContextType | null>(null);
+
+// export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+//   const [user, setUser] = useState<User | null>(null);
+//   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+//   const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+
+//   const [authLoading, setAuthLoading] = useState(true);
+//   const [workspaceLoading, setWorkspaceLoading] = useState(true);
+
+//   const isLoading = authLoading || workspaceLoading;
+
+//   // 🔹 INITIAL HYDRATION
+//   useEffect(() => {
+//     const init = async () => {
+//       try {
+//         // 1️⃣ Restore from localStorage first
+//         const storedUser = localStorage.getItem("user");
+//         const storedWorkspaces = localStorage.getItem("workspaces");
+//         const storedActive = localStorage.getItem("activeWorkspace");
+
+//         if (storedUser) setUser(JSON.parse(storedUser));
+//         if (storedWorkspaces) setWorkspaces(JSON.parse(storedWorkspaces));
+//         if (storedActive) setActiveWorkspace(JSON.parse(storedActive));
+
+//         // 2️⃣ Verify user from API
+//         const meRes = await authService.getMe();
+//         const me = meRes?.data ?? meRes;
+//         setUser(me);
+//         localStorage.setItem("user", JSON.stringify(me));
+
+//         // 3️⃣ Load workspaces from API
+//         await loadWorkspaces();
+//       } catch (err) {
+//         console.error("Auth init failed:", err);
+//         logout();
+//       } finally {
+//         setAuthLoading(false);
+//       }
+//     };
+
+//     init();
+//   }, []);
+
+//   // 🔹 WORKSPACE LOADER
+//   const loadWorkspaces = async () => {
+//     setWorkspaceLoading(true);
+//     try {
+//       const orgRes = await organizationService.getOrganizations();
+//       const orgs = Array.isArray(orgRes?.data) ? orgRes.data : orgRes;
+
+//       const workspacePool: Workspace[] = await Promise.all(
+//         orgs.map(async (org: any) => {
+//           const membership = await organizationService.getMyMembership(org.id);
+//           return {
+//             id: org.id,
+//             name: org.name,
+//             img: org.image_url || undefined,
+//             role: membership?.role,
+//             lastActive: membership?.joined_at,
+//           };
+//         })
+//       );
+
+//       setWorkspaces(workspacePool);
+//       localStorage.setItem("workspaces", JSON.stringify(workspacePool));
+
+//       // Reset activeWorkspace if it no longer exists
+//       if (activeWorkspace && !workspacePool.find((w) => w.id === activeWorkspace.id)) {
+//         setActiveWorkspace(null);
+//         localStorage.removeItem("activeWorkspace");
+//       }
+//     } catch (err) {
+//       console.error("Failed to load workspaces:", err);
+//     } finally {
+//       setWorkspaceLoading(false);
+//     }
+//   };
+
+//   const refreshWorkspaces = async () => {
+//     await loadWorkspaces();
+//   };
+
+//   // 🔹 SET ACTIVE WORKSPACE
+//   const setWorkspace = (ws: Workspace) => {
+//     setActiveWorkspace(ws);
+//     localStorage.setItem("activeWorkspace", JSON.stringify(ws));
+//   };
+
+//   // 🔹 SET AUTH DATA (FULLY SAFE)
+//   const setAuthData = async (
+//     userData: User,
+//     workspacesData?: Workspace[],
+//     workspace?: Workspace | null
+//   ) => {
+//     setAuthLoading(true);
+//     try {
+//       // Set user immediately
+//       setUser(userData);
+//       localStorage.setItem("user", JSON.stringify(userData));
+
+//       // Set or fetch workspaces
+//       if (workspacesData && workspacesData.length > 0) {
+//         setWorkspaces(workspacesData);
+//         localStorage.setItem("workspaces", JSON.stringify(workspacesData));
+//       } else {
+//         await loadWorkspaces();
+//       }
+
+//       // Set active workspace
+//       if (workspace) {
+//         setActiveWorkspace(workspace);
+//         localStorage.setItem("activeWorkspace", JSON.stringify(workspace));
+//       }
+//     } finally {
+//       setAuthLoading(false);
+//     }
+//   };
+
+//   // 🔹 LOGOUT
+//   const logout = () => {
+//     setUser(null);
+//     setWorkspaces([]);
+//     setActiveWorkspace(null);
+//     localStorage.clear();
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         user,
+//         workspaces,
+//         activeWorkspace,
+//         authLoading,
+//         workspaceLoading,
+//         isLoading,
+//         setWorkspace,
+//         refreshWorkspaces,
+//         setAuthData,
+//         logout,
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// // 🔹 CUSTOM HOOK
+// export const useAuth = () => {
+//   const ctx = useContext(AuthContext);
+//   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+//   return ctx;
+// };
+
+
+
+// "use client";
+
+// import React, {
+//   createContext,
+//   useContext,
+//   useEffect,
+//   useState,
+//   useCallback,
+// } from "react";
+// import { authService, organizationService } from "@services/api";
+
+// /* ================= TYPES ================= */
+
+// export interface Workspace {
+//   id: string;
+//   name: string;
+//   role: string;
+//   img: string;
+//   lastActive?: string;
+// }
+
+// export interface User {
+//   id: string;
+//   email: string;
+//   first_name?: string;
+//   last_name?: string;
+// }
+
+// interface AuthContextType {
+//   user: User | null;
+//   workspaces: Workspace[];
+//   activeWorkspace: Workspace | null;
+//   authLoading: boolean;
+//   workspaceLoading: boolean;
+//   hydrated: boolean;
+//   setWorkspace: (ws: Workspace) => void;
+//   refreshWorkspaces: () => Promise<void>;
+//   logout: () => void;
+// }
+
+// /* ================= CONTEXT ================= */
+
+// const AuthContext = createContext<AuthContextType | null>(null);
+
+// /* ================= PROVIDER ================= */
+
+// export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+//   const [user, setUser] = useState<User | null>(null);
+//   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+//   const [activeWorkspace, setActiveWorkspace] =
+//     useState<Workspace | null>(null);
+
+//   const [authLoading, setAuthLoading] = useState(true);
+//   const [workspaceLoading, setWorkspaceLoading] = useState(false);
+//   const [hydrated, setHydrated] = useState(false);
+
+//   /* ================= LOAD WORKSPACES ================= */
+
+//   const loadWorkspaces = useCallback(async () => {
+//     setWorkspaceLoading(true);
+
+//     try {
+//       const orgRes = await organizationService.getOrganizations();
+//       const orgs = Array.isArray(orgRes?.data) ? orgRes.data : orgRes;
+
+//       if (!Array.isArray(orgs) || orgs.length === 0) {
+//         setWorkspaces([]);
+//         return;
+//       }
+
+//       const memberships = await Promise.allSettled(
+//         orgs.map((org: any) =>
+//           organizationService.getMyMembership(org.id)
+//         )
+//       );
+
+//       const workspacePool: Workspace[] = orgs.map(
+//         (org: any, index: number) => {
+//           const result = memberships[index];
+
+//           return {
+//             id: org.id,
+//             name: org.name,
+//             img: org.image_url || "/workspace.svg",
+//             role:
+//               result.status === "fulfilled"
+//                 ? result.value?.role ?? "member"
+//                 : "member",
+//             lastActive:
+//               result.status === "fulfilled"
+//                 ? result.value?.joined_at
+//                 : undefined,
+//           };
+//         }
+//       );
+
+//       setWorkspaces(workspacePool);
+//       localStorage.setItem("workspaces", JSON.stringify(workspacePool));
+
+//       // validate active workspace
+//       const storedActive = localStorage.getItem("activeWorkspace");
+//       if (storedActive) {
+//         const parsed = JSON.parse(storedActive);
+//         const exists = workspacePool.find((w) => w.id === parsed.id);
+//         if (!exists) {
+//           setActiveWorkspace(null);
+//           localStorage.removeItem("activeWorkspace");
+//         }
+//       }
+//     } catch (err) {
+//       console.error("Workspace loading failed:", err);
+//     } finally {
+//       setWorkspaceLoading(false);
+//     }
+//   }, []);
+
+//   /* ================= INIT (HYDRATION) ================= */
+
+//   useEffect(() => {
+//     const init = async () => {
+//       try {
+//         // restore cache
+//         const cachedUser = localStorage.getItem("user");
+//         const cachedWorkspaces = localStorage.getItem("workspaces");
+//         const cachedActive = localStorage.getItem("activeWorkspace");
+
+//         if (cachedUser) setUser(JSON.parse(cachedUser));
+//         if (cachedWorkspaces) setWorkspaces(JSON.parse(cachedWorkspaces));
+//         if (cachedActive) setActiveWorkspace(JSON.parse(cachedActive));
+
+//         // verify session
+//         const meRes = await authService.getMe();
+//         const me = meRes?.data ?? meRes;
+
+//         setUser(me);
+//         localStorage.setItem("user", JSON.stringify(me));
+
+//         // load workspaces (NON-BLOCKING)
+//         loadWorkspaces();
+//       } catch (err) {
+//         logout();
+//       } finally {
+//         setAuthLoading(false);
+//         setHydrated(true);
+//       }
+//     };
+
+//     init();
+//   }, [loadWorkspaces]);
+
+//   /* ================= ACTIONS ================= */
+
+//   const setWorkspace = (ws: Workspace) => {
+//     setActiveWorkspace(ws);
+//     localStorage.setItem("activeWorkspace", JSON.stringify(ws));
+//   };
+
+//   const refreshWorkspaces = async () => {
+//     await loadWorkspaces();
+//   };
+
+//   const logout = () => {
+//     setUser(null);
+//     setWorkspaces([]);
+//     setActiveWorkspace(null);
+//     localStorage.clear();
+//   };
+
+//   /* ================= PROVIDER ================= */
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         user,
+//         workspaces,
+//         activeWorkspace,
+//         authLoading,
+//         workspaceLoading,
+//         hydrated,
+//         setWorkspace,
+//         refreshWorkspaces,
+//         logout,
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// /* ================= HOOK ================= */
+
+// export const useAuth = () => {
+//   const ctx = useContext(AuthContext);
+//   if (!ctx) {
+//     throw new Error("useAuth must be used within AuthProvider");
+//   }
+//   return ctx;
+// };
+
+
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { authService, organizationService } from "@services/api";
+
+/* ================= TYPES ================= */
 
 export interface Workspace {
   id: string;
@@ -519,135 +916,129 @@ interface AuthContextType {
   user: User | null;
   workspaces: Workspace[];
   activeWorkspace: Workspace | null;
+  hydrated: boolean;
   authLoading: boolean;
   workspaceLoading: boolean;
-  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
   setWorkspace: (ws: Workspace) => void;
-  refreshWorkspaces: () => Promise<void>;
-  setAuthData: (userData: User, workspacesData?: Workspace[], workspace?: Workspace | null) => Promise<void>;
   logout: () => void;
 }
 
+/* ================= CONTEXT ================= */
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+/* ================= PROVIDER ================= */
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [activeWorkspace, setActiveWorkspace] =
+    useState<Workspace | null>(null);
 
-  const [authLoading, setAuthLoading] = useState(true);
-  const [workspaceLoading, setWorkspaceLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [workspaceLoading, setWorkspaceLoading] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-  const isLoading = authLoading || workspaceLoading;
+  /* ================= LOAD WORKSPACES ================= */
 
-  // 🔹 INITIAL HYDRATION
-  useEffect(() => {
-    const init = async () => {
-      try {
-        // 1️⃣ Restore from localStorage first
-        const storedUser = localStorage.getItem("user");
-        const storedWorkspaces = localStorage.getItem("workspaces");
-        const storedActive = localStorage.getItem("activeWorkspace");
-
-        if (storedUser) setUser(JSON.parse(storedUser));
-        if (storedWorkspaces) setWorkspaces(JSON.parse(storedWorkspaces));
-        if (storedActive) setActiveWorkspace(JSON.parse(storedActive));
-
-        // 2️⃣ Verify user from API
-        const meRes = await authService.getMe();
-        const me = meRes?.data ?? meRes;
-        setUser(me);
-        localStorage.setItem("user", JSON.stringify(me));
-
-        // 3️⃣ Load workspaces from API
-        await loadWorkspaces();
-      } catch (err) {
-        console.error("Auth init failed:", err);
-        logout();
-      } finally {
-        setAuthLoading(false);
-      }
-    };
-
-    init();
-  }, []);
-
-  // 🔹 WORKSPACE LOADER
-  const loadWorkspaces = async () => {
+  const loadWorkspaces = useCallback(async () => {
     setWorkspaceLoading(true);
+
     try {
       const orgRes = await organizationService.getOrganizations();
-      const orgs = Array.isArray(orgRes?.data) ? orgRes.data : orgRes;
+      const orgs = orgRes?.data ?? orgRes ?? [];
 
-      const workspacePool: Workspace[] = await Promise.all(
-        orgs.map(async (org: any) => {
-          const membership = await organizationService.getMyMembership(org.id);
-          return {
-            id: org.id,
-            name: org.name,
-            img: org.image_url || undefined,
-            role: membership?.role,
-            lastActive: membership?.joined_at,
-          };
+      const memberships = await Promise.allSettled(
+        orgs.map((org: any) =>
+          organizationService.getMyMembership(org.id)
+        )
+      );
+
+      const normalized: Workspace[] = orgs.map(
+        (org: any, idx: number) => ({
+          id: org.id,
+          name: org.name,
+          img: org.image_url || "/workspace.svg",
+          role:
+            memberships[idx].status === "fulfilled"
+              ? memberships[idx].value?.role ?? "member"
+              : "member",
+          lastActive:
+            memberships[idx].status === "fulfilled"
+              ? memberships[idx].value?.joined_at
+              : undefined,
         })
       );
 
-      setWorkspaces(workspacePool);
-      localStorage.setItem("workspaces", JSON.stringify(workspacePool));
-
-      // Reset activeWorkspace if it no longer exists
-      if (activeWorkspace && !workspacePool.find((w) => w.id === activeWorkspace.id)) {
-        setActiveWorkspace(null);
-        localStorage.removeItem("activeWorkspace");
-      }
-    } catch (err) {
-      console.error("Failed to load workspaces:", err);
+      setWorkspaces(normalized);
+      localStorage.setItem("workspaces", JSON.stringify(normalized));
+    } catch (e) {
+      console.error("Workspace load failed", e);
     } finally {
       setWorkspaceLoading(false);
     }
-  };
+  }, []);
 
-  const refreshWorkspaces = async () => {
-    await loadWorkspaces();
-  };
+  /* ================= HYDRATE ================= */
 
-  // 🔹 SET ACTIVE WORKSPACE
-  const setWorkspace = (ws: Workspace) => {
-    setActiveWorkspace(ws);
-    localStorage.setItem("activeWorkspace", JSON.stringify(ws));
-  };
+  useEffect(() => {
+    const hydrate = async () => {
+      try {
+        // Restore cache
+        const cachedUser = localStorage.getItem("user");
+        const cachedWorkspaces = localStorage.getItem("workspaces");
+        const cachedActive = localStorage.getItem("activeWorkspace");
 
-  // 🔹 SET AUTH DATA (FULLY SAFE)
-  const setAuthData = async (
-    userData: User,
-    workspacesData?: Workspace[],
-    workspace?: Workspace | null
-  ) => {
-    setAuthLoading(true);
-    try {
-      // Set user immediately
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
+        if (cachedUser) setUser(JSON.parse(cachedUser));
+        if (cachedWorkspaces)
+          setWorkspaces(JSON.parse(cachedWorkspaces));
+        if (cachedActive)
+          setActiveWorkspace(JSON.parse(cachedActive));
 
-      // Set or fetch workspaces
-      if (workspacesData && workspacesData.length > 0) {
-        setWorkspaces(workspacesData);
-        localStorage.setItem("workspaces", JSON.stringify(workspacesData));
-      } else {
+        // Verify session
+        const meRes = await authService.getMe();
+        const me = meRes?.data ?? meRes;
+
+        setUser(me);
+        localStorage.setItem("user", JSON.stringify(me));
+
+        // Load fresh workspaces
         await loadWorkspaces();
+      } catch {
+        logout();
+      } finally {
+        setHydrated(true);
       }
+    };
 
-      // Set active workspace
-      if (workspace) {
-        setActiveWorkspace(workspace);
-        localStorage.setItem("activeWorkspace", JSON.stringify(workspace));
-      }
+    hydrate();
+  }, [loadWorkspaces]);
+
+  /* ================= ACTIONS ================= */
+
+  const login = async (email: string, password: string) => {
+    setAuthLoading(true);
+
+    try {
+      await authService.login({ email, password });
+      const meRes = await authService.getMe();
+      const me = meRes?.data ?? meRes;
+
+      setUser(me);
+      localStorage.setItem("user", JSON.stringify(me));
+
+      await loadWorkspaces();
     } finally {
       setAuthLoading(false);
     }
   };
 
-  // 🔹 LOGOUT
+  const setWorkspace = (ws: Workspace) => {
+    setActiveWorkspace(ws);
+    localStorage.setItem("activeWorkspace", JSON.stringify(ws));
+  };
+
   const logout = () => {
     setUser(null);
     setWorkspaces([]);
@@ -661,21 +1052,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         workspaces,
         activeWorkspace,
+        hydrated,
         authLoading,
         workspaceLoading,
-        isLoading,
+        login,
         setWorkspace,
-        refreshWorkspaces,
-        setAuthData,
         logout,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-// 🔹 CUSTOM HOOK
+/* ================= HOOK ================= */
+
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
