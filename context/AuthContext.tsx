@@ -1020,6 +1020,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     setAuthLoading(true);
+    setWorkspaceLoading(true)
 
     try {
       await authService.login({ email, password });
@@ -1029,8 +1030,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(me);
       localStorage.setItem("user", JSON.stringify(me));
 
+      setWorkspaces([]);
+      localStorage.removeItem("workspaces")
+
       await loadWorkspaces();
     } finally {
+      setWorkspaceLoading(false);
       setAuthLoading(false);
     }
   };

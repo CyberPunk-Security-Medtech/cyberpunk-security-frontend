@@ -131,20 +131,44 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const { login, workspaces } = useAuth();
+  const { login,user, workspaces, workspaceLoading, authLoading, hydrated } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+
+ useEffect(() => {
+  if (!hydrated) return;
+  if (authLoading || workspaceLoading) return;
+
+  if(!hasSubmitted) return;
+
+  if (!user) return;
+
+  if (workspaces.length === 0) {
+    router.replace("/onboarding/hospital-info");
+  } else {
+    router.replace("/auth/workspace-select");
+  }
+}, [
+  hydrated,
+  authLoading,
+  workspaceLoading,
+  user,
+  workspaces,
+  router,
+]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,14 +176,9 @@ export default function LoginForm() {
 
     try {
       await login(email, password);
-
+      setHasSubmitted(true);
       toast.success("Login successful!");
 
-      if (workspaces.length === 0) {
-        router.replace("/onboarding/hospital-info");
-      } else {
-        router.replace("/auth/workspace-select");
-      }
     } catch (err: any) {
       toast.error(err?.message || "Login failed");
     } finally {
