@@ -63,7 +63,7 @@ import { usePathname } from "next/navigation";
 const menu = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/doctor-dashboard" },
   { name: "Patients Records", icon: Users, href: "/dashboard/doctor-dashboard/patient-records" },
-  { name: "AI Assistant", icon: Sparkles, href: "/assistant" },
+  { name: "AI Assistant", icon: Sparkles, href: "/dashboard/doctor-dashboard/ai-assistant" },
 ];
 
 export default function Sidebar({ sidebarMinimize, setSidebarMinimize }: any) {
