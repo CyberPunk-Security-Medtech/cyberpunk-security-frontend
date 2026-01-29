@@ -1,15 +1,26 @@
-function LoginPrompt({ email }: { email: string }) {
+import { useRouter } from "next/navigation";
+
+type LoginPromptProps = {
+  email: string;
+  onSuccess: () => void;
+  redirectTo: string ;
+};
+
+
+
+function LoginPrompt({ email, redirectTo }: LoginPromptProps) {
+  const router = useRouter();
   return (
     <div className="mt-6">
       <p className="text-sm text-gray-600 mb-4">
         Please log in to accept this invitation.
       </p>
-      <a
-        href={`/auth/login?email=${encodeURIComponent(email)}`}
+      <button onClick={() =>router.push
+        (redirectTo)}
         className="block bg-blue-900 text-white py-2 rounded-full"
       >
         Login
-      </a>
+      </button>
     </div>
   );
 }

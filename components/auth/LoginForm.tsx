@@ -135,11 +135,14 @@ import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+
 
 export default function LoginForm() {
   const { login,user, workspaces, workspaceLoading, authLoading, hydrated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") 
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -156,6 +159,11 @@ export default function LoginForm() {
 
   if (!user) return;
 
+if(redirect){
+  router.replace(redirect);
+  return;
+}
+
   if (workspaces.length === 0) {
     router.replace("/onboarding/hospital-info");
   } else {
@@ -167,6 +175,8 @@ export default function LoginForm() {
   workspaceLoading,
   user,
   workspaces,
+  hasSubmitted,
+  redirect,
   router,
 ]);
 

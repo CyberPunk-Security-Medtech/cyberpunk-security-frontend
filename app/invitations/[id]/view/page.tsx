@@ -528,6 +528,8 @@ export default function AcceptInvitationPage() {
 
         {step === "login" && <LoginPrompt 
         email={invite!.email}
+         onSuccess ={() => {setStatus("idle")}}
+         redirectTo={`/auth/login?email=${encodeURIComponent(invite!.email)}&redirect=/invitations/${id}`}
         />}
 
         {step === "accept" && (
