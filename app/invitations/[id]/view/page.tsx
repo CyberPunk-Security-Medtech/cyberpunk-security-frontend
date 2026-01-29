@@ -451,14 +451,14 @@ export default function AcceptInvitationPage() {
 
     if (!invite.user_exists) return "set-password";
 
-    if (!hydrated) return "loading";
+    if (!hydrated || authLoading) return "loading";
 
     if (!user) return "login";
 
     if (user.email !== invite.email) return "login";
 
     return "accept";
-  }, [invite, user, hydrated, status]);
+  }, [invite, user, hydrated,authLoading, status]);
 
   /* -----------------------------
      Accept invitation
@@ -526,7 +526,9 @@ export default function AcceptInvitationPage() {
           />
         )}
 
-        {step === "login" && <LoginPrompt email={invite!.email} />}
+        {step === "login" && <LoginPrompt 
+        email={invite!.email}
+        />}
 
         {step === "accept" && (
           <button
