@@ -17,26 +17,39 @@ const patients = [
 ]
 
 export default function PatientsRecords() {
-    return (
-        <div className="w-full max-w-[1600px] mx-auto space-y-6 font-sans">
-            {/* Top Section: Title & Toolbar */}
-            <div className="flex flex-col gap-4 items-start md:flex-row md:justify-between md:items-center mb-6">
-                <h2 className="text-2xl font-bold text-black">Patients Records</h2>
+    const [mounted, setMounted] = React.useState(false);
 
-                <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                    {/* Search Input */}
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    return (
+        // REMOVED ROOT PADDING: The layout already provides px-4 lg:px-12.
+        // This prevents "double padding" indentation.
+        <div className="w-full space-y-6 font-sans py-4">
+
+            {/* Top Section: Title & Toolbar */}
+            <div className="flex flex-col gap-6 mb-8 w-full">
+                {/* Title Row - Left Aligned */}
+                <h2 className="text-2xl font-bold text-black text-left">Patients Records</h2>
+
+                {/* Search & Button Row - Justify Between */}
+                <div className="flex flex-col md:flex-row justify-between items-center w-full gap-4">
+                    {/* Search Input - Far Left */}
                     <div className="relative w-full md:w-[350px]">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 color-[#9CA3AF]" />
                         <input
                             type="text"
                             placeholder="Search patient"
-                            className="w-full h-[50px] pl-12 pr-4 rounded-[100px] bg-white border border-gray-100 text-sm text-gray-700 outline-none focus:ring-1 focus:ring-[rgba(0,184,168,0.9)] placeholder-gray-400"
+                            className="w-full h-[50px] pl-12 pr-4 rounded-[100px] bg-white border border-gray-100 text-sm text-gray-700 outline-none focus:ring-1 focus:ring-[#00B8A8] placeholder-gray-400"
                         />
                     </div>
 
-                    {/* Add Patient Button */}
+                    {/* Add Patient Button - Far Right */}
                     <button
-                        className="w-full md:w-auto justify-center bg-[rgba(0,184,168,0.9)] text-white font-medium px-6 h-[50px] rounded-[100px] hover:opacity-90 transition flex items-center gap-2 whitespace-nowrap text-sm"
+                        className="w-full md:w-auto bg-[rgba(0,184,168,0.9)] text-white font-medium px-6 h-[50px] rounded-[100px] hover:opacity-90 transition flex items-center justify-center gap-2 whitespace-nowrap text-sm bg-[#00B8A8]"
                     >
                         <span className="text-lg leading-none mb-[2px]">+</span> Add New Patient Record
                     </button>
@@ -44,13 +57,13 @@ export default function PatientsRecords() {
             </div>
 
             {/* Filters Row */}
-            <div className="flex flex-col mb-6">
+            <div className="flex flex-col mb-6 w-full">
                 <span className="font-medium text-gray-400 text-sm mb-2">Filter:</span>
                 <div className="flex flex-wrap items-center justify-between w-full gap-y-4">
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                         {/* Department Dropdown */}
                         <div className="relative">
-                            <select className="appearance-none bg-[#F9FAFB] border border-gray-100 rounded-full px-4 py-2 pr-8 text-gray-600 outline-none cursor-pointer hover:border-gray-200">
+                            <select className="appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 pr-8 text-gray-600 outline-none cursor-pointer hover:border-gray-300">
                                 <option>Department</option>
                                 <option>Cardiology</option>
                                 <option>Neurology</option>
@@ -60,7 +73,7 @@ export default function PatientsRecords() {
 
                         {/* Last Visit Dropdown */}
                         <div className="relative">
-                            <select className="appearance-none bg-[#F9FAFB] border border-gray-100 rounded-full px-4 py-2 pr-8 text-gray-600 outline-none cursor-pointer hover:border-gray-200">
+                            <select className="appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 pr-8 text-gray-600 outline-none cursor-pointer hover:border-gray-300">
                                 <option>Last Visit</option>
                                 <option>This Week</option>
                                 <option>This Month</option>
@@ -83,8 +96,9 @@ export default function PatientsRecords() {
                 </div>
             </div>
 
-            {/* Table Container - Fixed Scroll Logic */}
-            <div className="w-full overflow-x-hidden">
+            {/* Table Container - Centered Exception */}
+            {/* Added max-w-[95%] mx-auto to strictly center the table */}
+            <div className="w-full max-w-[95%] mx-auto overflow-x-hidden">
                 <div className="w-full overflow-x-auto border border-gray-200 rounded-xl bg-white">
                     <table className="min-w-[1000px] w-full text-left whitespace-nowrap">
                         <thead>
@@ -137,24 +151,24 @@ export default function PatientsRecords() {
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            {/* Pagination Footer */}
-            <div className="flex items-center justify-between mt-6 text-sm text-gray-400">
-                <span>Showing 1-9 from 15</span>
-                <div className="flex items-center gap-2">
-                    <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-gray-400">
-                        <ChevronLeft size={16} />
-                    </button>
-                    <button className="w-8 h-8 flex items-center justify-center rounded bg-[#E8EAF6] text-[#1A2380] font-medium border border-[#E8EAF6]">
-                        1
-                    </button>
-                    <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-100 hover:bg-gray-50 text-gray-600 font-medium">
-                        2
-                    </button>
-                    <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-gray-400">
-                        <ChevronRight size={16} />
-                    </button>
+                {/* Pagination Footer - Centered with Table */}
+                <div className="flex items-center justify-between mt-6 text-sm text-gray-400 w-full">
+                    <span>Showing 1-9 from 15</span>
+                    <div className="flex items-center gap-2">
+                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-gray-400">
+                            <ChevronLeft size={16} />
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center rounded bg-[#E8EAF6] text-[#1A2380] font-medium border border-[#E8EAF6]">
+                            1
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-100 hover:bg-gray-50 text-gray-600 font-medium">
+                            2
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-gray-400">
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

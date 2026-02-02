@@ -97,9 +97,12 @@ export default function Sidebar({
               className="rounded-full"
             />
             {(!sidebarMinimize || sidebarOpen) && (
-              <div>
-                <p className="font-medium text-white">{user.name}</p>
-                <p className="text-xs text-gray-400">{user.role}</p>
+              <div className="flex items-center justify-between flex-1">
+                <div>
+                  <p className="font-medium text-white">{user.name}</p>
+                  <p className="text-xs text-gray-400">{user.role}</p>
+                </div>
+                <ChevronRight size={18} className="text-gray-400" />
               </div>
             )}
           </div>

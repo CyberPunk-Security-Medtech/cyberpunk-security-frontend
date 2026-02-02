@@ -35,17 +35,28 @@ export default function Header({
               <Menu size={20} className="text-[#1A2380]" />
             </button>
           )}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/Avatar.png"
+              alt="Logo"
+              width={45}
+              height={45}
+              className="hidden md:block"
+            />
             {icon && <div className="flex-shrink-0">{icon}</div>}
-            <h2 className={`hidden md:block text-lg ${icon ? 'text-black font-normal' : 'font-semibold text-[#1A2380]'} truncate`}>
+            <h2 className={`hidden md:block text-lg ${icon ? 'text-black font-normal' : 'font-bold text-[#1A2380]'} truncate`}>
               {title}
             </h2>
           </div>
         </div>
+      </div>
 
-        {/* Search Bar - Moved to Left */}
+      {/* Right Section */}
+      <div className="flex items-center gap-5">
+
+        {/* Search Bar - Moved to Right */}
         {showSearch && (
-          <div className="relative flex items-center max-w-md w-full ml-4">
+          <div className="relative flex items-center max-w-xs w-full mr-2 hidden md:flex">
             <div className="relative group transition-all duration-300 ease-in-out w-full">
               <Search
                 size={18}
@@ -59,10 +70,7 @@ export default function Header({
             </div>
           </div>
         )}
-      </div>
 
-      {/* Right Section */}
-      <div className="flex items-center gap-5">
         {/* Notification */}
         <button className="relative p-2 rounded-md hover:bg-gray-100 transition">
           <Bell size={20} className="text-gray-500" />
