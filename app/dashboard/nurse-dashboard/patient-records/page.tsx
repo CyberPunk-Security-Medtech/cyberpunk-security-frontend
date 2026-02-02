@@ -17,13 +17,8 @@ const patients = [
 ]
 
 export default function PatientsRecords() {
-    const [mounted, setMounted] = React.useState(false);
+    // Removed mounted check to allow server rendering
 
-    React.useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted) return null;
 
     return (
         // REMOVED ROOT PADDING: The layout already provides px-4 lg:px-12.
@@ -96,10 +91,9 @@ export default function PatientsRecords() {
                 </div>
             </div>
 
-            {/* Table Container - Centered Exception */}
-            {/* Added max-w-[95%] mx-auto to strictly center the table */}
-            <div className="w-full max-w-[95%] mx-auto overflow-x-hidden">
-                <div className="w-full overflow-x-auto border border-gray-200 rounded-xl bg-white">
+            {/* Table Container - Aligned with Header */}
+            <div className="w-full overflow-x-hidden">
+                <div className="w-full max-w-[95%] mx-auto overflow-x-auto border border-gray-200 rounded-xl bg-white">
                     <table className="min-w-[1000px] w-full text-left whitespace-nowrap">
                         <thead>
                             <tr className="text-xs text-gray-400 border-b border-gray-100 bg-gray-50/50">

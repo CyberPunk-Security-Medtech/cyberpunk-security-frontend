@@ -25,15 +25,6 @@ export default function DashboardLayout({
 }) {
     const [sidebarMinimize, setSidebarMinimize] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [mounted, setMounted] = useState(false);
-
-    // Hydration guard
-    if (typeof window !== 'undefined' && !mounted) {
-        setMounted(true);
-    }
-
-    if (!mounted) return null;
-
     return (
         <div className="font-sans h-screen flex overflow-hidden">
             {/* Sidebar */}
