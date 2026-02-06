@@ -102,6 +102,15 @@ const patients = [
   },
 ];
 
+const statusClassMap: Record<string, string> = {
+  Active: "bg-[#E0F2F1] text-[#00B8A8]",
+  Discharged: "bg-[#EDE7F6] text-[#673AB7]",
+  Pending: "bg-[#FFF8E1] text-[#FFA000]",
+};
+
+const getStatusClass = (status: string) =>
+  statusClassMap[status] ?? "bg-gray-100 text-gray-600";
+
 export default function PatientsRecords() {
   return (
     <div className="w-full space-y-4 md:space-y-6 font-sans py-2 md:py-4">
@@ -162,7 +171,7 @@ export default function PatientsRecords() {
           {/* Entries Per Page - Separate Row on Mobile */}
           <div className="flex items-center gap-2 text-sm text-gray-500 w-full sm:w-auto flex-wrap">
             <div className="relative">
-              <select className="appearance-none bg-white border border-gray-200 rounded-md px-3 py-2 md:py-2.5 pr-7 text-sm md:text-base text-gray-600 outline-none cursor-pointer h-11 md:h-12 transition">
+              <select className="appearance-none bg-white border border-gray-200 rounded-full px-3 py-2 md:py-2.5 pr-7 text-sm md:text-base text-gray-600 outline-none cursor-pointer h-11 md:h-12 transition">
                 <option>10</option>
                 <option>20</option>
                 <option>50</option>
@@ -178,10 +187,10 @@ export default function PatientsRecords() {
 
       {/* Table Container - Horizontal Scroll ONLY in this container */}
       <div className="w-full overflow-hidden">
-        <div className="w-full lg:max-w-[95%] lg:mx-auto overflow-x-auto border border-gray-200 rounded-lg md:rounded-xl bg-white">
-          <table className="min-w-full w-full text-left text-sm md:text-base">
+        <div className="w-full lg:max-w-none lg:mx-0 xl:max-w-[95%] xl:mx-auto overflow-x-auto border border-gray-200 rounded-lg md:rounded-xl bg-white">
+          <table className="min-w-[900px] w-full text-left text-sm md:text-base">
             <thead>
-              <tr className="text-xs md:text-sm text-gray-400 border-b border-gray-100 bg-gray-50/50">
+              <tr className="text-xs text-gray-400 border-b border-gray-100 bg-gray-50/50">
                 <th className="py-3 md:py-4 px-3 md:px-4 font-medium whitespace-nowrap">
                   Patient Name
                 </th>
@@ -219,35 +228,33 @@ export default function PatientsRecords() {
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#E0F2F1] text-[#00B8A8] flex items-center justify-center font-semibold text-xs md:text-sm flex-shrink-0">
                         {p.initials}
                       </div>
-                      <span className="font-semibold text-gray-900 text-xs md:text-base truncate">
+                      <span className="font-semibold text-gray-900 text-sm truncate">
                         {p.name}
                       </span>
                     </div>
                   </td>
-                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-xs md:text-base whitespace-nowrap">
+                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-sm whitespace-nowrap">
                     {p.id}
                   </td>
-                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-xs md:text-base whitespace-nowrap">
+                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-sm whitespace-nowrap">
                     {p.age}
                   </td>
-                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-xs md:text-base whitespace-nowrap">
+                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-sm whitespace-nowrap">
                     {p.gender}
                   </td>
-                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-xs md:text-base whitespace-nowrap">
+                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-sm whitespace-nowrap">
                     {p.condition}
                   </td>
                   <td className="px-3 md:px-4 py-3 md:py-4 whitespace-nowrap">
                     <span
-                      className={`px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-semibold inline-block
-                                            ${p.status === "Active" ? "bg-[#E0F2F1] text-[#00B8A8]" : ""}
-                                            ${p.status === "Discharged" ? "bg-[#EDE7F6] text-[#673AB7]" : ""}
-                                            ${p.status === "Pending" ? "bg-[#FFF8E1] text-[#FFA000]" : ""}
-                                        `}
+                      className={`px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs md:text-sm font-semibold inline-block ${getStatusClass(
+                        p.status
+                      )}`}
                     >
                       {p.status}
                     </span>
                   </td>
-                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-xs md:text-base whitespace-nowrap">
+                  <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-sm whitespace-nowrap">
                     {p.date}
                   </td>
                   <td className="px-3 md:px-4 py-3 md:py-4 text-gray-400 sticky right-0 bg-white hover:bg-gray-50 whitespace-nowrap">
