@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams} from "next/navigation";
 import { toast } from "react-toastify";
 import OTPInput from "@components/OTPInput";
 import { authService } from "@services/api";
