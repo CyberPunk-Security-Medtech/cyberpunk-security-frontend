@@ -121,7 +121,7 @@ const statusClassMap: Record<PatientStatus, string> = {
   Pending: "bg-[#FFF8E1] text-[#FFA000]",
 };
 
-const getStatusClass = (status: string) =>
+const getStatusClass = (status: PatientStatus) =>
   statusClassMap[status] ?? "bg-gray-100 text-gray-600";
 
 export default function PatientsRecords() {
