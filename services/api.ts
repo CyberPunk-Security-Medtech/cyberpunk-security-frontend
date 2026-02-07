@@ -69,7 +69,7 @@ export const authService = {
     const response = await api.get("/api/v1/users/me/", {
       withCredentials: true,
     });
-    return response.data
+    return response.data.data;
   },
 };
 
@@ -163,3 +163,15 @@ export const invitationService = {
 };
 
 
+export const PatientService = {
+createPatient: async (orgId: string, patientData: any) => {
+  const res = await api.post(
+    `/api/v1/organizations/${orgId}/patients`,
+    patientData);
+  return res.data;
+},
+getPatients: async (orgId: string) => {
+  const res = await api.get(`/api/v1/organizations/${orgId}/patients`);
+  return res.data;
+},
+}

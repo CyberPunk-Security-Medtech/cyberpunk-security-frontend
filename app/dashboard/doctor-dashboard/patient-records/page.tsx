@@ -1,9 +1,13 @@
 'use client'
 
 import Button from '@components/Button'
+import AddPatientModal from '@components/dashboard/doctor-dashboard/AddPatientModal';
 import PatientTable from '@components/dashboard/doctor-dashboard/PatientTable'
+import { useState } from 'react';
+
 
 export default function PatientsRecords() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="px-6 py-4">
       {/* Header Row */}
@@ -15,10 +19,13 @@ export default function PatientsRecords() {
 
         <Button
           type="button"
+          onSubmitHandler={() => setIsModalOpen(true)}
           className="bg-[#1A2380] text-white font-medium px-5 py-2.5 rounded-md hover:bg-[#00B8A8] transition"
         >
           + Add New Patient Record
         </Button>
+
+        <AddPatientModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
       </div>
 
       {/* Filters */}
