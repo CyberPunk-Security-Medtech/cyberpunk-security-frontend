@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   MoreHorizontal,
   ChevronLeft,
@@ -8,8 +9,20 @@ import {
   Search,
 } from "lucide-react";
 
-// Strict Data matching the Screenshot requirements
-const patients = [
+type PatientStatus = "Active" | "Discharged" | "Pending";
+
+type Patient = {
+  initials: string;
+  name: string;
+  id: string;
+  age: number;
+  gender: string;
+  condition: string;
+  status: PatientStatus;
+  date: string;
+};
+
+const patients: Patient[] = [
   {
     initials: "BH",
     name: "Brandon Herwitz",
@@ -102,7 +115,7 @@ const patients = [
   },
 ];
 
-const statusClassMap: Record<string, string> = {
+const statusClassMap: Record<PatientStatus, string> = {
   Active: "bg-[#E0F2F1] text-[#00B8A8]",
   Discharged: "bg-[#EDE7F6] text-[#673AB7]",
   Pending: "bg-[#FFF8E1] text-[#FFA000]",
@@ -112,18 +125,20 @@ const getStatusClass = (status: string) =>
   statusClassMap[status] ?? "bg-gray-100 text-gray-600";
 
 export default function PatientsRecords() {
+  const router = useRouter();
+
+  const handleRowClick = (id: Patient["id"]) => {
+    router.push(`/dashboard/nurse-dashboard/patient-records/${id}`);
+  };
+
   return (
     <div className="w-full space-y-4 md:space-y-6 font-sans py-2 md:py-4">
-      {/* Top Section: Title & Toolbar */}
       <div className="flex flex-col gap-4 md:gap-6 w-full">
-        {/* Title Row */}
         <h2 className="text-xl md:text-2xl font-bold text-black text-left">
           Patients Records
         </h2>
 
-        {/* Search & Button Row - Stack on Mobile */}
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full items-start sm:items-center">
-          {/* Search Input */}
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
@@ -133,21 +148,20 @@ export default function PatientsRecords() {
             />
           </div>
 
-          {/* Add Patient Button - Full Width on Mobile, Auto on SM+ */}
-          <button className="w-full sm:w-auto sm:ml-auto bg-[#00B8A8] hover:bg-[#00A899] text-white font-medium px-4 md:px-6 h-11 md:h-12 rounded-full transition flex items-center justify-center gap-2 whitespace-nowrap text-sm md:text-base flex-shrink-0">
+          <Link
+            href="/dashboard/nurse-dashboard/patient-records/new"
+            className="w-full sm:w-auto sm:ml-auto bg-[#00B8A8] hover:bg-[#00A899] text-white font-medium px-4 md:px-6 h-11 md:h-12 rounded-full transition flex items-center justify-center gap-2 whitespace-nowrap text-sm md:text-base flex-shrink-0"
+          >
             <span className="text-lg leading-none">+</span> Add New Patient
             Record
-          </button>
+          </Link>
         </div>
       </div>
 
-      {/* Filters Row - Responsive Stack */}
       <div className="flex flex-col gap-3 md:gap-4 w-full">
         <span className="font-medium text-gray-400 text-sm">Filter:</span>
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full items-start sm:items-center sm:justify-between">
-          {/* Dropdowns Row */}
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
-            {/* Department Dropdown */}
             <div className="relative w-full sm:w-auto">
               <select className="w-full sm:w-auto appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 md:py-2.5 pr-8 text-sm md:text-base text-gray-600 outline-none cursor-pointer hover:border-gray-300 h-11 md:h-12 transition">
                 <option>Department</option>
@@ -157,7 +171,6 @@ export default function PatientsRecords() {
               <ChevronLeft className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 rotate-[-90deg] text-gray-400 pointer-events-none" />
             </div>
 
-            {/* Last Visit Dropdown */}
             <div className="relative w-full sm:w-auto">
               <select className="w-full sm:w-auto appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 md:py-2.5 pr-8 text-sm md:text-base text-gray-600 outline-none cursor-pointer hover:border-gray-300 h-11 md:h-12 transition">
                 <option>Last Visit</option>
@@ -168,7 +181,6 @@ export default function PatientsRecords() {
             </div>
           </div>
 
-          {/* Entries Per Page - Separate Row on Mobile */}
           <div className="flex items-center gap-2 text-sm text-gray-500 w-full sm:w-auto flex-wrap">
             <div className="relative">
               <select className="appearance-none bg-white border border-gray-200 rounded-full px-3 py-2 md:py-2.5 pr-7 text-sm md:text-base text-gray-600 outline-none cursor-pointer h-11 md:h-12 transition">
@@ -185,7 +197,6 @@ export default function PatientsRecords() {
         </div>
       </div>
 
-      {/* Table Container - Horizontal Scroll ONLY in this container */}
       <div className="w-full overflow-hidden">
         <div className="w-full lg:max-w-none lg:mx-0 xl:max-w-[95%] xl:mx-auto overflow-x-auto border border-gray-200 rounded-lg md:rounded-xl bg-white">
           <table className="min-w-[900px] w-full text-left text-sm md:text-base">
@@ -220,17 +231,22 @@ export default function PatientsRecords() {
             <tbody>
               {patients.map((p, index) => (
                 <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors h-16 md:h-20"
+                  key={`${p.id}-${index}`}
+                  onClick={() => handleRowClick(p.id)}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors h-16 md:h-20 cursor-pointer"
                 >
                   <td className="px-3 md:px-4 py-3 md:py-4">
                     <div className="flex items-center gap-2 md:gap-3 min-w-0">
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#E0F2F1] text-[#00B8A8] flex items-center justify-center font-semibold text-xs md:text-sm flex-shrink-0">
                         {p.initials}
                       </div>
-                      <span className="font-semibold text-gray-900 text-sm truncate">
+                      <Link
+                        href={`/dashboard/nurse-dashboard/patient-records/${p.id}`}
+                        onClick={(event) => event.stopPropagation()}
+                        className="font-semibold text-gray-900 text-sm truncate hover:underline"
+                      >
                         {p.name}
-                      </span>
+                      </Link>
                     </div>
                   </td>
                   <td className="px-3 md:px-4 py-3 md:py-4 text-gray-900 font-medium text-sm whitespace-nowrap">
@@ -258,7 +274,10 @@ export default function PatientsRecords() {
                     {p.date}
                   </td>
                   <td className="px-3 md:px-4 py-3 md:py-4 text-gray-400 sticky right-0 bg-white hover:bg-gray-50 whitespace-nowrap">
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition inline-flex items-center justify-center h-10 w-10 flex-shrink-0">
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-2 hover:bg-gray-100 rounded-full transition inline-flex items-center justify-center h-10 w-10 flex-shrink-0"
+                    >
                       <MoreHorizontal size={18} />
                     </button>
                   </td>
@@ -268,7 +287,6 @@ export default function PatientsRecords() {
           </table>
         </div>
 
-        {/* Pagination Footer - Responsive Stack */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 mt-4 md:mt-6 text-sm text-gray-400 w-full">
           <span className="text-xs md:text-sm">Showing 1-9 from 15</span>
           <div className="flex items-center gap-1 md:gap-2">
