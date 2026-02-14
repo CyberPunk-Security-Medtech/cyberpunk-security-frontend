@@ -130,7 +130,7 @@ import React, { useState } from 'react'
 import Modal from '@components/Modal'
 import { FieldLabel, Input, Textarea } from '@components/Field'
 import { Plus } from 'lucide-react'
-import { consultationService } from '@services/api'
+import { PatientService } from '@services/api'
 import Button from '@components/Button'
 
 interface PatientPrescriptionModalProps {
@@ -163,37 +163,37 @@ export function PatientPrescriptionModal({
     setFormData(prev => ({ ...prev, [id]: value }))
   }
 
-  const handleSubmit = async () => {
-    if (!visitId) return
-    setLoading(true)
-    try {
-      await consultationService.createPrescription(visitId, formData)
-      onClose()
-      // Reset form
-      setFormData({
-        medicationName: '',
-        dosage: '',
-        frequency: '',
-        interval: '',
-        duration: '',
-        durationType: 'Days',
-        route: '',
-        startDate: '',
-        instructions: ''
-      })
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const handleSubmit = async () => {
+  //   if (!visitId) return
+  //   setLoading(true)
+  //   try {
+  //     await PatientService.createPrescription(visitId, formData)
+  //     onClose()
+  //     // Reset form
+  //     setFormData({
+  //       medicationName: '',
+  //       dosage: '',
+  //       frequency: '',
+  //       interval: '',
+  //       duration: '',
+  //       durationType: 'Days',
+  //       route: '',
+  //       startDate: '',
+  //       instructions: ''
+  //     })
+  //   } catch (e) {
+  //     console.error(e)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   return (
     <Modal title="Create New Prescription" isOpen={open} onClose={onClose}>
       <div className="relative flex flex-col max-h-[95vh]">
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); /* handleSubmit() */ }}>
             {/* Medication Name */}
             <div>
               <FieldLabel htmlFor="medicationName">Medication Name</FieldLabel>

@@ -2,7 +2,7 @@
 'use client'
 
 import { createContext, useContext, useState, ReactNode } from 'react'
-import { consultationService } from '@services/api'
+
 
 interface ConsultationContextType {
     isConsultationActive: boolean
