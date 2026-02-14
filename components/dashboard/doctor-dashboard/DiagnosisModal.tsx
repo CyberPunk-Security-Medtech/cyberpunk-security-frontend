@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { consultationService } from '@services/api'
+import { PatientService } from '@services/api'
 import Modal from '@components/Modal'
 import { FieldLabel, Input, Textarea } from '@components/Field'
 import Button from '@components/Button'
@@ -7,10 +7,10 @@ import Button from '@components/Button'
 interface DiagnosisModalProps {
     open: boolean
     onClose: () => void
-    visitId: string | null
+    consultationId: string | null
 }
 
-export function DiagnosisModal({ open, onClose, visitId }: DiagnosisModalProps) {
+export function DiagnosisModal({ open, onClose, consultationId }: DiagnosisModalProps) {
     const [loading, setLoading] = useState(false)
     const [form, setForm] = useState({
         pdx: '',
@@ -19,10 +19,13 @@ export function DiagnosisModal({ open, onClose, visitId }: DiagnosisModalProps) 
     })
 
     const handleSubmit = async () => {
-        if (!visitId) return
+        const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}");
+        const orgId = workspace.id;
+        if (!consultationId) return
         setLoading(true)
         try {
-            await consultationService.addDiagnosis(visitId, {
+            await PatientService.addDiagnosis(orgId, consultationId, {
+                // visitId,
                 primary_diagnosis: form.pdx,
                 secondary_diagnosis: form.sdx,
                 observation: form.obs
@@ -72,7 +75,7 @@ export function DiagnosisModal({ open, onClose, visitId }: DiagnosisModalProps) 
                     <Button
                         type="button"
                         onSubmitHandler={handleSubmit}
-                        disabled={loading || !visitId}
+                        disabled={loading || !consultationId}
                         className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
                     >
                         {loading ? 'Creating...' : 'Create Diagnosis'}

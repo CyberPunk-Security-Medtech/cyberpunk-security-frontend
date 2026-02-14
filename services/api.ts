@@ -69,7 +69,7 @@ export const authService = {
     const response = await api.get("/api/v1/users/me/", {
       withCredentials: true,
     });
-    return response.data
+    return response.data.data;
   },
 };
 
@@ -163,24 +163,41 @@ export const invitationService = {
   }
 };
 
-export const consultationService = {
-  startConsultation: async (visitId: string) => {
-    const response = await api.post(`/visits/${visitId}/start`);
-    return response.data;
-  },
-  addNote: async (visitId: string, note: string) => {
-    const response = await api.post(`/visits/${visitId}/notes`, { note });
-    return response.data;
-  },
-  addDiagnosis: async (visitId: string, diagnosisData: any) => {
-    const response = await api.post(`/visits/${visitId}/diagnosis`, diagnosisData);
-    return response.data;
-  },
-  createPrescription: async (visitId: string, prescriptionData: any) => {
-    const response = await api.post(`/visits/${visitId}/prescriptions`, prescriptionData);
-    return response.data;
-  }
-};
 
 
-
+export const PatientService = {
+createPatient: async (orgId: string, patientData: any) => {
+  const res = await api.post(
+    `/api/v1/organizations/${orgId}/patients`,
+    patientData);
+  return res.data;
+},
+getPatients: async (orgId: string) => {
+  const res = await api.get(`/api/v1/organizations/${orgId}/patients`);
+  return res.data;
+},
+getPatient: async (orgId: string, patientId: string) => {
+  const res = await api.get(`/api/v1/organizations/${orgId}/patients/${patientId}`);
+  return res.data;
+},
+getMedicalHistory: async (orgId: string, patientId: string) => {
+  const res = await api.get(`/api/v1/organizations/${orgId}/patients/${patientId}/diagnoses`);
+  return res.data;
+},
+createConsultation: async (orgId: string, consultationData: any) => {
+  const res = await api.post(`/api/v1/organizations/${orgId}/consultations`, consultationData);
+  return res.data;
+},
+addDiagnosis: async (orgId: string, consultationId: string, payload: any) =>{
+  const res = await api.post(`/api/v1/organizations/${orgId}/consultations/${consultationId}/diagnoses/`, payload);
+  return res.data;
+},
+createDepartment: async (orgId: string, payload: { name: string }) => {
+  const res = await api.post(`/api/v1/organizations/${orgId}/departments`, payload);
+  return res.data;
+},
+getDepartments: async (orgId: string) => {
+  const res = await api.get(`/api/v1/organizations/${orgId}/departments`);
+  return res.data;
+},
+}

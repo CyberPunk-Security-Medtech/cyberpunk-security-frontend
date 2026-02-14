@@ -921,6 +921,7 @@ interface AuthContextType {
   workspaceLoading: boolean;
   refreshWorkspaces: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  workspace: Workspace | null;
   setWorkspace: (ws: Workspace) => void;
   logout: () => void;
 }
@@ -940,6 +941,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authLoading, setAuthLoading] = useState(false);
   const [workspaceLoading, setWorkspaceLoading] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [workspace, setWorkspaceState] = useState<Workspace | null>(null);
 
   /* ================= LOAD WORKSPACES ================= */
 
@@ -1063,6 +1065,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         workspaceLoading,
         refreshWorkspaces: loadWorkspaces,
         login,
+        workspace,
         setWorkspace,
         logout,
       }}
