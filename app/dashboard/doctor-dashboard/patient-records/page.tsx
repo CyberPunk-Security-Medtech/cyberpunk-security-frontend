@@ -116,8 +116,8 @@ export default function PatientsRecords() {
 
         <Button
           type="button"
-          className="bg-[#1A2380] text-white font-medium px-5 py-2.5 rounded-md opacity-60 cursor-not-allowed"
-          disabled
+          onSubmitHandler={() => router.push("/dashboard/doctor-dashboard/patient-records/new")}
+          className="bg-[#1A2380] text-white font-medium px-5 py-2.5 rounded-md hover:bg-[#00B8A8] transition"
         >
           + Add New Patient Record
         </Button>

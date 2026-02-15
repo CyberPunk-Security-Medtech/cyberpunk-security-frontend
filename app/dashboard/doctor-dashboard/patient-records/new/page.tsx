@@ -62,7 +62,7 @@ export default function AddNewPatientRecord() {
       setSubmitting(true);
       await patientService.createPatient(activeWorkspace.id, form);
       toast.success("Patient record created");
-      router.push("/dashboard/nurse-dashboard/patient-records");
+      router.push("/dashboard/doctor-dashboard/patient-records");
     } catch (error: any) {
       const message =
         error?.response?.data?.detail ||
@@ -78,7 +78,7 @@ export default function AddNewPatientRecord() {
     <div className="w-full space-y-6 md:space-y-8 font-sans py-2 md:py-4">
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:relative">
         <Link
-          href="/dashboard/nurse-dashboard/patient-records"
+          href="/dashboard/doctor-dashboard/patient-records"
           className="inline-flex items-center gap-2 rounded-full bg-[#ECEEFD] text-[#1A2380] text-xs md:text-sm font-medium px-4 py-2 hover:bg-[#E0E4FA] transition"
         >
           <ChevronLeft size={16} />
@@ -262,7 +262,7 @@ export default function AddNewPatientRecord() {
           <button
             type="button"
             className="rounded-full border border-gray-200 px-4 py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-50 transition"
-            onClick={() => router.push("/dashboard/nurse-dashboard/patient-records")}
+            onClick={() => router.push("/dashboard/doctor-dashboard/patient-records")}
           >
             Cancel
           </button>
