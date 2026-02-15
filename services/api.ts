@@ -21,14 +21,23 @@ export type InviteDetailsResponse = {
     slug: string;
     image_url: string | null;
   };
-
 };
 
+type WrappedData<T> = {
+  data: T;
+};
+
+const unwrap = <T>(payload: T | WrappedData<T>): T => {
+  if (payload && typeof payload === "object" && "data" in (payload as object)) {
+    return (payload as WrappedData<T>).data;
+  }
+  return payload as T;
+};
 
 // Auth endpoints
 export const authService = {
   login: async (credentials: { email: string; password: string }) => {
-    const response = await api.post("/api/v1/auth/login/", credentials);
+    const response = await api.post("/api/v1/auth/login", credentials);
     return response.data;
   },
   refresh: async () => {
@@ -37,28 +46,28 @@ export const authService = {
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   signup: async (userData: any) => {
-    const response = await api.post("/api/v1/auth/register/", userData);
+    const response = await api.post("/api/v1/auth/register", userData);
     return response.data;
   },
   requestPasswordReset: async (email: string) => {
-    const response = await api.post("/api/v1/auth/request-password-reset/", { email });
+    const response = await api.post("/api/v1/auth/request-password-reset", { email });
     return response.data;
   },
   verifyEmail: async (code: string, email: string) => {
-    const response = await api.post("/api/v1/auth/verify-user/", { code, email });
+    const response = await api.post("/api/v1/auth/verify-user", { code, email });
     return response.data;
   },
   verifyPasswordReset: async (code: string, email: string) => {
-    const res = await api.post("/api/v1/auth/verify-reset-code/", { code, email });
+    const res = await api.post("/api/v1/auth/verify-reset-code", { code, email });
     return res.data;
   },
   resendOtp: async (email: string) => {
     return (
-      await api.post("/api/v1/auth/resend-verification/", { email })
+      await api.post("/api/v1/auth/resend-verification", { email })
     ).data;
   },
   resetPassword: async (email: string, code: string, new_password: string) => {
-    const response = await api.post("/api/v1/auth/reset-password/", {
+    const response = await api.post("/api/v1/auth/reset-password", {
       email,
       code,
       new_password,
@@ -66,14 +75,12 @@ export const authService = {
     return response.data;
   },
   getMe: async () => {
-    const response = await api.get("/api/v1/users/me/", {
+    const response = await api.get("/api/v1/users/me", {
       withCredentials: true,
     });
-    return response.data.data;
+    return response.data;
   },
 };
-
-
 
 export interface CreateOrganizationPayload {
   name: string;
@@ -82,33 +89,35 @@ export interface CreateOrganizationPayload {
 
 export const organizationService = {
   createOrganization: async (payload: CreateOrganizationPayload) => {
-    const response = await api.post("/api/v1/organizations/", payload, {
+    const response = await api.post("/api/v1/organizations", payload, {
       withCredentials: true,
-    })
+    });
     return response.data;
   },
 
   getOrganizations: async () => {
-    const response = await api.get("/api/v1/organizations/");
+    const response = await api.get("/api/v1/organizations");
     return response.data;
   },
 
   getMyMembership: async (org_id: string) => {
-    const response = await api.get(`/api/v1/membership/${org_id}/`);
-    return response.data?.data
+    const response = await api.get(`/api/v1/membership/${org_id}`);
+    return unwrap(response.data);
   },
 
+  getDepartments: async (org_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/departments`);
+    return unwrap(response.data);
+  },
 };
 
-
-
 export const uploadService = {
-  uploadImage: async (file: File) => {
+  uploadImage: async (org_id: string, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
 
     const response = await api.post(
-      "/api/v1/organizations/{org_id}/image/",
+      `/api/v1/organizations/${org_id}/image`,
       formData,
       {
         headers: {
@@ -121,22 +130,19 @@ export const uploadService = {
   },
 };
 
-
-
 export const invitationService = {
   async sendInvitation(email: string, role: string, org_id: string) {
-    const res = await api.post(`/api/v1/organizations/${org_id}/invitations`, { email, role });;
-    return res.data; // should include invitation.id
+    const res = await api.post(`/api/v1/organizations/${org_id}/invitations`, { email, role });
+    return res.data;
   },
-  // 1️⃣ Fetch invitation details (used when page loads)
+
   async getInviteDetails(invitation_id: string): Promise<InviteDetailsResponse> {
-    const res = await api.get(`api/v1/invitations/${invitation_id}`);
+    const res = await api.get(`/api/v1/invitations/${invitation_id}`);
     return res.data.data;
   },
 
-  // 2️⃣ Accept invitation
   async acceptInvite(invitation_id: string): Promise<void> {
-    await api.post(`api/v1/invitations/${invitation_id}/accept`);
+    await api.post(`/api/v1/invitations/${invitation_id}/accept`);
   },
 
   async revokeInvitation(org_id: string, inv_id: string) {
@@ -145,14 +151,13 @@ export const invitationService = {
     );
   },
 
-
   async registerInvitedUser(invitation_id: string, payload: {
     email: string;
     first_name: string;
     last_name: string;
     password: string;
   }): Promise<void> {
-    await api.post(`/api/v1/invitations/${invitation_id}/register-user`, payload)
+    await api.post(`/api/v1/invitations/${invitation_id}/register-user`, payload);
   },
 
   async getOrganizationInvitations(orgId: string) {
@@ -160,44 +165,149 @@ export const invitationService = {
       `/api/v1/organizations/${orgId}/invitations`
     );
     return res.data.data;
-  }
+  },
 };
 
+export type PatientCreatePayload = {
+  first_name: string;
+  last_name: string;
+  dob: string;
+  gender: "Male" | "Female" | "Other";
+  marital_status?: "Single" | "Married" | "Divorced" | "Widowed" | null;
+  blood_group?: string | null;
+  email: string;
+  phone_number: string;
+  allergies?: string | null;
+  past_medical_history?: string | null;
+  family_medical_history?: string | null;
+  symptoms?: string | null;
+  current_medications?: string | null;
+  immunizations?: string | null;
+  lifestyle_info?: string | null;
+  enrollee_type?: string | null;
+  hmo_provider?: string | null;
+  hmo_plan?: string | null;
+  hmo_number?: string | null;
+  policy_start_date?: string | null;
+  policy_expiry_date?: string | null;
+};
 
+export const patientService = {
+  getPatients: async (org_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/patients`);
+    return unwrap(response.data);
+  },
 
-export const PatientService = {
-createPatient: async (orgId: string, patientData: any) => {
-  const res = await api.post(
-    `/api/v1/organizations/${orgId}/patients`,
-    patientData);
-  return res.data;
-},
-getPatients: async (orgId: string) => {
-  const res = await api.get(`/api/v1/organizations/${orgId}/patients`);
-  return res.data;
-},
-getPatient: async (orgId: string, patientId: string) => {
-  const res = await api.get(`/api/v1/organizations/${orgId}/patients/${patientId}`);
-  return res.data;
-},
-getMedicalHistory: async (orgId: string, patientId: string) => {
-  const res = await api.get(`/api/v1/organizations/${orgId}/patients/${patientId}/diagnoses`);
-  return res.data;
-},
-createConsultation: async (orgId: string, consultationData: any) => {
-  const res = await api.post(`/api/v1/organizations/${orgId}/consultations`, consultationData);
-  return res.data;
-},
-addDiagnosis: async (orgId: string, consultationId: string, payload: any) =>{
-  const res = await api.post(`/api/v1/organizations/${orgId}/consultations/${consultationId}/diagnoses/`, payload);
-  return res.data;
-},
-createDepartment: async (orgId: string, payload: { name: string }) => {
-  const res = await api.post(`/api/v1/organizations/${orgId}/departments`, payload);
-  return res.data;
-},
-getDepartments: async (orgId: string) => {
-  const res = await api.get(`/api/v1/organizations/${orgId}/departments`);
-  return res.data;
-},
-}
+  createPatient: async (org_id: string, payload: PatientCreatePayload) => {
+    const response = await api.post(`/api/v1/organizations/${org_id}/patients`, payload);
+    return unwrap(response.data);
+  },
+
+  getPatient: async (org_id: string, patient_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}`);
+    return unwrap(response.data);
+  },
+
+  getPatientDiagnoses: async (org_id: string, patient_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}/diagnoses`);
+    return unwrap(response.data);
+  },
+
+  getPatientLabTests: async (org_id: string, patient_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}/lab-tests`);
+    return unwrap(response.data);
+  },
+
+  getPatientPrescriptions: async (org_id: string, patient_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}/prescriptions`);
+    return unwrap(response.data);
+  },
+};
+
+export const consultationService = {
+  listConsultations: async (
+    org_id: string,
+    params?: { status_filter?: string; department_id?: string }
+  ) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/consultations`, {
+      params,
+    });
+    return unwrap(response.data);
+  },
+
+  attendConsultation: async (org_id: string, consultation_id: string) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/attend`
+    );
+    return response.data;
+  },
+
+  completeConsultation: async (
+    org_id: string,
+    consultation_id: string,
+    payload?: {
+      status?: "Pending" | "In Progress" | "Completed" | "Cancelled";
+      clinical_notes?: string | null;
+      doctor_id?: string | null;
+    }
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/complete`,
+      payload ?? {}
+    );
+    return unwrap(response.data);
+  },
+
+  addDiagnosis: async (
+    org_id: string,
+    consultation_id: string,
+    diagnosisData: {
+      primary_diagnosis: string;
+      secondary_diagnosis?: string | null;
+      symptoms?: string | null;
+    }
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/diagnoses`,
+      diagnosisData
+    );
+    return unwrap(response.data);
+  },
+
+  orderLabTest: async (
+    org_id: string,
+    consultation_id: string,
+    labData: {
+      test_name: string;
+      test_category?: string | null;
+      priority?: string;
+      clinical_notes?: string | null;
+    }
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/lab-tests`,
+      labData
+    );
+    return unwrap(response.data);
+  },
+
+  createPrescription: async (
+    org_id: string,
+    consultation_id: string,
+    prescriptionData: {
+      medication_name: string;
+      dosage: string;
+      frequency: string;
+      duration: string;
+      route?: string | null;
+      start_date?: string | null;
+      instructions?: string | null;
+    }
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/prescriptions`,
+      prescriptionData
+    );
+    return unwrap(response.data);
+  },
+};
