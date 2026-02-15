@@ -311,3 +311,61 @@ export const consultationService = {
     return unwrap(response.data);
   },
 };
+
+// Backward-compatible aliases for older dashboard components.
+// Prefer patientService / organizationService / consultationService in new code.
+export const PatientService = {
+  createPatient: async (org_id: string, payload: Record<string, unknown>) =>
+    ({
+      data: await patientService.createPatient(
+        org_id,
+        payload as PatientCreatePayload
+      ),
+    }),
+  getPatients: async (org_id: string) => ({
+    data: await patientService.getPatients(org_id),
+  }),
+  getPatient: async (org_id: string, patient_id: string) => ({
+    data: await patientService.getPatient(org_id, patient_id),
+  }),
+  getMedicalHistory: async (org_id: string, patient_id: string) => ({
+    data: await patientService.getPatientDiagnoses(org_id, patient_id),
+  }),
+  createConsultation: async (
+    org_id: string,
+    payload: {
+      patient_id: string;
+      department_id?: string;
+      reason_for_visit?: string;
+      priority?: string;
+      vitals?: string;
+    }
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations`,
+      payload
+    );
+    return { data: unwrap(response.data) };
+  },
+  addDiagnosis: async (
+    org_id: string,
+    consultation_id: string,
+    payload: {
+      primary_diagnosis: string;
+      secondary_diagnosis?: string | null;
+      symptoms?: string | null;
+    }
+  ) => ({
+    data: await consultationService.addDiagnosis(org_id, consultation_id, payload),
+  }),
+  createDepartment: async (org_id: string, payload: { name: string }) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/departments`,
+      payload
+    );
+    return { data: unwrap(response.data) };
+  },
+  getDepartments: async (org_id: string) => ({
+    data: await organizationService.getDepartments(org_id),
+  }),
+};

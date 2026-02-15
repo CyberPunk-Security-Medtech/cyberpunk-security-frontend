@@ -48,7 +48,7 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 bg-[#F9FAFB] overflow-hidden">
-        <Header setSidebarOpen={setSidebarOpen} user={nurseProfile} />
+        <Header setSidebarOpen={setSidebarOpen} />
         <main className="flex-1 overflow-y-auto px-4 md:px-6 lg:px-6 xl:px-12 py-4 md:py-6">
           {children}
         </main>
