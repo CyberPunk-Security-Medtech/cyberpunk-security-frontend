@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { MenuItem, UserProfile } from "@/types/index";
+import { authService } from "@services/api";
 
 interface SidebarProps {
   sidebarMinimize: boolean;
@@ -26,6 +28,37 @@ export default function SideBar({
   backgroundColor = "#060921",
 }: SidebarProps) {
   const pathname = usePathname();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (!profileMenuRef.current) return;
+      if (!profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (sidebarMinimize) setIsProfileMenuOpen(false);
+  }, [sidebarMinimize]);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout request failed", error);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/auth/login";
+    }
+  };
 
   return (
     <>
@@ -102,18 +135,54 @@ export default function SideBar({
         </div>
 
         <div className="px-6 mt-auto border-t border-white/10 pt-6">
-          <div className="flex items-center gap-3">
-            <Image
-              src={user.avatar || "/avatars/eleanor.png"}
-              alt={user.name}
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            {!sidebarMinimize && (
-              <div>
-                <p className="font-medium">{user.name}</p>
-                <p className="text-xs text-gray-400">{user.role}</p>
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              type="button"
+              onClick={() => !sidebarMinimize && setIsProfileMenuOpen((prev) => !prev)}
+              className="w-full flex items-center gap-3 text-left"
+              aria-label="Open profile menu"
+            >
+              <Image
+                src={user.avatar || "/avatars/eleanor.png"}
+                alt={user.name}
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              {!sidebarMinimize && (
+                <>
+                  <div>
+                    <p className="font-medium">{user.name}</p>
+                    <p className="text-xs text-gray-400">{user.role}</p>
+                  </div>
+                  <span
+                    className={`ml-auto transition-transform ${
+                      isProfileMenuOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    <svg
+                      width="14"
+                      height="8"
+                      viewBox="0 0 14 8"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M1 1.5L7 6.5L13 1.5" fill="currentColor" />
+                    </svg>
+                  </span>
+                </>
+              )}
+            </button>
+
+            {!sidebarMinimize && isProfileMenuOpen && (
+              <div className="absolute left-0 right-0 bottom-full mb-2 rounded-lg border border-white/20 bg-white py-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full px-3 py-2 text-left text-sm text-[#0F172A] hover:bg-slate-100"
+                >
+                  Logout
+                </button>
               </div>
             )}
           </div>

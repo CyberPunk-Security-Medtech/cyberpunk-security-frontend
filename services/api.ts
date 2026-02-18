@@ -40,6 +40,10 @@ export const authService = {
     const response = await api.post("/api/v1/auth/login", credentials);
     return response.data;
   },
+  logout: async () => {
+    const response = await api.post("/api/v1/auth/logout");
+    return response.data;
+  },
   refresh: async () => {
     const response = await api.post("/api/v1/auth/refresh");
     return response.data;
@@ -107,6 +111,14 @@ export const organizationService = {
 
   getDepartments: async (org_id: string) => {
     const response = await api.get(`/api/v1/organizations/${org_id}/departments`);
+    return unwrap(response.data);
+  },
+
+  createDepartment: async (org_id: string, payload: { name: string }) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/departments`,
+      payload
+    );
     return unwrap(response.data);
   },
 };
@@ -225,9 +237,29 @@ export const patientService = {
 };
 
 export const consultationService = {
+  createConsultation: async (
+    org_id: string,
+    payload: {
+      patient_id: string;
+      department_id: string;
+      reason_for_visit: string;
+      priority?: "Routine" | "Urgent" | "Emergency";
+      vitals?: string | null;
+    }
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations`,
+      payload
+    );
+    return unwrap(response.data);
+  },
+
   listConsultations: async (
     org_id: string,
-    params?: { status_filter?: string; department_id?: string }
+    params?: {
+      status_filter?: "Pending" | "In Progress" | "Completed" | "Cancelled";
+      department_id?: string;
+    }
   ) => {
     const response = await api.get(`/api/v1/organizations/${org_id}/consultations`, {
       params,
@@ -237,9 +269,10 @@ export const consultationService = {
 
   attendConsultation: async (org_id: string, consultation_id: string) => {
     const response = await api.post(
-      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/attend`
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/attend`,
+      {}
     );
-    return response.data;
+    return unwrap(response.data);
   },
 
   completeConsultation: async (
@@ -341,11 +374,15 @@ export const PatientService = {
       vitals?: string;
     }
   ) => {
-    const response = await api.post(
-      `/api/v1/organizations/${org_id}/consultations`,
-      payload
-    );
-    return { data: unwrap(response.data) };
+    return {
+      data: await consultationService.createConsultation(org_id, {
+        patient_id: payload.patient_id,
+        department_id: payload.department_id ?? "",
+        reason_for_visit: payload.reason_for_visit ?? "",
+        priority: (payload.priority as "Routine" | "Urgent" | "Emergency" | undefined) ?? "Routine",
+        vitals: payload.vitals ?? null,
+      }),
+    };
   },
   addDiagnosis: async (
     org_id: string,

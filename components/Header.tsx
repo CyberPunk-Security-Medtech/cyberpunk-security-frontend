@@ -3,15 +3,18 @@
 import { Bell, Menu, Search } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface HeaderProps {
   setSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   showSearch?: boolean;
+  desktopPaddingClassName?: string;
 }
 
 export default function Header({
   setSidebarOpen,
   showSearch = true,
+  desktopPaddingClassName = "md:px-8",
 }: HeaderProps) {
   const { user } = useAuth();
   const [organizationName, setOrganizationName] = useState("");
@@ -33,7 +36,9 @@ export default function Header({
     : "User";
 
   return (
-    <header className="w-full flex items-center justify-between px-4 md:px-8 py-4 border-b border-gray-100 bg-white sticky top-0 z-40">
+    <header
+      className={`w-full flex items-center justify-between px-4 py-4 border-b border-gray-100 bg-white sticky top-0 z-40 ${desktopPaddingClassName}`}
+    >
       <div className="flex items-center gap-3">
         {setSidebarOpen && (
           <button
@@ -44,6 +49,13 @@ export default function Header({
             <Menu size={20} className="text-[#1A2380]" />
           </button>
         )}
+        <Image
+          src="/images/Avatar.png"
+          alt="Organization logo"
+          width={36}
+          height={36}
+          className="h-9 w-9 rounded-full object-cover"
+        />
         <h2 className="text-lg font-semibold text-[#1A2380] truncate">
           {organizationName || "Sisyphus Medical Center"}
         </h2>

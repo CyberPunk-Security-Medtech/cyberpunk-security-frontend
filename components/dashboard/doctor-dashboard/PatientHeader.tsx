@@ -2,7 +2,9 @@
 
 import { StatusBadge } from "@components/StatusBadge";
 import Button from "@components/Button";
+import { useState } from "react";
 import { useConsultation } from "./ConsultationContext";
+import { CreateConsultationModal } from "./ConsultationModal";
 
 const parseVitals = (raw?: string | null): Array<{ label: string; value: string; status: "Normal" | "High" | "Low" }> => {
   if (!raw) {
@@ -12,13 +14,19 @@ const parseVitals = (raw?: string | null): Array<{ label: string; value: string;
 };
 
 export default function PatientHeader() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   const {
     patient,
     patientLoading,
     consultations,
+    consultationLoading,
     consultationStatus,
     isConsultationActive,
+    patientId,
+    hasConsultation,
     canStartConsultation,
+    refreshConsultations,
     startConsultation,
   } = useConsultation();
 
@@ -56,12 +64,24 @@ export default function PatientHeader() {
           ) : (
             <Button
               type="button"
-              onSubmitHandler={handleStart}
-              disabled={!canStartConsultation || consultationStatus === "starting"}
+              onSubmitHandler={
+                hasConsultation
+                  ? handleStart
+                  : () => setIsCreateModalOpen(true)
+              }
+              disabled={
+                consultationLoading ||
+                consultationStatus === "starting" ||
+                (hasConsultation && !canStartConsultation)
+              }
               className="bg-[#1A2380] text-white px-6 py-2 rounded-md hover:bg-[#00B8A8] transition disabled:opacity-50"
             >
               {consultationStatus === "starting"
                 ? "Starting..."
+                : consultationLoading
+                ? "Loading..."
+                : !hasConsultation
+                ? "Create Consultation"
                 : canStartConsultation
                 ? "Start Consultation"
                 : "No Consultation Ready"}
@@ -94,6 +114,15 @@ export default function PatientHeader() {
           </div>
         ))}
       </div>
+
+      <CreateConsultationModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        patientId={patientId}
+        onCreated={() => {
+          void refreshConsultations();
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { consultationService, patientService } from "@services/api";
+import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
 
 type ConsultationStatus = "idle" | "starting" | "active";
@@ -16,9 +17,16 @@ type ConsultationContextType = {
   consultationStatus: ConsultationStatus;
   isConsultationActive: boolean;
   currentConsultationId: string | null;
+  hasConsultation: boolean;
   canStartConsultation: boolean;
   refreshPatient: () => Promise<void>;
   refreshConsultations: () => Promise<void>;
+  createConsultation: (payload: {
+    department_id: string;
+    reason_for_visit: string;
+    priority?: "Routine" | "Urgent" | "Emergency";
+    vitals?: string | null;
+  }) => Promise<string | null>;
   startConsultation: () => Promise<void>;
 };
 
@@ -59,8 +67,25 @@ export function ConsultationProvider({
     if (!orgId) return;
     setConsultationLoading(true);
     try {
-      const result = await consultationService.listConsultations(orgId);
-      const mine = (result ?? []).filter((c: any) => c.patient_id === patientId);
+      // Backend defaults listConsultations to "Pending", so fetch both states
+      // to preserve active consultation state across reloads.
+      const [inProgressResult, pendingResult] = await Promise.all([
+        consultationService.listConsultations(orgId, { status_filter: "In Progress" }),
+        consultationService.listConsultations(orgId, { status_filter: "Pending" }),
+      ]);
+
+      const merged = [...(inProgressResult ?? []), ...(pendingResult ?? [])];
+      const uniqueById = Array.from(
+        new Map(merged.map((c: any) => [c.id, c])).values()
+      );
+
+      const mine = uniqueById
+        .filter((c: any) => c.patient_id === patientId)
+        .sort((a: any, b: any) => {
+          const aTime = new Date(a.updated_at ?? a.created_at ?? 0).getTime();
+          const bTime = new Date(b.updated_at ?? b.created_at ?? 0).getTime();
+          return bTime - aTime;
+        });
       setConsultations(mine);
 
       const active = mine.find((c: any) => String(c.status).toLowerCase() === "in progress");
@@ -83,7 +108,32 @@ export function ConsultationProvider({
   }, [orgId, patientId]);
 
   const isConsultationActive = consultationStatus === "active";
+  const hasConsultation = !!currentConsultationId;
   const canStartConsultation = !!currentConsultationId && !isConsultationActive;
+
+  const createConsultation = async (payload: {
+    department_id: string;
+    reason_for_visit: string;
+    priority?: "Routine" | "Urgent" | "Emergency";
+    vitals?: string | null;
+  }) => {
+    if (!orgId || !patientId) return null;
+    try {
+      const created = await consultationService.createConsultation(orgId, {
+        patient_id: patientId,
+        department_id: payload.department_id,
+        reason_for_visit: payload.reason_for_visit,
+        priority: payload.priority ?? "Routine",
+        vitals: payload.vitals ?? null,
+      });
+
+      await refreshConsultations();
+      return created?.id ?? null;
+    } catch (error) {
+      console.error("Failed to create consultation", error);
+      return null;
+    }
+  };
 
   const startConsultation = async () => {
     if (!orgId || !currentConsultationId) return;
@@ -93,7 +143,21 @@ export function ConsultationProvider({
       setConsultationStatus("active");
       await refreshConsultations();
     } catch (error) {
-      console.error("Failed to attend consultation", error);
+      if (isAxiosError(error)) {
+        const method = error.config?.method?.toUpperCase() ?? "UNKNOWN";
+        const url = error.config?.url ?? "UNKNOWN_URL";
+        const status = error.response?.status;
+        const responseData = error.response?.data;
+        console.error("Failed to attend consultation", {
+          message: error.message,
+          method,
+          url,
+          status,
+          responseData,
+        });
+      } else {
+        console.error("Failed to attend consultation", error);
+      }
       setConsultationStatus("idle");
     }
   };
@@ -109,9 +173,11 @@ export function ConsultationProvider({
       consultationStatus,
       isConsultationActive,
       currentConsultationId,
+      hasConsultation,
       canStartConsultation,
       refreshPatient,
       refreshConsultations,
+      createConsultation,
       startConsultation,
     }),
     [
@@ -124,6 +190,7 @@ export function ConsultationProvider({
       consultationStatus,
       isConsultationActive,
       currentConsultationId,
+      hasConsultation,
       canStartConsultation,
     ]
   );

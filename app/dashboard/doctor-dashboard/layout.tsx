@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import Sidebar from '@components/SideBar';
 import Header from '@components/Header';
-import { LayoutDashboard, Users, Sparkles } from "lucide-react";
+import { ClipboardList, LayoutDashboard, Users, Sparkles } from "lucide-react";
 import { MenuItem, UserProfile } from '@/types/index';
 
 const doctorMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/doctor-dashboard" },
   { name: "Patients Records", icon: Users, href: "/dashboard/doctor-dashboard/patient-records" },
+  { name: "Consultations", icon: ClipboardList, href: "/dashboard/doctor-dashboard/consultations" },
   { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
 ];
 
@@ -38,7 +39,10 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 bg-[#F9FAFB]">
-        <Header setSidebarOpen={setSidebarOpen} />
+        <Header
+          setSidebarOpen={setSidebarOpen}
+          desktopPaddingClassName="md:px-12"
+        />
         <main className="flex-1 overflow-y-auto px-6 py-4">{children}</main>
       </div>
     </div>
