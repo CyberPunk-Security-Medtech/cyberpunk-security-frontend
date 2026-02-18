@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -9,12 +8,10 @@ import {
   ChevronRight,
   Search,
 } from "lucide-react";
-import { useAuth } from "@context/AuthContext";
-import { organizationService, patientService } from "@services/api";
 
 type PatientStatus = "Active" | "Discharged" | "Pending";
 
-type PatientRow = {
+type Patient = {
   initials: string;
   name: string;
   id: string;
@@ -25,10 +22,98 @@ type PatientRow = {
   date: string;
 };
 
-type Department = {
-  id: string;
-  name: string;
-};
+const patients: Patient[] = [
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 32,
+    gender: "Male",
+    condition: "Diabetes Type 2",
+    status: "Active",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Female",
+    condition: "Hypertension",
+    status: "Discharged",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 32,
+    gender: "Female",
+    condition: "Tuberculosis (TB)",
+    status: "Pending",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Female",
+    condition: "Hepatitis",
+    status: "Active",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Male",
+    condition: "Dehydration",
+    status: "Active",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Male",
+    condition: "Dehydration",
+    status: "Active",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Male",
+    condition: "Dehydration",
+    status: "Active",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Male",
+    condition: "Dehydration",
+    status: "Active",
+    date: "Oct-30-2025",
+  },
+  {
+    initials: "BH",
+    name: "Brandon Herwitz",
+    id: "SMC-04000B",
+    age: 56,
+    gender: "Male",
+    condition: "Infertility",
+    status: "Discharged",
+    date: "Oct-30-2025",
+  },
+];
 
 const statusClassMap: Record<PatientStatus, string> = {
   Active: "bg-[#E0F2F1] text-[#00B8A8]",
@@ -39,97 +124,10 @@ const statusClassMap: Record<PatientStatus, string> = {
 const getStatusClass = (status: PatientStatus) =>
   statusClassMap[status] ?? "bg-gray-100 text-gray-600";
 
-const calculateAge = (dob?: string | null): number => {
-  if (!dob) return 0;
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return 0;
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-    age -= 1;
-  }
-  return age;
-};
-
-const formatDate = (value?: string | null): string => {
-  if (!value) return "-";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "-";
-  return d.toLocaleDateString();
-};
-
 export default function PatientsRecords() {
   const router = useRouter();
-  const { activeWorkspace } = useAuth();
 
-  const [search, setSearch] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [patients, setPatients] = useState<PatientRow[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-
-  useEffect(() => {
-    const orgId = activeWorkspace?.id;
-    if (!orgId) return;
-
-    let ignore = false;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const [patientsRes, departmentsRes] = await Promise.all([
-          patientService.getPatients(orgId),
-          organizationService.getDepartments(orgId),
-        ]);
-
-        if (ignore) return;
-
-        const normalizedPatients: PatientRow[] = (patientsRes ?? []).map((p: any) => ({
-          initials: `${p.first_name?.[0] ?? ""}${p.last_name?.[0] ?? ""}`.toUpperCase() || "NA",
-          name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
-          id: p.id,
-          age: calculateAge(p.dob),
-          gender: p.gender ?? "-",
-          condition:
-            p.symptoms ||
-            p.past_medical_history ||
-            p.family_medical_history ||
-            "No condition recorded",
-          status: "Active",
-          date: formatDate(p.updated_at),
-        }));
-
-        setPatients(normalizedPatients);
-        setDepartments(departmentsRes ?? []);
-      } catch (error) {
-        console.error("Failed to load patients/departments", error);
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
-
-    load();
-    return () => {
-      ignore = true;
-    };
-  }, [activeWorkspace?.id]);
-
-  const filteredPatients = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return patients.filter((p) => {
-      const searchPass =
-        query.length === 0 ||
-        p.name.toLowerCase().includes(query) ||
-        p.id.toLowerCase().includes(query);
-      const departmentPass =
-        selectedDepartment === "all" || selectedDepartment.length > 0;
-      return searchPass && departmentPass;
-    });
-  }, [patients, search, selectedDepartment]);
-
-  const handleRowClick = (id: string) => {
+  const handleRowClick = (id: Patient["id"]) => {
     router.push(`/dashboard/nurse-dashboard/patient-records/${id}`);
   };
 
@@ -145,8 +143,6 @@ export default function PatientsRecords() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search patient"
               className="w-full h-11 md:h-12 pl-12 pr-4 rounded-full bg-white border border-gray-200 text-sm md:text-base text-gray-700 outline-none focus:ring-1 focus:ring-[#00B8A8] focus:border-[#00B8A8] placeholder-gray-400 transition"
             />
@@ -167,25 +163,35 @@ export default function PatientsRecords() {
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full items-start sm:items-center sm:justify-between">
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
             <div className="relative w-full sm:w-auto">
-              <select
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="w-full sm:w-auto appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 md:py-2.5 pr-8 text-sm md:text-base text-gray-600 outline-none cursor-pointer hover:border-gray-300 h-11 md:h-12 transition"
-              >
-                <option value="all">Department</option>
-                {departments.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
+              <select className="w-full sm:w-auto appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 md:py-2.5 pr-8 text-sm md:text-base text-gray-600 outline-none cursor-pointer hover:border-gray-300 h-11 md:h-12 transition">
+                <option>Department</option>
+                <option>Cardiology</option>
+                <option>Neurology</option>
+              </select>
+              <ChevronLeft className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 rotate-[-90deg] text-gray-400 pointer-events-none" />
+            </div>
+
+            <div className="relative w-full sm:w-auto">
+              <select className="w-full sm:w-auto appearance-none bg-[#F9FAFB] border border-gray-200 rounded-full px-4 py-2 md:py-2.5 pr-8 text-sm md:text-base text-gray-600 outline-none cursor-pointer hover:border-gray-300 h-11 md:h-12 transition">
+                <option>Last Visit</option>
+                <option>This Week</option>
+                <option>This Month</option>
               </select>
               <ChevronLeft className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 rotate-[-90deg] text-gray-400 pointer-events-none" />
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-500 w-full sm:w-auto flex-wrap">
+            <div className="relative">
+              <select className="appearance-none bg-white border border-gray-200 rounded-full px-3 py-2 md:py-2.5 pr-7 text-sm md:text-base text-gray-600 outline-none cursor-pointer h-11 md:h-12 transition">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+              </select>
+              <ChevronLeft className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 rotate-[-90deg] text-gray-400 pointer-events-none" />
+            </div>
             <span className="text-xs md:text-sm whitespace-nowrap">
-              {loading ? "Loading..." : `${filteredPatients.length} patients`}
+              Entries per page
             </span>
           </div>
         </div>
@@ -223,17 +229,9 @@ export default function PatientsRecords() {
               </tr>
             </thead>
             <tbody>
-              {!loading && filteredPatients.length === 0 && (
-                <tr>
-                  <td className="px-4 py-8 text-center text-gray-500" colSpan={8}>
-                    No patients found.
-                  </td>
-                </tr>
-              )}
-
-              {filteredPatients.map((p) => (
+              {patients.map((p, index) => (
                 <tr
-                  key={p.id}
+                  key={`${p.id}-${index}`}
                   onClick={() => handleRowClick(p.id)}
                   className="border-b border-gray-100 hover:bg-gray-50 transition-colors h-16 md:h-20 cursor-pointer"
                 >
@@ -290,16 +288,16 @@ export default function PatientsRecords() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 mt-4 md:mt-6 text-sm text-gray-400 w-full">
-          <span className="text-xs md:text-sm">
-            Showing {filteredPatients.length > 0 ? "1-" : "0"}
-            {filteredPatients.length} from {filteredPatients.length}
-          </span>
+          <span className="text-xs md:text-sm">Showing 1-9 from 15</span>
           <div className="flex items-center gap-1 md:gap-2">
             <button className="h-10 w-10 md:h-10 md:w-10 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-gray-400 transition">
               <ChevronLeft size={16} />
             </button>
             <button className="h-10 w-10 md:h-10 md:w-10 flex items-center justify-center rounded bg-[#E8EAF6] text-[#1A2380] font-medium border border-[#E8EAF6] text-sm">
               1
+            </button>
+            <button className="h-10 w-10 md:h-10 md:w-10 flex items-center justify-center rounded border border-gray-100 hover:bg-gray-50 text-gray-600 font-medium transition text-sm">
+              2
             </button>
             <button className="h-10 w-10 md:h-10 md:w-10 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-50 text-gray-400 transition">
               <ChevronRight size={16} />

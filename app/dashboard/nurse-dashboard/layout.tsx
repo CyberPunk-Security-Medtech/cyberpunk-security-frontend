@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Sidebar from "@components/SideBar";
-import Header from "@components/Header";
 import { LayoutDashboard, Users, Sparkles } from "lucide-react";
 import { MenuItem, UserProfile } from "@/types/index";
+import Header from "@components/Header";
 
 const nurseMenu: MenuItem[] = [
   {
