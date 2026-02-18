@@ -1,25 +1,56 @@
 'use client'
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard,
   Users,
   Activity,
+  Building2,
   ShieldCheck,
   BarChart2,
   Settings,
   HelpCircle,
 } from "lucide-react";
 import Image from "next/image";
+import { authService } from "@services/api";
 
 
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (!profileMenuRef.current) return;
+      if (!profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout request failed", error);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/auth/login";
+    }
+  };
 
   const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin-dashboard" },
     { label: "Staff management", icon: Users, href: "/dashboard/admin-dashboard/staff-management" },
+    { label: "Departments", icon: Building2, href: "/dashboard/admin-dashboard/departments" },
     { label: "Patients Transfers", icon: Activity, href: "/dashboard/admin-dashboard/patients-transfers" },
     { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin-dashboard/hmo-management" },
     { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin-dashboard/compliance" },
@@ -61,14 +92,52 @@ export default function Sidebar() {
 
       {/* User Bottom Card */}
       <div className="px-3 pb-6">
-        <div className="flex items-center gap-3 bg-white/5 rounded-2xl px-3 py-3">
-          <div className="w-9 h-9 rounded-full bg-emerald-400 flex items-center justify-center text-sm font-semibold text-[#051466]">
-            EP
-          </div>
-          <div>
-            <p className="text-sm font-medium">Eleanor Pena</p>
-            <p className="text-[11px] text-slate-300">Hospital Administrator</p>
-          </div>
+        <div className="relative" ref={profileMenuRef}>
+          <button
+            type="button"
+            onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+            className="w-full flex items-center gap-3 bg-white/5 rounded-2xl px-3 py-3 text-left"
+            aria-label="Open profile menu"
+          >
+            <Image
+              src="/avatars/eleanor.png"
+              alt="Eleanor Pena"
+              width={36}
+              height={36}
+              className="rounded-full"
+            />
+            <div>
+              <p className="text-sm font-medium">Eleanor Pena</p>
+              <p className="text-[11px] text-slate-300">Hospital Administrator</p>
+            </div>
+            <span
+              className={`ml-auto transition-transform ${
+                isProfileMenuOpen ? "rotate-180" : ""
+              }`}
+            >
+              <svg
+                width="14"
+                height="8"
+                viewBox="0 0 14 8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M1 1.5L7 6.5L13 1.5" fill="white" />
+              </svg>
+            </span>
+          </button>
+
+          {isProfileMenuOpen && (
+            <div className="absolute left-0 right-0 bottom-full mb-2 rounded-lg border border-white/20 bg-white py-1 shadow-lg">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full px-3 py-2 text-left text-sm text-[#0F172A] hover:bg-slate-100"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </aside>

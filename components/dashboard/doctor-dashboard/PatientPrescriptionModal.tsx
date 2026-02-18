@@ -1,212 +1,106 @@
-// 'use client'
+"use client";
 
-// import { useState } from 'react'
-// import Modal from '@components/Modal'
-// import { FieldLabel, Input, Select, Textarea } from '@components/Field'
-
-// export function PatientPrescriptionModal() {
-//   const [open, setOpen] = useState(false)
-
-//   return (
-//     <section className="bg-white rounded-lg border shadow-sm p-6">
-//       {/* Header */}
-//       <div className="flex items-center justify-between mb-6">
-//         <h3 className="text-lg font-semibold text-[#1A2380]">Prescription</h3>
-//         <button
-//           onClick={() => setOpen(true)}
-//           className="rounded-md bg-[#1A2380] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#141a66] transition"
-//         >
-//           + New Prescription
-//         </button>
-//       </div>
-
-//       {/* Empty State */}
-//       <div className="rounded-xl border border-dashed p-10 text-center text-gray-400">
-//         No prescriptions yet.
-//       </div>
-
-//       {/* Modal */}
-//       <Modal title="Create New Prescription" isOpen={open} onClose={() => setOpen(false)}>
-//         <form className="space-y-6">
-//           {/* Medication Name */}
-//           <div>
-//             <FieldLabel>Medication Name</FieldLabel>
-//             <Input placeholder="Search Medication Name" />
-//           </div>
-
-//           {/* Dosage + Frequency */}
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//             <div>
-//               <FieldLabel>Dosage</FieldLabel>
-//               <Input placeholder="Enter Dosage (500mg)" />
-//             </div>
-//             <div className="grid grid-cols-2 gap-3">
-//               <div>
-//                 <FieldLabel>Frequency</FieldLabel>
-//                 <Select defaultValue="">
-//                   <option value="" disabled>
-//                     Select Frequency
-//                   </option>
-//                   <option>Daily</option>
-//                   <option>Twice Daily</option>
-//                   <option>Weekly</option>
-//                 </Select>
-//               </div>
-//               <div className="pt-6">
-//                 <Input defaultValue="Daily" readOnly />
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Duration + Route + Date */}
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//             <div className="grid grid-cols-2 gap-3">
-//               <div>
-//                 <FieldLabel>Duration</FieldLabel>
-//                 <Input placeholder="Enter Duration" />
-//               </div>
-//               <div className="pt-6">
-//                 <Select defaultValue="Month">
-//                   <option>Day</option>
-//                   <option>Week</option>
-//                   <option>Month</option>
-//                 </Select>
-//               </div>
-//             </div>
-//             <div className="grid grid-cols-2 gap-3">
-//               <div>
-//                 <FieldLabel>Route</FieldLabel>
-//                 <Select defaultValue="">
-//                   <option value="" disabled>
-//                     Select Route
-//                   </option>
-//                   <option>Oral</option>
-//                   <option>IM</option>
-//                   <option>IV</option>
-//                 </Select>
-//               </div>
-//               <div>
-//                 <FieldLabel>Start Date</FieldLabel>
-//                 <Input type="date" />
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Special Instructions */}
-//           <div>
-//             <FieldLabel>Special Instructions</FieldLabel>
-//             <Textarea rows={5} placeholder="Write Special Instructions" />
-//           </div>
-
-//           {/* Buttons */}
-//           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-//             <button
-//               type="button"
-//               className="rounded-full border px-6 py-2.5 text-sm font-medium"
-//             >
-//               + Add Another Medication
-//             </button>
-//             <div className="flex gap-3">
-//               <button
-//                 type="button"
-//                 onClick={() => setOpen(false)}
-//                 className="rounded-full border px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
-//               >
-//                 Cancel
-//               </button>
-//               <button className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#00B8A8] transition">
-//                 Save & Send to Pharmacist
-//               </button>
-//             </div>
-//           </div>
-//         </form>
-//       </Modal>
-//     </section>
-//   )
-// }
-'use client'
-
-import React, { useState } from 'react'
-import Modal from '@components/Modal'
-import { FieldLabel, Input, Textarea } from '@components/Field'
-import { Plus } from 'lucide-react'
-import { PatientService } from '@services/api'
-import Button from '@components/Button'
+import React, { useState } from "react";
+import Modal from "@components/Modal";
+import { FieldLabel, Input, Textarea } from "@components/Field";
+import { Plus } from "lucide-react";
+import { consultationService } from "@services/api";
+import Button from "@components/Button";
+import { toast } from "react-toastify";
 
 interface PatientPrescriptionModalProps {
-  open: boolean
-  onClose: () => void
-  visitId: string | null
+  open: boolean;
+  onClose: () => void;
+  consultationId: string | null;
+  orgId: string | null;
+  onCreated?: () => Promise<void> | void;
 }
 
 export function PatientPrescriptionModal({
   open,
   onClose,
-  visitId
+  consultationId,
+  orgId,
+  onCreated,
 }: PatientPrescriptionModalProps) {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    medicationName: '',
-    dosage: '',
-    frequency: '',
-    interval: '',
-    duration: '',
-    durationType: 'Days',
-    route: '',
-    startDate: '',
-    instructions: ''
-  })
+    medication_name: "",
+    dosage: "",
+    frequency: "",
+    interval: "",
+    duration: "",
+    durationType: "Days",
+    route: "",
+    start_date: "",
+    instructions: "",
+  });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setFormData(prev => ({ ...prev, [id]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
-  // const handleSubmit = async () => {
-  //   if (!visitId) return
-  //   setLoading(true)
-  //   try {
-  //     await PatientService.createPrescription(visitId, formData)
-  //     onClose()
-  //     // Reset form
-  //     setFormData({
-  //       medicationName: '',
-  //       dosage: '',
-  //       frequency: '',
-  //       interval: '',
-  //       duration: '',
-  //       durationType: 'Days',
-  //       route: '',
-  //       startDate: '',
-  //       instructions: ''
-  //     })
-  //   } catch (e) {
-  //     console.error(e)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
+  const handleSubmit = async () => {
+    if (!consultationId || !orgId) return;
+    setLoading(true);
+    try {
+      await consultationService.createPrescription(orgId, consultationId, {
+        medication_name: formData.medication_name,
+        dosage: formData.dosage,
+        frequency: [formData.frequency, formData.interval].filter(Boolean).join(" ").trim(),
+        duration: `${formData.duration} ${formData.durationType}`.trim(),
+        route: formData.route || null,
+        start_date: formData.start_date || null,
+        instructions: formData.instructions || null,
+      });
+      onClose();
+      if (onCreated) await onCreated();
+      setFormData({
+        medication_name: "",
+        dosage: "",
+        frequency: "",
+        interval: "",
+        duration: "",
+        durationType: "Days",
+        route: "",
+        start_date: "",
+        instructions: "",
+      });
+      toast.success("Prescription created");
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to create prescription");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal title="Create New Prescription" isOpen={open} onClose={onClose}>
       <div className="relative flex flex-col max-h-[95vh]">
-        {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); /* handleSubmit() */ }}>
-            {/* Medication Name */}
+          <form
+            className="space-y-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
             <div>
-              <FieldLabel htmlFor="medicationName">Medication Name</FieldLabel>
+              <FieldLabel htmlFor="medication_name">Medication Name</FieldLabel>
               <Input
-                id="medicationName"
+                id="medication_name"
                 placeholder="Search Medication Name"
                 type="text"
-                value={formData.medicationName}
+                value={formData.medication_name}
                 onChange={handleChange}
+                required
               />
             </div>
 
-            {/* Dosage */}
             <div>
               <FieldLabel htmlFor="dosage">Dosage</FieldLabel>
               <Input
@@ -215,10 +109,10 @@ export function PatientPrescriptionModal({
                 type="text"
                 value={formData.dosage}
                 onChange={handleChange}
+                required
               />
             </div>
 
-            {/* Frequency & Interval */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <FieldLabel htmlFor="frequency">Frequency</FieldLabel>
@@ -246,7 +140,6 @@ export function PatientPrescriptionModal({
               </div>
             </div>
 
-            {/* Duration */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <FieldLabel htmlFor="duration">Duration</FieldLabel>
@@ -255,6 +148,7 @@ export function PatientPrescriptionModal({
                   placeholder="Enter Duration"
                   value={formData.duration}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div>
@@ -272,7 +166,6 @@ export function PatientPrescriptionModal({
               </div>
             </div>
 
-            {/* Route & Start Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <FieldLabel htmlFor="route">Route</FieldLabel>
@@ -290,17 +183,16 @@ export function PatientPrescriptionModal({
               </div>
 
               <div>
-                <FieldLabel htmlFor="startDate">Start Date</FieldLabel>
+                <FieldLabel htmlFor="start_date">Start Date</FieldLabel>
                 <Input
-                  id="startDate"
+                  id="start_date"
                   type="date"
-                  value={formData.startDate}
+                  value={formData.start_date}
                   onChange={handleChange}
                 />
               </div>
             </div>
 
-            {/* Special Instructions */}
             <div>
               <FieldLabel htmlFor="instructions">Special Instructions</FieldLabel>
               <Textarea
@@ -312,7 +204,6 @@ export function PatientPrescriptionModal({
               />
             </div>
 
-            {/* Add Another Medication */}
             <div>
               <button
                 type="button"
@@ -323,7 +214,6 @@ export function PatientPrescriptionModal({
               </button>
             </div>
 
-            {/* Sticky Footer Buttons inside form to handle submit properly */}
             <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 flex justify-end gap-3 -mx-6 -mb-6 mt-6">
               <button
                 type="button"
@@ -334,15 +224,15 @@ export function PatientPrescriptionModal({
               </button>
               <Button
                 type="submit"
-                disabled={loading || !visitId}
+                disabled={loading || !consultationId || !orgId}
                 className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#00B8A8] transition disabled:opacity-50"
               >
-                {loading ? 'Sending...' : 'Save & Send to Pharmacist'}
+                {loading ? "Sending..." : "Save & Send to Pharmacist"}
               </Button>
             </div>
           </form>
         </div>
       </div>
     </Modal>
-  )
+  );
 }
