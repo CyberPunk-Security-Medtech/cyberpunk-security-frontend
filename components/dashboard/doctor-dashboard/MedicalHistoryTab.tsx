@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StatusBadge } from "@components/StatusBadge";
 import { DiagnosisModal } from "./DiagnosisModal";
 import Button from "@components/Button";
@@ -15,8 +15,8 @@ export default function MedicalHistoryTab() {
   const {
     patientId,
     orgId,
-    isConsultationActive,
-    currentConsultationId,
+    isSelectedConsultationActive,
+    selectedConsultationId,
   } = useConsultation();
 
   const [note, setNote] = useState("");
@@ -37,12 +37,17 @@ export default function MedicalHistoryTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, patientId]);
 
+  const filteredRows = useMemo(() => {
+    if (!selectedConsultationId) return rows;
+    return rows.filter((row: any) => row.consultation_id === selectedConsultationId);
+  }, [rows, selectedConsultationId]);
+
   const handleSaveNote = async () => {
-    if (!orgId || !currentConsultationId || !note.trim()) return;
+    if (!orgId || !selectedConsultationId || !note.trim()) return;
 
     setSavingNote(true);
     try {
-      await consultationService.completeConsultation(orgId, currentConsultationId, {
+      await consultationService.completeConsultation(orgId, selectedConsultationId, {
         clinical_notes: note.trim(),
       });
       setNote("");
@@ -56,15 +61,15 @@ export default function MedicalHistoryTab() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
-      <section className="bg-white rounded-lg border shadow-sm p-6">
-        <div className="flex items-center justify-between mb-6">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:gap-8">
+      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Medical History</h3>
           <button
             onClick={() => setOpen(true)}
-            disabled={!isConsultationActive || !currentConsultationId}
+            disabled={!isSelectedConsultationActive || !selectedConsultationId}
             className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
-              isConsultationActive && !!currentConsultationId
+              isSelectedConsultationActive && !!selectedConsultationId
                 ? "bg-[#1A2380] hover:bg-[#00B8A8]"
                 : "bg-gray-300 cursor-not-allowed"
             }`}
@@ -74,20 +79,20 @@ export default function MedicalHistoryTab() {
         </div>
 
         <div className="space-y-4">
-          {rows.length === 0 && (
+          {filteredRows.length === 0 && (
             <div className="rounded-xl border p-4 text-sm text-gray-500">
               No diagnosis records yet.
             </div>
           )}
 
-          {rows.map((h: any) => (
+          {filteredRows.map((h: any) => (
             <div
               key={h.id}
-              className="flex items-center justify-between rounded-xl border p-4"
+              className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <h4 className="font-medium text-[#1A2380]">{h.primary_diagnosis}</h4>
-                <p className="text-xs text-gray-500">
+              <div className="min-w-0">
+                <h4 className="break-words font-medium text-[#1A2380]">{h.primary_diagnosis}</h4>
+                <p className="break-words text-xs text-gray-500">
                   {h.secondary_diagnosis || h.symptoms || "No additional notes"}
                 </p>
               </div>
@@ -104,18 +109,18 @@ export default function MedicalHistoryTab() {
         <DiagnosisModal
           open={open}
           onClose={() => setOpen(false)}
-          consultationId={currentConsultationId}
+          consultationId={selectedConsultationId}
           orgId={orgId}
           onCreated={loadDiagnoses}
         />
       </section>
 
-      <section className="bg-white rounded-lg border shadow-sm p-6">
+      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <h3 className="text-lg font-semibold text-[#1A2380] mb-4">Doctor&apos;s Note</h3>
 
         <textarea
-          placeholder={isConsultationActive ? "Add Note" : "Start consultation to add notes"}
-          disabled={!isConsultationActive || !currentConsultationId}
+          placeholder={isSelectedConsultationActive ? "Add Note" : "Start consultation to add notes"}
+          disabled={!isSelectedConsultationActive || !selectedConsultationId}
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="w-full border border-gray-200 rounded-md p-3 text-sm focus:ring-1 focus:ring-[#00B8A8] outline-none resize-none disabled:bg-gray-50"
@@ -126,7 +131,7 @@ export default function MedicalHistoryTab() {
           <Button
             type="button"
             onSubmitHandler={handleSaveNote}
-            disabled={!isConsultationActive || savingNote || !note.trim() || !currentConsultationId}
+            disabled={!isSelectedConsultationActive || savingNote || !note.trim() || !selectedConsultationId}
             className="bg-[#1A2380] text-white px-4 py-2 rounded-md hover:bg-[#00B8A8] transition text-sm disabled:opacity-50 disabled:bg-gray-300"
           >
             {savingNote ? "Saving..." : "Save Note"}

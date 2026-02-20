@@ -9,9 +9,9 @@ import { useState } from 'react';
 export default function PatientsRecords() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
-    <div className="px-6 py-4">
+    <div className="py-2 sm:py-4">
       {/* Header Row */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-[#1A2380]">Patients Records</h2>
           <p className="text-gray-500 text-sm">View and manage patient information</p>
@@ -20,7 +20,7 @@ export default function PatientsRecords() {
         <Button
           type="button"
           onSubmitHandler={() => setIsModalOpen(true)}
-          className="bg-[#1A2380] text-white font-medium px-5 py-2.5 rounded-md hover:bg-[#00B8A8] transition"
+          className="w-full rounded-md bg-[#1A2380] px-5 py-2.5 font-medium text-white transition hover:bg-[#00B8A8] sm:w-auto"
         >
           + Add New Patient Record
         </Button>
@@ -29,8 +29,8 @@ export default function PatientsRecords() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
-        <div className="relative w-full sm:w-80">
+      <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative w-full lg:max-w-sm">
           <input
             type="text"
             placeholder="Search patient"
@@ -48,14 +48,14 @@ export default function PatientsRecords() {
           </svg>
         </div>
 
-        <div className="flex items-center gap-3">
-          <select className="border border-gray-200 rounded-md px-3 py-2 text-sm focus:ring-[#00B8A8]">
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:w-auto lg:grid-cols-2">
+          <select className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:ring-[#00B8A8]">
             <option>Department</option>
             <option>Cardiology</option>
             <option>Neurology</option>
             <option>Pediatrics</option>
           </select>
-          <select className="border border-gray-200 rounded-md px-3 py-2 text-sm focus:ring-[#00B8A8]">
+          <select className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:ring-[#00B8A8]">
             <option>Last Visit</option>
             <option>This Week</option>
             <option>This Month</option>

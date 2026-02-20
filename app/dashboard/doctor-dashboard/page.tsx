@@ -1,22 +1,3 @@
-// import OverviewCards from "@components/dashboard/doctor-dashboard/OverviewCards";
-// import TodayAppointments from "@components/dashboard/doctor-dashboard/TodaysAppointment";
-// import LabTest from "@components/dashboard/doctor-dashboard/LabTest";
-
-
-
-
-// export default function Dashboard() {
-//   return (
-//     // <DashboardLayout>
-//       <>
-//       {/* // <DashboardLayout> */}
-//       <h2 className="text-xl font-semibold text-[#1A2380] mb-1">Good morning, Dr. Alex!</h2><p className="text-gray-500 mb-8">Welcome back to PrivaCure dashboard</p><OverviewCards /><TodayAppointments /><LabTest/>
-//       </>
-//     // </DashboardLayout>
-//   );
-// }
-
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -25,32 +6,40 @@ import TodayAppointments from "@components/dashboard/doctor-dashboard/TodaysAppo
 import LabTest from "@components/dashboard/doctor-dashboard/LabTest";
 import { authService } from "@services/api";
 
+const formatDoctorName = (user: any): string => {
+  const firstName = (user?.first_name ?? "").toString().trim();
+  const lastName = (user?.last_name ?? "").toString().trim();
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  if (fullName) return fullName;
+
+  const emailPrefix = (user?.email ?? "").toString().split("@")[0]?.trim();
+  return emailPrefix || "Doctor";
+};
+
 export default function Dashboard() {
-  const [doctorName, setDoctorName] = useState("");
+  const [doctorName, setDoctorName] = useState("Doctor");
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const me = await authService.getMe();
-
-        // adjust depending on API structure
-        setDoctorName(`${me.first_name} ${me.last_name}`);
+        const meRes = await authService.getMe();
+        const me = meRes?.data ?? meRes;
+        setDoctorName(formatDoctorName(me));
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load doctor profile", err);
+        setDoctorName("Doctor");
       }
     };
 
-    fetchUser();
+    void fetchUser();
   }, []);
 
   return (
     <>
       <h2 className="text-xl font-semibold text-[#1A2380] mb-1">
-        Good morning, Dr. {doctorName || "Loading..."}!
+        Good morning, Dr. {doctorName}!
       </h2>
-      <p className="text-gray-500 mb-8">
-        Welcome back to PrivaCure dashboard
-      </p>
+      <p className="text-gray-500 mb-8">Welcome back to PrivaCure dashboard</p>
 
       <OverviewCards />
       <TodayAppointments />

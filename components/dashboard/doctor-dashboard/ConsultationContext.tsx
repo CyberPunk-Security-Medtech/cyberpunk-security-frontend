@@ -16,9 +16,14 @@ type ConsultationContextType = {
   consultationLoading: boolean;
   consultationStatus: ConsultationStatus;
   isConsultationActive: boolean;
+  isSelectedConsultationActive: boolean;
   currentConsultationId: string | null;
+  selectedConsultationId: string | null;
+  selectedConsultation: any | null;
   hasConsultation: boolean;
+  hasOpenConsultation: boolean;
   canStartConsultation: boolean;
+  setSelectedConsultationId: (consultationId: string | null) => void;
   refreshPatient: () => Promise<void>;
   refreshConsultations: () => Promise<void>;
   createConsultation: (payload: {
@@ -49,6 +54,7 @@ export function ConsultationProvider({
   const [consultationLoading, setConsultationLoading] = useState(false);
   const [consultationStatus, setConsultationStatus] = useState<ConsultationStatus>("idle");
   const [currentConsultationId, setCurrentConsultationId] = useState<string | null>(null);
+  const [selectedConsultationId, setSelectedConsultationId] = useState<string | null>(null);
 
   const refreshPatient = async () => {
     if (!orgId || !patientId) return;
@@ -67,14 +73,19 @@ export function ConsultationProvider({
     if (!orgId) return;
     setConsultationLoading(true);
     try {
-      // Backend defaults listConsultations to "Pending", so fetch both states
-      // to preserve active consultation state across reloads.
-      const [inProgressResult, pendingResult] = await Promise.all([
+      const [inProgressResult, pendingResult, completedResult, cancelledResult] = await Promise.all([
         consultationService.listConsultations(orgId, { status_filter: "In Progress" }),
         consultationService.listConsultations(orgId, { status_filter: "Pending" }),
+        consultationService.listConsultations(orgId, { status_filter: "Completed" }),
+        consultationService.listConsultations(orgId, { status_filter: "Cancelled" }),
       ]);
 
-      const merged = [...(inProgressResult ?? []), ...(pendingResult ?? [])];
+      const merged = [
+        ...(inProgressResult ?? []),
+        ...(pendingResult ?? []),
+        ...(completedResult ?? []),
+        ...(cancelledResult ?? []),
+      ];
       const uniqueById = Array.from(
         new Map(merged.map((c: any) => [c.id, c])).values()
       );
@@ -90,9 +101,12 @@ export function ConsultationProvider({
 
       const active = mine.find((c: any) => String(c.status).toLowerCase() === "in progress");
       const pending = mine.find((c: any) => String(c.status).toLowerCase() === "pending");
-      const selected = active ?? pending ?? null;
+      const selectedForActions = active ?? pending ?? null;
+      const selectedForView =
+        mine.find((c: any) => c.id === selectedConsultationId) ?? null;
 
-      setCurrentConsultationId(selected?.id ?? null);
+      setCurrentConsultationId(selectedForActions?.id ?? null);
+      setSelectedConsultationId(selectedForView?.id ?? null);
       setConsultationStatus(active ? "active" : "idle");
     } catch (error) {
       console.error("Failed to load consultations", error);
@@ -107,9 +121,20 @@ export function ConsultationProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, patientId]);
 
-  const isConsultationActive = consultationStatus === "active";
+  const selectedConsultation =
+    consultations.find((consultation) => consultation.id === selectedConsultationId) ?? null;
+  const selectedStatus = String(selectedConsultation?.status ?? "").toLowerCase();
+  const actionConsultation =
+    consultations.find((consultation) => consultation.id === currentConsultationId) ?? null;
+  const actionStatus = String(actionConsultation?.status ?? "").toLowerCase();
+  const isConsultationActive = actionStatus === "in progress";
+  const isSelectedConsultationActive = selectedStatus === "in progress";
   const hasConsultation = !!currentConsultationId;
-  const canStartConsultation = !!currentConsultationId && !isConsultationActive;
+  const hasOpenConsultation = consultations.some((consultation) => {
+    const status = String(consultation?.status ?? "").toLowerCase();
+    return status === "pending" || status === "in progress";
+  });
+  const canStartConsultation = actionStatus === "pending";
 
   const createConsultation = async (payload: {
     department_id: string;
@@ -136,10 +161,17 @@ export function ConsultationProvider({
   };
 
   const startConsultation = async () => {
-    if (!orgId || !currentConsultationId) return;
+    const targetConsultationId =
+      selectedStatus === "pending"
+        ? selectedConsultationId
+        : actionStatus === "pending"
+        ? currentConsultationId
+        : null;
+
+    if (!orgId || !targetConsultationId) return;
     setConsultationStatus("starting");
     try {
-      await consultationService.attendConsultation(orgId, currentConsultationId);
+      await consultationService.attendConsultation(orgId, targetConsultationId);
       setConsultationStatus("active");
       await refreshConsultations();
     } catch (error) {
@@ -172,9 +204,14 @@ export function ConsultationProvider({
       consultationLoading,
       consultationStatus,
       isConsultationActive,
+      isSelectedConsultationActive,
       currentConsultationId,
+      selectedConsultationId,
+      selectedConsultation,
       hasConsultation,
+      hasOpenConsultation,
       canStartConsultation,
+      setSelectedConsultationId,
       refreshPatient,
       refreshConsultations,
       createConsultation,
@@ -189,9 +226,14 @@ export function ConsultationProvider({
       consultationLoading,
       consultationStatus,
       isConsultationActive,
+      isSelectedConsultationActive,
       currentConsultationId,
+      selectedConsultationId,
+      selectedConsultation,
       hasConsultation,
+      hasOpenConsultation,
       canStartConsultation,
+      setSelectedConsultationId,
     ]
   );
 

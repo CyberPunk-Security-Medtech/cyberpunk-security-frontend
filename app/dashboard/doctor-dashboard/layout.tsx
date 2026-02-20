@@ -33,6 +33,8 @@ export default function DashboardLayout({
       <Sidebar
         sidebarMinimize={sidebarMinimize}
         setSidebarMinimize={setSidebarMinimize}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
         menuItems={doctorMenu}
         user={doctorProfile}
       />
@@ -43,7 +45,7 @@ export default function DashboardLayout({
           setSidebarOpen={setSidebarOpen}
           desktopPaddingClassName="md:px-12"
         />
-        <main className="flex-1 overflow-y-auto px-6 py-4">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
       </div>
     </div>
   );
