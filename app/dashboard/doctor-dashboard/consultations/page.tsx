@@ -146,7 +146,9 @@ export default function ConsultationsPage() {
     await withRowLoading(row.id, async () => {
       await consultationService.attendConsultation(orgId, row.id);
       await loadConsultations();
-      router.push(`/dashboard/doctor-dashboard/patient/${row.patient_id}`);
+      router.push(
+        `/dashboard/doctor-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`
+      );
     });
   };
 
@@ -158,16 +160,74 @@ export default function ConsultationsPage() {
     });
   };
 
+  const renderActionButtons = (row: ConsultationRow, rowLoading: boolean) => {
+    const detailHref = `/dashboard/doctor-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`;
+
+    if (row.status === "Pending") {
+      return (
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          <button
+            type="button"
+            onClick={() => void handleStart(row)}
+            disabled={rowLoading}
+            className="w-full rounded-md bg-[#1A2380] px-3 py-1.5 text-white hover:bg-[#111B66] disabled:opacity-50 sm:w-auto"
+          >
+            {rowLoading ? "Starting..." : "Start"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(detailHref)}
+            className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
+          >
+            Details
+          </button>
+        </div>
+      );
+    }
+
+    if (row.status === "In Progress") {
+      return (
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          <button
+            type="button"
+            onClick={() => router.push(detailHref)}
+            className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
+          >
+            Continue
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleComplete(row)}
+            disabled={rowLoading}
+            className="w-full rounded-md bg-[#00B8A8] px-3 py-1.5 text-white hover:bg-[#00A393] disabled:opacity-50 sm:w-auto"
+          >
+            {rowLoading ? "Saving..." : "Complete"}
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => router.push(detailHref)}
+        className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
+      >
+        View
+      </button>
+    );
+  };
+
   return (
-    <div className="px-6 py-4 space-y-6">
+    <div className="min-w-0 space-y-6 py-2 sm:py-4">
       <div className="space-y-1">
-        <h2 className="text-2xl font-semibold text-[#1A2380]">Consultation Queue</h2>
+        <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">Consultation Queue</h2>
         <p className="text-sm text-gray-500">
           Track pending, active and completed consultations across your patients.
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div className="min-w-0 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap gap-2">
           {STATUS_TABS.map((tab) => {
             const isActive = activeTab === tab;
@@ -176,10 +236,10 @@ export default function ConsultationsPage() {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`rounded-full px-3 py-1.5 text-sm transition ${
+                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
                   isActive
                     ? "bg-[#1A2380] text-white"
-                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 {tab} ({counts[tab] ?? 0})
@@ -193,107 +253,115 @@ export default function ConsultationsPage() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search by patient, reason or ID"
-          className="w-full md:w-80 rounded-full border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8]"
+          className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8] lg:max-w-sm"
         />
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
-        <table className="w-full text-sm text-left border-collapse">
-          <thead className="text-gray-600 border-b bg-gray-50">
-            <tr>
-              <th className="py-3 px-4 font-medium">Patient</th>
-              <th className="py-3 px-4 font-medium">Department</th>
-              <th className="py-3 px-4 font-medium">Reason</th>
-              <th className="py-3 px-4 font-medium">Priority</th>
-              <th className="py-3 px-4 font-medium">Status</th>
-              <th className="py-3 px-4 font-medium">Updated</th>
-              <th className="py-3 px-4 font-medium text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
+      <div className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="hidden overflow-x-auto xl:block">
+          <table className="w-full min-w-[980px] border-collapse text-left text-sm">
+            <thead className="border-b bg-gray-50 text-gray-600">
               <tr>
-                <td className="px-4 py-6 text-gray-500" colSpan={7}>
-                  Loading consultations...
-                </td>
+                <th className="px-4 py-3 font-medium">Patient</th>
+                <th className="px-4 py-3 font-medium">Department</th>
+                <th className="px-4 py-3 font-medium">Reason</th>
+                <th className="px-4 py-3 font-medium">Priority</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Updated</th>
+                <th className="px-4 py-3 text-right font-medium">Action</th>
               </tr>
-            )}
+            </thead>
+            <tbody>
+              {loading && (
+                <tr>
+                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
+                    Loading consultations...
+                  </td>
+                </tr>
+              )}
 
-            {!loading && filteredRows.length === 0 && (
-              <tr>
-                <td className="px-4 py-6 text-gray-500" colSpan={7}>
-                  No consultations found.
-                </td>
-              </tr>
-            )}
+              {!loading && filteredRows.length === 0 && (
+                <tr>
+                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
+                    No consultations found.
+                  </td>
+                </tr>
+              )}
 
-            {!loading &&
-              filteredRows.map((row) => {
-                const rowLoading = !!actionLoadingById[row.id];
-                return (
-                  <tr key={row.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-[#1A2380]">{row.patient_name}</div>
-                      <div className="text-xs text-gray-500">{row.patient_id}</div>
-                    </td>
-                    <td className="px-4 py-3">{row.department_name}</td>
-                    <td className="px-4 py-3 max-w-[280px] truncate">{row.reason_for_visit}</td>
-                    <td className="px-4 py-3">{row.priority}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={toBadgeStatus(row.status)} />
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">{formatDate(row.updated_at)}</td>
-                    <td className="px-4 py-3 text-right">
-                      {row.status === "Pending" && (
-                        <button
-                          type="button"
-                          onClick={() => void handleStart(row)}
-                          disabled={rowLoading}
-                          className="rounded-md bg-[#1A2380] px-3 py-1.5 text-white hover:bg-[#111B66] disabled:opacity-50"
-                        >
-                          {rowLoading ? "Starting..." : "Start"}
-                        </button>
-                      )}
+              {!loading &&
+                filteredRows.map((row) => {
+                  const rowLoading = !!actionLoadingById[row.id];
+                  return (
+                    <tr key={row.id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-[#1A2380]">{row.patient_name}</div>
+                        <div className="break-all text-xs text-gray-500">{row.patient_id}</div>
+                      </td>
+                      <td className="px-4 py-3">{row.department_name}</td>
+                      <td className="px-4 py-3">
+                        <span className="line-clamp-1">{row.reason_for_visit}</span>
+                      </td>
+                      <td className="px-4 py-3">{row.priority}</td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={toBadgeStatus(row.status)} />
+                      </td>
+                      <td className="px-4 py-3 text-gray-500">{formatDate(row.updated_at)}</td>
+                      <td className="px-4 py-3 text-right">{renderActionButtons(row, rowLoading)}</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
 
-                      {row.status === "In Progress" && (
-                        <div className="inline-flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              router.push(`/dashboard/doctor-dashboard/patient/${row.patient_id}`)
-                            }
-                            className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
-                          >
-                            Continue
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleComplete(row)}
-                            disabled={rowLoading}
-                            className="rounded-md bg-[#00B8A8] px-3 py-1.5 text-white hover:bg-[#00A393] disabled:opacity-50"
-                          >
-                            {rowLoading ? "Saving..." : "Complete"}
-                          </button>
-                        </div>
-                      )}
+        <div className="space-y-3 p-3 sm:p-4 xl:hidden">
+          {loading && (
+            <div className="rounded-lg border p-4 text-sm text-gray-500">
+              Loading consultations...
+            </div>
+          )}
 
-                      {(row.status === "Completed" || row.status === "Cancelled") && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            router.push(`/dashboard/doctor-dashboard/patient/${row.patient_id}`)
-                          }
-                          className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
-                        >
-                          View
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
+          {!loading && filteredRows.length === 0 && (
+            <div className="rounded-lg border p-4 text-sm text-gray-500">
+              No consultations found.
+            </div>
+          )}
+
+          {!loading &&
+            filteredRows.map((row) => {
+              const rowLoading = !!actionLoadingById[row.id];
+              return (
+                <div key={row.id} className="overflow-hidden rounded-lg border border-gray-200 p-4">
+                  <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="break-words font-medium text-[#1A2380]">{row.patient_name}</p>
+                      <p className="break-all text-xs text-gray-500">{row.patient_id}</p>
+                    </div>
+                    <StatusBadge status={toBadgeStatus(row.status)} />
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-2 text-xs text-gray-600 sm:grid-cols-2">
+                    <p>
+                      Department: <span className="font-medium text-gray-800">{row.department_name}</span>
+                    </p>
+                    <p>
+                      Priority: <span className="font-medium text-gray-800">{row.priority}</span>
+                    </p>
+                    <p className="sm:col-span-2">
+                      Reason: <span className="break-words font-medium text-gray-800">{row.reason_for_visit}</span>
+                    </p>
+                    <p className="sm:col-span-2">
+                      Updated: <span className="font-medium text-gray-800">{formatDate(row.updated_at)}</span>
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    {renderActionButtons(row, rowLoading)}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );

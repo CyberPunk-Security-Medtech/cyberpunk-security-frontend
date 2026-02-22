@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Modal from "@components/Modal";
 import { FieldLabel, Input, Select, Textarea } from "@components/Field";
 import { StatusBadge } from "@components/StatusBadge";
@@ -16,8 +16,8 @@ export default function LabTestTab() {
   const {
     orgId,
     patientId,
-    currentConsultationId,
-    isConsultationActive,
+    selectedConsultationId,
+    isSelectedConsultationActive,
   } = useConsultation();
 
   const [form, setForm] = useState({
@@ -42,13 +42,18 @@ export default function LabTestTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, patientId]);
 
+  const filteredTests = useMemo(() => {
+    if (!selectedConsultationId) return tests;
+    return tests.filter((item: any) => item.consultation_id === selectedConsultationId);
+  }, [tests, selectedConsultationId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orgId || !currentConsultationId) return;
+    if (!orgId || !selectedConsultationId) return;
 
     setSubmitting(true);
     try {
-      await consultationService.orderLabTest(orgId, currentConsultationId, {
+      await consultationService.orderLabTest(orgId, selectedConsultationId, {
         test_name: form.test_name,
         test_category: form.test_category || null,
         priority: form.priority,
@@ -72,35 +77,35 @@ export default function LabTestTab() {
   };
 
   return (
-    <section className="bg-white rounded-lg border shadow-sm p-6">
-      <div className="flex items-center justify-between mb-6">
+    <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-semibold text-brand-navy">Lab Test</h3>
         <button
-          disabled={!isConsultationActive || !currentConsultationId}
+          disabled={!isSelectedConsultationActive || !selectedConsultationId}
           onClick={() => setOpen(true)}
           className="rounded-md bg-brand-navy px-4 py-2.5 text-sm font-medium text-white hover:bg-[#141a66] disabled:opacity-50"
         >
           + Order Lab Test
         </button>
       </div>
-      {!isConsultationActive && (
+      {!isSelectedConsultationActive && (
         <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
           Start an active consultation before ordering lab tests.
         </p>
       )}
       <div className="space-y-3">
-        {tests.length === 0 && (
+        {filteredTests.length === 0 && (
           <div className="rounded-xl border px-4 py-4 text-sm text-gray-500">
             No lab tests recorded.
           </div>
         )}
-        {tests.map((t: any) => (
-          <div key={t.id} className="flex items-center justify-between rounded-xl border px-4 py-4">
+        {filteredTests.map((t: any) => (
+          <div key={t.id} className="flex flex-col gap-3 rounded-xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="truncate font-medium text-brand-navy">{t.test_name}</p>
-              <p className="text-xs text-gray-500">{t.test_category || "Uncategorized"}</p>
+              <p className="break-words font-medium text-brand-navy">{t.test_name}</p>
+              <p className="break-words text-xs text-gray-500">{t.test_category || "Uncategorized"}</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {t.priority && (
                 <span className="rounded-full bg-[#FFEBEC] px-2.5 py-1 text-xs font-medium text-[#CC1820]">
                   {t.priority}
@@ -157,7 +162,7 @@ export default function LabTestTab() {
               Cancel
             </button>
             <button
-              disabled={submitting || !orgId || !currentConsultationId}
+              disabled={submitting || !orgId || !selectedConsultationId}
               className="rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
               type="submit"
             >

@@ -5,6 +5,7 @@ import Sidebar from '@components/SideBar';
 import Header from '@components/Header';
 import { ClipboardList, LayoutDashboard, Users, Sparkles } from "lucide-react";
 import { MenuItem, UserProfile } from '@/types/index';
+import { useAuth } from '@context/AuthContext';
 
 const doctorMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/doctor-dashboard" },
@@ -13,10 +14,11 @@ const doctorMenu: MenuItem[] = [
   { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
 ];
 
-const doctorProfile: UserProfile = {
-  name: "Eleanor Pena",
-  role: "Doctor",
-  avatar: "/avatars/eleanor.png"
+const formatDisplayName = (user: { first_name?: string; last_name?: string; email?: string } | null) => {
+  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+  if (fullName) return fullName;
+  const emailPrefix = user?.email?.split("@")?.[0]?.trim();
+  return emailPrefix || "Doctor";
 };
 
 export default function DashboardLayout({
@@ -24,8 +26,15 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { user, activeWorkspace } = useAuth();
   const [sidebarMinimize, setSidebarMinimize] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Kept for Header if needed, though unused in Sidebar
+
+  const doctorProfile: UserProfile = {
+    name: formatDisplayName(user),
+    role: activeWorkspace?.role ?? "Doctor",
+    avatar: "/avatars/eleanor.png",
+  };
 
   return (
     <div className="font-sans h-screen flex overflow-hidden">
@@ -33,6 +42,8 @@ export default function DashboardLayout({
       <Sidebar
         sidebarMinimize={sidebarMinimize}
         setSidebarMinimize={setSidebarMinimize}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
         menuItems={doctorMenu}
         user={doctorProfile}
       />
@@ -43,7 +54,7 @@ export default function DashboardLayout({
           setSidebarOpen={setSidebarOpen}
           desktopPaddingClassName="md:px-12"
         />
-        <main className="flex-1 overflow-y-auto px-6 py-4">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
       </div>
     </div>
   );

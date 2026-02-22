@@ -132,6 +132,18 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@context/AuthContext";
 
+const resolveDashboardPath = (rawRole?: string) => {
+  const normalized = (rawRole ?? "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "");
+
+  if (normalized.includes("doctor")) return "/dashboard/doctor-dashboard";
+  if (normalized.includes("nurse")) return "/dashboard/nurse-dashboard";
+  if (normalized.includes("admin")) return "/dashboard/admin-dashboard";
+
+  return "/dashboard/admin-dashboard";
+};
+
 export default function WorkspaceSelectPage() {
   const router = useRouter();
   const {
@@ -151,7 +163,7 @@ export default function WorkspaceSelectPage() {
 
   const handleSelect = (workspace: any) => {
     setWorkspace(workspace);
-    router.push(`/dashboard/${workspace.role}-dashboard`);
+    router.push(resolveDashboardPath(workspace?.role));
   };
 
   

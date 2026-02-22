@@ -49,6 +49,11 @@ export default function SideBar({
     if (sidebarMinimize) setIsProfileMenuOpen(false);
   }, [sidebarMinimize]);
 
+  useEffect(() => {
+    // Ensure mobile drawer closes after navigation.
+    setSidebarOpen?.(false);
+  }, [pathname, setSidebarOpen]);
+
   const handleLogout = async () => {
     try {
       await authService.logout();
@@ -70,9 +75,9 @@ export default function SideBar({
       )}
 
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 text-white transition-all duration-300 flex flex-col justify-between py-6 ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] text-white transition-all duration-300 flex flex-col justify-between py-6 ${
           sidebarMinimize ? "lg:w-20" : "lg:w-[260px]"
-        } ${sidebarOpen ? "translate-x-0 w-[260px]" : "-translate-x-full lg:translate-x-0"}`}
+        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         style={{ backgroundColor }}
       >
         <div>

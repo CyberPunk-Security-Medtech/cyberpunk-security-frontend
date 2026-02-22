@@ -2,13 +2,18 @@
 
 import { ChevronDown, Search, Download, Plus, Bell } from "lucide-react";
 import Button from "@components/Button"
+import { useAuth } from "@context/AuthContext";
 
 export default function Topbar() {
+  const { user } = useAuth();
+  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+  const displayName = fullName || user?.email?.split("@")?.[0] || "Administrator";
+
   return (
     <header className="px-8 py-4 border-b bg-white flex items-center justify-between">
       <div>
         <h1 className="text-xl font-semibold">Dashboard Overview</h1>
-        <p className="text-sm text-slate-500">Welcome back, Mrs. Elena.</p>
+        <p className="text-sm text-slate-500">Welcome back, {displayName}.</p>
       </div>
 
       <div className="flex items-center gap-2">
