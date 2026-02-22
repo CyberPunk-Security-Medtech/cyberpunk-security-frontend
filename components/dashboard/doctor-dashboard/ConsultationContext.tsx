@@ -106,7 +106,7 @@ export function ConsultationProvider({
         mine.find((c: any) => c.id === selectedConsultationId) ?? null;
 
       setCurrentConsultationId(selectedForActions?.id ?? null);
-      setSelectedConsultationId(selectedForView?.id ?? null);
+      setSelectedConsultationId(selectedForView?.id ?? selectedConsultationId ?? null);
       setConsultationStatus(active ? "active" : "idle");
     } catch (error) {
       console.error("Failed to load consultations", error);

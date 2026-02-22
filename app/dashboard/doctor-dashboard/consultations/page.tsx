@@ -146,7 +146,9 @@ export default function ConsultationsPage() {
     await withRowLoading(row.id, async () => {
       await consultationService.attendConsultation(orgId, row.id);
       await loadConsultations();
-      router.push(`/dashboard/doctor-dashboard/patient/${row.patient_id}`);
+      router.push(
+        `/dashboard/doctor-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`
+      );
     });
   };
 
@@ -159,16 +161,27 @@ export default function ConsultationsPage() {
   };
 
   const renderActionButtons = (row: ConsultationRow, rowLoading: boolean) => {
+    const detailHref = `/dashboard/doctor-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`;
+
     if (row.status === "Pending") {
       return (
-        <button
-          type="button"
-          onClick={() => void handleStart(row)}
-          disabled={rowLoading}
-          className="w-full rounded-md bg-[#1A2380] px-3 py-1.5 text-white hover:bg-[#111B66] disabled:opacity-50 sm:w-auto"
-        >
-          {rowLoading ? "Starting..." : "Start"}
-        </button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          <button
+            type="button"
+            onClick={() => void handleStart(row)}
+            disabled={rowLoading}
+            className="w-full rounded-md bg-[#1A2380] px-3 py-1.5 text-white hover:bg-[#111B66] disabled:opacity-50 sm:w-auto"
+          >
+            {rowLoading ? "Starting..." : "Start"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(detailHref)}
+            className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
+          >
+            Details
+          </button>
+        </div>
       );
     }
 
@@ -177,9 +190,7 @@ export default function ConsultationsPage() {
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <button
             type="button"
-            onClick={() =>
-              router.push(`/dashboard/doctor-dashboard/patient/${row.patient_id}`)
-            }
+            onClick={() => router.push(detailHref)}
             className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
           >
             Continue
@@ -199,7 +210,7 @@ export default function ConsultationsPage() {
     return (
       <button
         type="button"
-        onClick={() => router.push(`/dashboard/doctor-dashboard/patient/${row.patient_id}`)}
+        onClick={() => router.push(detailHref)}
         className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
       >
         View

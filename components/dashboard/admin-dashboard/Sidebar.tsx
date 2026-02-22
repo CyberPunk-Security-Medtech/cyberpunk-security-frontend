@@ -14,13 +14,19 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { authService } from "@services/api";
+import { useAuth } from "@context/AuthContext";
 
 
 
 export default function Sidebar() {
+  const { user, activeWorkspace } = useAuth();
   const pathname = usePathname();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+  const displayName = fullName || user?.email?.split("@")?.[0] || "Administrator";
+  const displayRole = activeWorkspace?.role || "Hospital Administrator";
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
@@ -101,14 +107,14 @@ export default function Sidebar() {
           >
             <Image
               src="/avatars/eleanor.png"
-              alt="Eleanor Pena"
+              alt={displayName}
               width={36}
               height={36}
               className="rounded-full"
             />
             <div>
-              <p className="text-sm font-medium">Eleanor Pena</p>
-              <p className="text-[11px] text-slate-300">Hospital Administrator</p>
+              <p className="text-sm font-medium">{displayName}</p>
+              <p className="text-[11px] text-slate-300">{displayRole}</p>
             </div>
             <span
               className={`ml-auto transition-transform ${

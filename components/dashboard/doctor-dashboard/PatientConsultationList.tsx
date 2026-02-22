@@ -1,11 +1,7 @@
 "use client";
 
-import Tabs from "@components/Tabs";
+import Link from "next/link";
 import { StatusBadge } from "@components/StatusBadge";
-import ActivityLogTab from "./ActivityLog";
-import LabTestTab from "./LabTestTab";
-import MedicalHistoryTab from "./MedicalHistoryTab";
-import PatientPrescriptionTab from "./PatientPrescriptionTab";
 import { useConsultation } from "./ConsultationContext";
 
 const formatDate = (value?: string | null) => {
@@ -30,19 +26,13 @@ export default function PatientConsultationList() {
     setSelectedConsultationId,
   } = useConsultation();
 
-  const tabs = [
-    { label: "Medical History", content: <MedicalHistoryTab /> },
-    { label: "Prescription", content: <PatientPrescriptionTab /> },
-    { label: "Lab Test", content: <LabTestTab /> },
-    { label: "Activity Log", content: <ActivityLogTab /> },
-  ];
-
   return (
     <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[#1A2380]">Consultations</h3>
         <p className="text-sm text-gray-500">
-          Click a consultation to open visit details. Click again to collapse.
+          Click a consultation to preview key details. Open full details for diagnosis, labs,
+          prescriptions, and notes.
         </p>
       </div>
 
@@ -62,6 +52,7 @@ export default function PatientConsultationList() {
         <div className="space-y-3">
           {consultations.map((consultation: any) => {
             const isSelected = consultation.id === selectedConsultationId;
+            const detailHref = `/dashboard/doctor-dashboard/consultations/${consultation.id}?patient_id=${consultation.patient_id}`;
 
             return (
               <div
@@ -92,7 +83,7 @@ export default function PatientConsultationList() {
                         {consultation.priority || "-"}
                       </span>
                       <span className="inline-block text-xs text-gray-500">
-                        {isSelected ? "Hide" : "Open"}
+                        {isSelected ? "Hide" : "Preview"}
                       </span>
                     </div>
                   </div>
@@ -122,7 +113,25 @@ export default function PatientConsultationList() {
                         </div>
                       </div>
 
-                      <Tabs key={`consultation-tabs-${consultation.id}`} tabs={tabs} />
+                      <p className="mb-4 rounded-lg border border-[#DADDFE] bg-[#EEF2FF] px-3 py-2 text-xs text-[#1A2380]">
+                        Preview mode uses lightweight list data. Open full details for complete
+                        consultation records.
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          href={detailHref}
+                          className="rounded-md bg-[#1A2380] px-4 py-2 text-sm text-white hover:bg-[#111B66]"
+                        >
+                          Open Full Consultation
+                        </Link>
+                        <Link
+                          href={`/dashboard/doctor-dashboard/patient/${consultation.patient_id}`}
+                          className="rounded-md border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                          Patient Overview
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>

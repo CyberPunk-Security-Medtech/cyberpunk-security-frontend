@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-export default function ReportsAnalyticsPage() {
+export default function AdminHelpPage() {
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h1 className="text-2xl font-semibold text-[#1A2380]">Reports & Analytics</h1>
+      <h1 className="text-2xl font-semibold text-[#1A2380]">Help</h1>
       <p className="mt-2 text-sm text-gray-600">
-        This page is now routed correctly in production. Reports and analytics workflow UI can be added here.
+        Help route has been added so sidebar navigation no longer returns 404 in production.
       </p>
       <div className="mt-5">
         <Link
