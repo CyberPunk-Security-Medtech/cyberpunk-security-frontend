@@ -8,6 +8,12 @@ import { useState } from 'react';
 
 export default function PatientsRecords() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshVersion, setRefreshVersion] = useState(0);
+
+  const handlePatientCreated = () => {
+    setRefreshVersion((current) => current + 1);
+  };
+
   return (
     <div className="py-2 sm:py-4">
       {/* Header Row */}
@@ -25,7 +31,11 @@ export default function PatientsRecords() {
           + Add New Patient Record
         </Button>
 
-        <AddPatientModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
+        <AddPatientModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onCreated={handlePatientCreated}
+        />
       </div>
 
       {/* Filters */}
@@ -64,7 +74,7 @@ export default function PatientsRecords() {
       </div>
 
       {/* Table */}
-      <PatientTable />
+      <PatientTable key={refreshVersion} />
     </div>
   )
 }

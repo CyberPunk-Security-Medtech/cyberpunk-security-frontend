@@ -10,6 +10,7 @@ import { useAuth } from "@context/AuthContext";
 interface AddPatientModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onCreated?: () => void;
 }
 
 type FormState = {
@@ -98,7 +99,7 @@ const extractApiErrorMessage = (responseData: unknown): string | null => {
   return details.length > 0 ? details : null;
 };
 
-export default function AddPatientModal({ isOpen, onClose}: AddPatientModalProps) {
+export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatientModalProps) {
   const { activeWorkspace } = useAuth();
   const [formData, setFormData] = useState<FormState>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
@@ -181,6 +182,7 @@ export default function AddPatientModal({ isOpen, onClose}: AddPatientModalProps
         ...optionalPayload,
       });
       toast.success("Patient created successfully");
+      onCreated?.();
       onClose();
       setFormData(emptyForm);
     } catch (error) {
