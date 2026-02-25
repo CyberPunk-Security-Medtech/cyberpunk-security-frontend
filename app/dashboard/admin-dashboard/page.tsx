@@ -18,6 +18,7 @@ import { useState } from "react";
 export default function AdminDashboard() {
     const { activeWorkspace } = useAuth();
     const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
+    const [patientTableRefreshVersion, setPatientTableRefreshVersion] = useState(0);
 
 
   if (!activeWorkspace?.id) {
@@ -28,7 +29,6 @@ export default function AdminDashboard() {
     );
   }
 
-  const orgId = activeWorkspace.id;
   return (
     <div className="min-h-screen flex bg-slate-50 text-slate-900">
       <Sidebar />
@@ -38,6 +38,9 @@ export default function AdminDashboard() {
         <AddPatientModal
           isOpen={isAddPatientModalOpen}
           onClose={() => setIsAddPatientModalOpen(false)}
+          onCreated={() =>
+            setPatientTableRefreshVersion((current) => current + 1)
+          }
         />
         <div className="px-8 py-6 space-y-6">
           <AnalyticsOverview />
@@ -47,7 +50,7 @@ export default function AdminDashboard() {
             <Performance />
             <TotalTransfers />
           </div>
-          <PatientTable />
+          <PatientTable refreshVersion={patientTableRefreshVersion} />
         </div>
       </main>
     </div>

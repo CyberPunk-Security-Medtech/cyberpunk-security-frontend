@@ -32,7 +32,11 @@ const formatDate = (value?: string | null): string => {
   return d.toLocaleDateString();
 };
 
-export default function PatientTable() {
+type PatientTableProps = {
+  refreshVersion?: number;
+};
+
+export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) {
   const { activeWorkspace } = useAuth();
   const [patients, setPatients] = useState<AdminPatient[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +74,7 @@ export default function PatientTable() {
     return () => {
       ignore = true;
     };
-  }, [activeWorkspace?.id, activeWorkspace?.name]);
+  }, [activeWorkspace?.id, activeWorkspace?.name, refreshVersion]);
 
   return (
     <section className="bg-white rounded-2xl shadow-sm border p-5">
