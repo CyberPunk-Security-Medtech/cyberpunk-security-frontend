@@ -12,7 +12,6 @@ export default function Topbar({ onAddPatientClick }: TopbarProps) {
   const { user } = useAuth();
   const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
   const displayName = fullName || user?.email?.split("@")?.[0] || "Administrator";
-
   return (
     <header className="px-8 py-4 border-b bg-white flex items-center justify-between">
       <div>
