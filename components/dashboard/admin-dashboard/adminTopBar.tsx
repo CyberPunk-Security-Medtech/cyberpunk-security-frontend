@@ -4,7 +4,11 @@ import { ChevronDown, Search, Download, Plus, Bell } from "lucide-react";
 import Button from "@components/Button"
 import { useAuth } from "@context/AuthContext";
 
-export default function Topbar() {
+type TopbarProps = {
+  onAddPatientClick?: () => void;
+};
+
+export default function Topbar({ onAddPatientClick }: TopbarProps) {
   const { user } = useAuth();
   const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
   const displayName = fullName || user?.email?.split("@")?.[0] || "Administrator";
@@ -32,6 +36,7 @@ export default function Topbar() {
 
         <Button
           type="button"
+          onSubmitHandler={onAddPatientClick}
           className="bg-[#1A2380] w-[133px] h-[43px] text-white rounded-full flex items-center justify-center gap-2"
         >
           <Plus className="w-4 h-4" />

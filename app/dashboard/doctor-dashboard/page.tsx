@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import OverviewCards from "@components/dashboard/doctor-dashboard/OverviewCards";
 import TodayAppointments from "@components/dashboard/doctor-dashboard/TodaysAppointment";
-import LabTest from "@components/dashboard/doctor-dashboard/LabTest";
 import { authService } from "@services/api";
 
 const formatDoctorName = (user: any): string => {
@@ -43,7 +42,7 @@ export default function Dashboard() {
 
       <OverviewCards />
       <TodayAppointments />
-      <LabTest />
+      {/* <LabTest /> */}
     </>
   );
 }

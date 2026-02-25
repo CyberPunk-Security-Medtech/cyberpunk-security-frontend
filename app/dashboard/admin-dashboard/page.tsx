@@ -1,6 +1,7 @@
 'use client'
 
 import AnalyticsOverview from "@components/dashboard/admin-dashboard/AnalyticsOverview";
+import AddPatientModal from "@components/dashboard/doctor-dashboard/AddPatientModal";
 import PatientTable from "@components/dashboard/admin-dashboard/patientTable";
 import RecentActivity from "@components/dashboard/admin-dashboard/recentActivity";
 import Sidebar from "@components/dashboard/admin-dashboard/Sidebar";
@@ -10,11 +11,13 @@ import Performance from "@components/dashboard/admin-dashboard/performance";
 import Header from "@components/Header";
 import Topbar from "@components/dashboard/admin-dashboard/adminTopBar";
 import { useAuth } from "@context/AuthContext";
+import { useState } from "react";
 
 
 
 export default function AdminDashboard() {
     const { activeWorkspace } = useAuth();
+    const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
 
 
   if (!activeWorkspace?.id) {
@@ -31,7 +34,11 @@ export default function AdminDashboard() {
       <Sidebar />
       <main className="flex-1 flex flex-col">
         <Header />
-        <Topbar/>
+        <Topbar onAddPatientClick={() => setIsAddPatientModalOpen(true)} />
+        <AddPatientModal
+          isOpen={isAddPatientModalOpen}
+          onClose={() => setIsAddPatientModalOpen(false)}
+        />
         <div className="px-8 py-6 space-y-6">
           <AnalyticsOverview />
           <StatCardsRow />
