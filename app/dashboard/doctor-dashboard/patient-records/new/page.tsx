@@ -61,7 +61,7 @@ export default function AddNewPatientRecord() {
     try {
       setSubmitting(true);
       await patientService.createPatient(activeWorkspace.id, form);
-      toast.success("Patient record created");
+      toast.success("Patient created successfully");
       router.push("/dashboard/doctor-dashboard/patient-records");
     } catch (error: any) {
       const message =

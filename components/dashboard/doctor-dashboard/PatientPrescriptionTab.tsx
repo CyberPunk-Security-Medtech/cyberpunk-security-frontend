@@ -12,9 +12,12 @@ export default function PatientPrescriptionTab() {
   const {
     isSelectedConsultationActive,
     selectedConsultationId,
+    selectedConsultation,
     orgId,
     patientId,
   } = useConsultation();
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
 
   const loadPrescriptions = async () => {
     if (!orgId || !patientId) return;
@@ -41,20 +44,22 @@ export default function PatientPrescriptionTab() {
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Prescription</h3>
-          <button
-            onClick={() => setOpen(true)}
-            disabled={!isSelectedConsultationActive || !selectedConsultationId}
-            className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
-              isSelectedConsultationActive && !!selectedConsultationId
-                ? "bg-[#1A2380] hover:bg-[#00B8A8]"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-          >
-            + Add Prescription
-          </button>
+          {!isCompletedConsultation && (
+            <button
+              onClick={() => setOpen(true)}
+              disabled={!isSelectedConsultationActive || !selectedConsultationId}
+              className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
+                isSelectedConsultationActive && !!selectedConsultationId
+                  ? "bg-[#1A2380] hover:bg-[#00B8A8]"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+            >
+              + Add Prescription
+            </button>
+          )}
         </div>
 
-        {!isSelectedConsultationActive && (
+        {!isSelectedConsultationActive && !isCompletedConsultation && (
           <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
             Start an active consultation before adding prescriptions.
           </p>

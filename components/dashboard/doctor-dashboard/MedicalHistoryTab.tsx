@@ -17,10 +17,13 @@ export default function MedicalHistoryTab() {
     orgId,
     isSelectedConsultationActive,
     selectedConsultationId,
+    selectedConsultation,
   } = useConsultation();
 
   const [note, setNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
 
   const loadDiagnoses = async () => {
     if (!orgId || !patientId) return;
@@ -61,21 +64,27 @@ export default function MedicalHistoryTab() {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:gap-8">
+    <div
+      className={`grid grid-cols-1 gap-6 ${
+        isCompletedConsultation ? "" : "lg:grid-cols-[2fr_1fr] lg:gap-8"
+      }`}
+    >
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Medical History</h3>
-          <button
-            onClick={() => setOpen(true)}
-            disabled={!isSelectedConsultationActive || !selectedConsultationId}
-            className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
-              isSelectedConsultationActive && !!selectedConsultationId
-                ? "bg-[#1A2380] hover:bg-[#00B8A8]"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-          >
-            + Add Diagnosis
-          </button>
+          {!isCompletedConsultation && (
+            <button
+              onClick={() => setOpen(true)}
+              disabled={!isSelectedConsultationActive || !selectedConsultationId}
+              className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
+                isSelectedConsultationActive && !!selectedConsultationId
+                  ? "bg-[#1A2380] hover:bg-[#00B8A8]"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+            >
+              + Add Diagnosis
+            </button>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -115,29 +124,31 @@ export default function MedicalHistoryTab() {
         />
       </section>
 
-      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
-        <h3 className="text-lg font-semibold text-[#1A2380] mb-4">Doctor&apos;s Note</h3>
+      {!isCompletedConsultation && (
+        <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+          <h3 className="text-lg font-semibold text-[#1A2380] mb-4">Doctor&apos;s Note</h3>
 
-        <textarea
-          placeholder={isSelectedConsultationActive ? "Add Note" : "Start consultation to add notes"}
-          disabled={!isSelectedConsultationActive || !selectedConsultationId}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          className="w-full border border-gray-200 rounded-md p-3 text-sm focus:ring-1 focus:ring-[#00B8A8] outline-none resize-none disabled:bg-gray-50"
-          rows={8}
-        />
+          <textarea
+            placeholder={isSelectedConsultationActive ? "Add Note" : "Start consultation to add notes"}
+            disabled={!isSelectedConsultationActive || !selectedConsultationId}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full border border-gray-200 rounded-md p-3 text-sm focus:ring-1 focus:ring-[#00B8A8] outline-none resize-none disabled:bg-gray-50"
+            rows={8}
+          />
 
-        <div className="flex justify-end mt-4">
-          <Button
-            type="button"
-            onSubmitHandler={handleSaveNote}
-            disabled={!isSelectedConsultationActive || savingNote || !note.trim() || !selectedConsultationId}
-            className="bg-[#1A2380] text-white px-4 py-2 rounded-md hover:bg-[#00B8A8] transition text-sm disabled:opacity-50 disabled:bg-gray-300"
-          >
-            {savingNote ? "Saving..." : "Save Note"}
-          </Button>
-        </div>
-      </section>
+          <div className="flex justify-end mt-4">
+            <Button
+              type="button"
+              onSubmitHandler={handleSaveNote}
+              disabled={!isSelectedConsultationActive || savingNote || !note.trim() || !selectedConsultationId}
+              className="bg-[#1A2380] text-white px-4 py-2 rounded-md hover:bg-[#00B8A8] transition text-sm disabled:opacity-50 disabled:bg-gray-300"
+            >
+              {savingNote ? "Saving..." : "Save Note"}
+            </Button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
