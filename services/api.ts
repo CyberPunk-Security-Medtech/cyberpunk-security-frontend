@@ -34,6 +34,11 @@ const unwrap = <T>(payload: T | WrappedData<T>): T => {
   return payload as T;
 };
 
+const isNotFoundError = (error: unknown): boolean => {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 404;
+};
+
 // Auth endpoints
 export const authService = {
   login: async (credentials: { email: string; password: string }) => {
@@ -342,6 +347,61 @@ export const consultationService = {
       prescriptionData
     );
     return unwrap(response.data);
+  },
+};
+
+const requestWithFallback = async <T>(
+  paths: string[],
+  request: (path: string) => Promise<T>
+): Promise<T> => {
+  let lastError: unknown;
+
+  for (const path of paths) {
+    try {
+      return await request(path);
+    } catch (error) {
+      lastError = error;
+      if (!isNotFoundError(error)) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+};
+
+export type LabOrderStatusFilter = "pending" | "in_progress" | "completed";
+
+export const labService = {
+  listLabOrders: async (org_id: string, status?: LabOrderStatusFilter) => {
+    const paths = [
+      `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders`,
+      `/api/v1/dashboard/lab/lab-orders`,
+      `/dashboard/lab/lab-orders`,
+    ];
+
+    return requestWithFallback(paths, async (path) => {
+      const response = await api.get(path, {
+        params: status ? { status } : undefined,
+      });
+      return unwrap(response.data);
+    });
+  },
+
+  getLabOrderDetails: async (org_id: string, lab_order_id: string) => {
+    const paths = [
+      `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}`,
+      `/api/v1/organizations/${org_id}/lab-orders/${lab_order_id}`,
+      `/api/v1/dashboard/lab/lab-orders/${lab_order_id}`,
+      `/api/v1/lab-orders/${lab_order_id}`,
+      `/dashboard/lab/lab-orders/${lab_order_id}`,
+      `/lab-orders/${lab_order_id}`,
+    ];
+
+    return requestWithFallback(paths, async (path) => {
+      const response = await api.get(path);
+      return unwrap(response.data);
+    });
   },
 };
 

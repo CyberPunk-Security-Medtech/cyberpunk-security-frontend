@@ -133,15 +133,29 @@ import Image from "next/image";
 import { useAuth } from "@context/AuthContext";
 
 const resolveDashboardPath = (rawRole?: string) => {
-  const normalized = (rawRole ?? "")
-    .toLowerCase()
-    .replace(/[^a-z]/g, "");
+  const normalized = (rawRole ?? "").toLowerCase().trim();
 
-  if (normalized.includes("doctor")) return "/dashboard/doctor-dashboard";
-  if (normalized.includes("nurse")) return "/dashboard/nurse-dashboard";
-  if (normalized.includes("admin")) return "/dashboard/admin-dashboard";
+  const roleRoutes: Record<string, string> = {
+    admin: "/dashboard/admin-dashboard",
+    doctor: "/dashboard/doctor-dashboard",
+    nurse: "/dashboard/nurse-dashboard",
+    pharmacist: "/dashboard/admin-dashboard",
+    lab: "/dashboard/lab-scientist",
+    "lab_technician": "/dashboard/lab-scientist",
+    "lab-technician": "/dashboard/lab-scientist",
+    "lab technician": "/dashboard/lab-scientist",
+  };
 
-  return "/dashboard/admin-dashboard";
+  if (roleRoutes[normalized]) return roleRoutes[normalized];
+
+  const compact = normalized.replace(/[^a-z]/g, "");
+  if (compact === "labtechnician") return "/dashboard/lab-scientist";
+  if (compact === "doctor") return "/dashboard/doctor-dashboard";
+  if (compact === "nurse") return "/dashboard/nurse-dashboard";
+  if (compact === "admin") return "/dashboard/admin-dashboard";
+  if (compact === "pharmacist") return "/dashboard/admin-dashboard";
+
+  return null;
 };
 
 export default function WorkspaceSelectPage() {
@@ -162,8 +176,13 @@ export default function WorkspaceSelectPage() {
   }
 
   const handleSelect = (workspace: any) => {
+    const nextPath = resolveDashboardPath(workspace?.role);
+    if (!nextPath) {
+      console.error("Unsupported workspace role:", workspace?.role, workspace);
+      return;
+    }
     setWorkspace(workspace);
-    router.push(resolveDashboardPath(workspace?.role));
+    router.push(nextPath);
   };
 
   

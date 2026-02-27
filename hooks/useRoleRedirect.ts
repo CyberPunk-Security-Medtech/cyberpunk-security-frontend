@@ -4,18 +4,22 @@ import { useRouter } from "next/navigation";
 
 export type UserRole = "admin" | "doctor" | "nurse" | "lab" | "pharmacist";
 
-// Map roles → dashboards
 const roleRoutes: Record<UserRole, string> = {
-  admin: "/dashboard/admin",
-  doctor: "/dashboard/doctor",
-  nurse: "/dashboard/nurse",
-  lab: "/dashboard/lab",
-  pharmacist: "/dashboard/pharmacist",
+  admin: "/dashboard/admin-dashboard",
+  doctor: "/dashboard/doctor-dashboard",
+  nurse: "/dashboard/nurse-dashboard",
+  lab: "/dashboard/lab-scientist",
+  pharmacist: "/dashboard/admin-dashboard",
 };
 
 export function toUserRole(role: string): UserRole | null {
-  const allowed: UserRole[] = ["admin", "doctor", "nurse", "lab", "pharmacist"];
-  return allowed.includes(role as UserRole) ? (role as UserRole) : null;
+  const normalized = role.toLowerCase().trim();
+  if (normalized === "admin") return "admin";
+  if (normalized === "doctor") return "doctor";
+  if (normalized === "nurse") return "nurse";
+  if (normalized === "lab" || normalized === "lab_technician") return "lab";
+  if (normalized === "pharmacist") return "pharmacist";
+  return null;
 }
 
 export function useRoleRedirect() {

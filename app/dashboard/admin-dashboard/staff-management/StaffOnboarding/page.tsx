@@ -7,6 +7,7 @@ import Image from "next/image";
 import { invitationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function StaffOnboarding() {
   const { activeWorkspace } = useAuth(); 
@@ -39,7 +40,14 @@ export default function StaffOnboarding() {
 
       toast.success("Invitation sent successfully");
     } catch (err) {
-      toast.error("Failed to send invitation");
+      let message = "Failed to send invitation";
+      if (axios.isAxiosError(err)) {
+        message =
+          err.response?.data?.message ||
+          err.response?.data?.detail ||
+          message;
+      }
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -90,7 +98,7 @@ export default function StaffOnboarding() {
                   <option value="">Select role</option>
                   <option value="doctor">Doctor</option>
                   <option value="nurse">Nurse</option>
-                  <option value="lab">Lab Scientist</option>
+                  <option value="lab_technician">Lab Scientist</option>
                   <option value="pharmacist">Pharmacist</option>
                 </select>
               </div>
