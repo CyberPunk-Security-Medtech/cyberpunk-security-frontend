@@ -3,6 +3,21 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  async redirects() {
+    return [
+      {
+        source: "/dashboard/lab-scientist-dashboard",
+        destination: "/dashboard/lab-scientist",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/lab-scientist-dashboard/:path*",
+        destination: "/dashboard/lab-scientist/:path*",
+        permanent: false,
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {

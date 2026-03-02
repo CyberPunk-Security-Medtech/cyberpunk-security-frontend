@@ -475,6 +475,13 @@ export default function AcceptInvitationPage() {
     }
   };
 
+  const handleRegisterSuccess = () => {
+    setInvite((previous) =>
+      previous ? { ...previous, user_exists: true } : previous
+    );
+    setStatus("idle");
+  };
+
   /* -----------------------------
      UI STATES
   ------------------------------ */
@@ -522,7 +529,7 @@ export default function AcceptInvitationPage() {
           <SetPasswordForm
             email={invite!.email}
             invitationId={id}
-            onSuccess={() => setStatus("idle")}
+            onSuccess={handleRegisterSuccess}
           />
         )}
 

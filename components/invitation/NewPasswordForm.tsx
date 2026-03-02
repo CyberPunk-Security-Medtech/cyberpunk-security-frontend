@@ -55,6 +55,7 @@
 import { useState } from "react";
 import { invitationService } from "@services/api";
 import { Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 
 interface Props {
   email: string ;
@@ -105,7 +106,14 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
 
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError("Failed to register user.");
+      let message = "Failed to register user.";
+      if (axios.isAxiosError(err)) {
+        message =
+          err.response?.data?.message ||
+          err.response?.data?.detail ||
+          message;
+      }
+      setError(message);
       console.error(err);
     } finally {
       setLoading(false);
@@ -196,6 +204,7 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
       >
         {loading ? "Registering..." : "Create Account"}
       </button>
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </form>
   );
 }
