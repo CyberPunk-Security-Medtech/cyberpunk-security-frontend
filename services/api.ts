@@ -403,7 +403,6 @@ export const labService = {
       return unwrap(response.data);
     });
   },
-
   startLabOrder: async (org_id: string, lab_order_id: string) => {
     const paths = [
       `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}/start`,
