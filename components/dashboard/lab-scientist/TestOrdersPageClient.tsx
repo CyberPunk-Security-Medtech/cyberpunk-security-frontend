@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { LayoutGrid, List, Search } from "lucide-react";
 import { StatusBadge } from "@components/StatusBadge";
@@ -62,6 +63,7 @@ export default function TestOrdersPageClient() {
   const [tab, setTab] = useState<TabFilter>("all");
   const [query, setQuery] = useState("");
   const [usingMockData, setUsingMockData] = useState(false);
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!orgId) {
@@ -182,6 +184,45 @@ export default function TestOrdersPageClient() {
 
   const openOrder = (id: string) => {
     router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
+  };
+
+  const markProcessing = (id: string, active: boolean) => {
+    setProcessingIds((prev) => {
+      const next = new Set(prev);
+      if (active) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
+
+  const updateOrderStatus = (id: string, status: LabOrder["status"]) => {
+    setOrders((prev) =>
+      prev.map((order) => (order.id === id ? { ...order, status } : order))
+    );
+  };
+
+  const handleStartProcessing = async (
+    order: LabOrder,
+    event?: MouseEvent
+  ) => {
+    event?.stopPropagation();
+    if (!orgId || order.status !== "pending") return;
+    if (processingIds.has(order.id)) return;
+
+    markProcessing(order.id, true);
+    try {
+      if (!usingMockData) {
+        await labService.startLabOrder(orgId, order.id);
+      }
+      updateOrderStatus(order.id, "in_progress");
+    } catch (error) {
+      console.error("Failed to start lab order", error);
+    } finally {
+      markProcessing(order.id, false);
+    }
   };
 
   return (
@@ -310,13 +351,23 @@ export default function TestOrdersPageClient() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => openOrder(order.id)}
-                  className="mt-4 w-full rounded-full bg-[#00B8A8] px-4 py-2 text-sm font-medium text-white hover:bg-[#00A899]"
-                >
-                  View Test Report
-                </button>
+                <div className="mt-4 space-y-2">
+                  <button
+                    type="button"
+                    onClick={(event) => handleStartProcessing(order, event)}
+                    disabled={order.status !== "pending" || processingIds.has(order.id)}
+                    className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Start Processing
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openOrder(order.id)}
+                    className="w-full rounded-full bg-[#00B8A8] px-4 py-2 text-sm font-medium text-white hover:bg-[#00A899]"
+                  >
+                    View Test Report
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -354,12 +405,26 @@ export default function TestOrdersPageClient() {
                       <StatusBadge status={toStatusBadgeType(order.status)} />
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
-                      >
-                        View
-                      </button>
+                      <div className="inline-flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={(event) => handleStartProcessing(order, event)}
+                          disabled={order.status !== "pending" || processingIds.has(order.id)}
+                          className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Start Processing
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openOrder(order.id);
+                          }}
+                          className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
+                        >
+                          View
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

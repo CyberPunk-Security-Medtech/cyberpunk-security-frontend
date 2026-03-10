@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@components/StatusBadge";
 import { useAuth } from "@context/AuthContext";
@@ -49,6 +50,7 @@ export default function LabScientistDashboardClient() {
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [usingMockData, setUsingMockData] = useState(false);
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!orgId) {
@@ -144,6 +146,45 @@ export default function LabScientistDashboardClient() {
     router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
   };
 
+  const markProcessing = (id: string, active: boolean) => {
+    setProcessingIds((prev) => {
+      const next = new Set(prev);
+      if (active) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
+
+  const updateOrderStatus = (id: string, status: LabOrder["status"]) => {
+    setOrders((prev) =>
+      prev.map((order) => (order.id === id ? { ...order, status } : order))
+    );
+  };
+
+  const handleStartProcessing = async (
+    order: LabOrder,
+    event?: MouseEvent
+  ) => {
+    event?.stopPropagation();
+    if (!orgId || order.status !== "pending") return;
+    if (processingIds.has(order.id)) return;
+
+    markProcessing(order.id, true);
+    try {
+      if (!usingMockData) {
+        await labService.startLabOrder(orgId, order.id);
+      }
+      updateOrderStatus(order.id, "in_progress");
+    } catch (error) {
+      console.error("Failed to start lab order", error);
+    } finally {
+      markProcessing(order.id, false);
+    }
+  };
+
   return (
     <div className="space-y-6 py-2 sm:py-4">
       <div className="space-y-1">
@@ -236,12 +277,26 @@ export default function LabScientistDashboardClient() {
                         <StatusBadge status={toStatusBadgeType(order.status)} />
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
-                        >
-                          View
-                        </button>
+                        <div className="inline-flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(event) => handleStartProcessing(order, event)}
+                            disabled={order.status !== "pending" || processingIds.has(order.id)}
+                            className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Start Processing
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openOrder(order.id);
+                            }}
+                            className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
+                          >
+                            View
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -251,10 +306,17 @@ export default function LabScientistDashboardClient() {
 
             <div className="space-y-3 p-3 lg:hidden">
               {orders.map((order) => (
-                <button
+                <div
                   key={order.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => openOrder(order.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openOrder(order.id);
+                    }
+                  }}
                   className="w-full rounded-lg border border-gray-200 p-4 text-left hover:bg-gray-50"
                 >
                   <div className="mb-3 flex items-start justify-between gap-3">
@@ -292,7 +354,27 @@ export default function LabScientistDashboardClient() {
                       </span>
                     </p>
                   </div>
-                </button>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={(event) => handleStartProcessing(order, event)}
+                      disabled={order.status !== "pending" || processingIds.has(order.id)}
+                      className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Start Processing
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openOrder(order.id);
+                      }}
+                      className="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+                    >
+                      View
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
