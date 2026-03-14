@@ -403,6 +403,21 @@ export const labService = {
       return unwrap(response.data);
     });
   },
+  startLabOrder: async (org_id: string, lab_order_id: string) => {
+    const paths = [
+      `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}/start`,
+      `/api/v1/organizations/${org_id}/lab-orders/${lab_order_id}/start`,
+      `/api/v1/dashboard/lab/lab-orders/${lab_order_id}/start`,
+      `/api/v1/lab-orders/${lab_order_id}/start`,
+      `/dashboard/lab/lab-orders/${lab_order_id}/start`,
+      `/lab-orders/${lab_order_id}/start`,
+    ];
+
+    return requestWithFallback(paths, async (path) => {
+      const response = await api.post(path, {});
+      return unwrap(response.data);
+    });
+  },
 };
 
 // Backward-compatible aliases for older dashboard components.
