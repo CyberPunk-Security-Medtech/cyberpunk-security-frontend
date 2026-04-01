@@ -32,7 +32,7 @@ export default function HeroSection() {
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-6 w-full sm:w-auto items-center justify-center md:justify-start">
-            <button className="w-full sm:w-auto rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base">
+            <button onClick={() => router.push("/#waitlist")} className="w-full sm:w-auto rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base">
               Join the Waitlist
             </button>
             <button

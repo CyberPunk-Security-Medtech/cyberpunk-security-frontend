@@ -372,6 +372,18 @@ const requestWithFallback = async <T>(
 
 export type LabOrderStatusFilter = "pending" | "in_progress" | "completed";
 
+export const waitlistService = {
+  joinWaitlist: async (payload: {
+    email: string;
+    institution_name: string;
+    phone_number: string;
+    full_name: string;
+  }) => {
+    const response = await api.post("/api/v1/waitlist", payload);
+    return response.data;
+  },
+};
+
 export const labService = {
   listLabOrders: async (org_id: string, status?: LabOrderStatusFilter) => {
     const paths = [

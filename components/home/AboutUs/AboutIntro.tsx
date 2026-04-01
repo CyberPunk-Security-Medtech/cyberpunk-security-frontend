@@ -46,7 +46,7 @@ export default function AboutSection() {
           transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
           className="flex flex-col md:flex-row items-center justify-center gap-4"
         >
-          <button className="px-8 py-3 rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] text-white font-medium hover:opacity-90 transition-all duration-300 shadow-md">
+          <button onClick={() => window.location.href = "/#waitlist"} className="px-8 py-3 rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] text-white font-medium hover:opacity-90 transition-all duration-300 shadow-md">
             Join the Waitlist
           </button>
           <button className="px-8 py-3 rounded-[15px] bg-gradient-to-br from-[#95DDFF] to-[#C5ECFF] text-[black] font-medium hover:opacity-90 transition-all shadow-md">
