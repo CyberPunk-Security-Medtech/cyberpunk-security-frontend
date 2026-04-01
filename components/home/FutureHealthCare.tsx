@@ -2,8 +2,66 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import { waitlistService } from "@services/api";
 
 export default function FutureHealthCare() {
+  const [formData, setFormData] = useState({
+    full_name: "",
+    email: "",
+    institution_name: "",
+    phone_number: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.full_name || !formData.email || !formData.institution_name || !formData.phone_number) {
+      toast.error("Please complete all fields");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await waitlistService.joinWaitlist({
+        full_name: formData.full_name,
+        email: formData.email,
+        institution_name: formData.institution_name,
+        phone_number: formData.phone_number,
+      });
+
+      toast.success("Successfully joined the waitlist!");
+      setFormData({
+        full_name: "",
+        email: "",
+        institution_name: "",
+        phone_number: "",
+      });
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.detail ||
+        "Failed to join waitlist. Please try again.";
+      toast.error(errorMessage);
+      console.error("Waitlist error:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const benefits = [
     {
       icon: "/early_access_benefits.svg",
@@ -40,7 +98,7 @@ export default function FutureHealthCare() {
         className="absolute right-6 sm:right-12 top-24 opacity-50 pointer-events-none hidden sm:block"
       />
 
-      <div className="max-w-6xl mx-auto text-center relative z-10">
+      <div className="max-w-6xl mx-auto text-center relative z-10" id="waitlist">
         {/* === Heading === */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -102,41 +160,58 @@ export default function FutureHealthCare() {
             className="absolute -top-8 left-4 opacity-40 pointer-events-none hidden sm:block"
           />
 
-          <h3 className="text-center text-lg sm:text-xl font-semibold mb-6">
+          <h3 className="text-center text-lg sm:text-xl font-semibold mb-6 relative z-10">
             Join Our Waitlist
           </h3>
 
-          <form className="space-y-4">
+          <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
             <input
               type="text"
+              name="full_name"
               placeholder="Your name"
+              value={formData.full_name}
+              onChange={handleChange}
               className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              required
             />
             <input
               type="email"
+              name="email"
               placeholder="Work email"
+              value={formData.email}
+              onChange={handleChange}
               className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              required
             />
             <input
               type="text"
+              name="institution_name"
               placeholder="Organization name"
+              value={formData.institution_name}
+              onChange={handleChange}
               className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              required
             />
             <input
-              type="text"
-              placeholder="Organization size"
+              type="tel"
+              name="phone_number"
+              placeholder="Phone number"
+              value={formData.phone_number}
+              onChange={handleChange}
               className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              required
             />
 
             <button
               type="submit"
-              className="w-full bg-white text-[#0040C1] font-semibold py-3 rounded-[30px] hover:opacity-90 transition text-sm sm:text-base"
+              disabled={submitting}
+              className="w-full bg-white text-[#0040C1] font-semibold py-3 rounded-[30px] hover:opacity-90 transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Join the waitlist
+              {submitting ? "Joining..." : "Join the waitlist"}
             </button>
           </form>
 
-          <p className="mt-4 text-center text-[11px] sm:text-[12px] text-white/80 leading-snug">
+          <p className="mt-4 text-center text-[11px] sm:text-[12px] text-white/80 leading-snug relative z-10">
             We respect your privacy. Your information will only be used to contact
             you about PrivaCure updates.
           </p>
