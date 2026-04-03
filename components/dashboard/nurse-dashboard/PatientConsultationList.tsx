@@ -52,7 +52,7 @@ export default function PatientConsultationList() {
         <div className="space-y-3">
           {consultations.map((consultation: any) => {
             const isSelected = consultation.id === selectedConsultationId;
-            const detailHref = `/dashboard/doctor-dashboard/consultations/${consultation.id}?patient_id=${consultation.patient_id}`;
+            const detailHref = `/dashboard/nurse-dashboard/consultations/${consultation.id}?patient_id=${consultation.patient_id}`;
 
             return (
               <div
@@ -126,7 +126,7 @@ export default function PatientConsultationList() {
                           Open Full Consultation
                         </Link>
                         <Link
-                          href={`/dashboard/doctor-dashboard/patient/${consultation.patient_id}`}
+                          href={`/dashboard/nurse-dashboard/patient/${consultation.patient_id}`}
                           className="rounded-md border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
                           Patient Overview

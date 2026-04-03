@@ -44,7 +44,7 @@ export default function PatientPrescriptionTab() {
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Prescription</h3>
-          {!isCompletedConsultation && (
+          {/* {!isCompletedConsultation && (
             <button
               onClick={() => setOpen(true)}
               disabled={!isSelectedConsultationActive || !selectedConsultationId}
@@ -56,7 +56,7 @@ export default function PatientPrescriptionTab() {
             >
               + Add Prescription
             </button>
-          )}
+          )} */}
         </div>
 
         {!isSelectedConsultationActive && !isCompletedConsultation && (

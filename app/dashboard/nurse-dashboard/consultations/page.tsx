@@ -152,13 +152,13 @@ export default function ConsultationsPage() {
     });
   };
 
-  const handleComplete = async (row: ConsultationRow) => {
-    if (!orgId) return;
-    await withRowLoading(row.id, async () => {
-      await consultationService.completeConsultation(orgId, row.id, { status: "Completed" });
-      await loadConsultations();
-    });
-  };
+  // const handleComplete = async (row: ConsultationRow) => {
+  //   if (!orgId) return;
+  //   await withRowLoading(row.id, async () => {
+  //     await consultationService.completeConsultation(orgId, row.id, { status: "Completed" });
+  //     await loadConsultations();
+  //   });
+  // };
 
   const renderActionButtons = (row: ConsultationRow, rowLoading: boolean) => {
     const detailHref = `/dashboard/nurse-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`;
@@ -195,14 +195,14 @@ export default function ConsultationsPage() {
           >
             Continue
           </button>
-          <button
+          {/* <button
             type="button"
             onClick={() => void handleComplete(row)}
             disabled={rowLoading}
             className="w-full rounded-md bg-[#00B8A8] px-3 py-1.5 text-white hover:bg-[#00A393] disabled:opacity-50 sm:w-auto"
           >
             {rowLoading ? "Saving..." : "Complete"}
-          </button>
+          </button> */}
         </div>
       );
     }

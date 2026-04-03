@@ -72,7 +72,7 @@ export default function MedicalHistoryTab() {
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Medical History</h3>
-          {!isCompletedConsultation && (
+          {/* {!isCompletedConsultation && (
             <button
               onClick={() => setOpen(true)}
               disabled={!isSelectedConsultationActive || !selectedConsultationId}
@@ -84,7 +84,7 @@ export default function MedicalHistoryTab() {
             >
               + Add Diagnosis
             </button>
-          )}
+          )} */}
         </div>
 
         <div className="space-y-4">
@@ -126,7 +126,7 @@ export default function MedicalHistoryTab() {
 
       {!isCompletedConsultation && (
         <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
-          <h3 className="text-lg font-semibold text-[#1A2380] mb-4">Doctor&apos;s Note</h3>
+          <h3 className="text-lg font-semibold text-[#1A2380] mb-4">Nurse&apos;s Note</h3>
 
           <textarea
             placeholder={isSelectedConsultationActive ? "Add Note" : "Start consultation to add notes"}
