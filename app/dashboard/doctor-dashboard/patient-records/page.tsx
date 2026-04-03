@@ -1,5 +1,6 @@
 'use client'
 
+
 import Button from '@components/Button'
 import AddPatientModal from '@components/dashboard/doctor-dashboard/AddPatientModal';
 import PatientTable from '@components/dashboard/doctor-dashboard/PatientTable'
