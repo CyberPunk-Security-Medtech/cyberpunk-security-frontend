@@ -15,10 +15,10 @@ export default function AboutUsPage() {
       <Navbar />
       <AboutIntro />
       <MissionVision />
-      <JourneyTimeline />
+      {/* <JourneyTimeline /> */}
       <TeamSection />
       <TeamValues />
-      <Appointment />
+      {/* <Appointment /> */}
       <Footer />
     </div>
   );

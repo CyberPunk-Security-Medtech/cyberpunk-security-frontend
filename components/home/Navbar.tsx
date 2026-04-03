@@ -3,12 +3,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  
+  const isAboutUs = pathname?.includes("/home/about-us");
+  const buttonText = isAboutUs ? "Join the Waitlist" : "Request Early Access";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -19,7 +24,6 @@ export default function Navbar() {
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "About Us", href: "/home/about-us" },
-    { label: "Book Now", href: "/home/book-now/" },
     { label: "Contact Us", href: "/home/contact-us" },
   ];
 
@@ -62,7 +66,7 @@ export default function Navbar() {
 
         {/* Main CTA */}
         <button className="rounded-full bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md hover:opacity-90 transition">
-          Request Early Access
+          {buttonText}
         </button>
       </div>
 
@@ -104,7 +108,7 @@ export default function Navbar() {
         </button>
               </div>
               <button className="mt-4 rounded-full bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md">
-                Request Early Access
+                {buttonText}
               </button>
             </div>
           </motion.div>

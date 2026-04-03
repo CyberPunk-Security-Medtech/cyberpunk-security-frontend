@@ -23,7 +23,12 @@ export default function FutureHealthCare() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.full_name || !formData.email || !formData.institution_name || !formData.phone_number) {
+    if (
+      !formData.full_name ||
+      !formData.email ||
+      !formData.institution_name ||
+      !formData.phone_number
+    ) {
       toast.error("Please complete all fields");
       return;
     }
@@ -98,7 +103,10 @@ export default function FutureHealthCare() {
         className="absolute right-6 sm:right-12 top-24 opacity-50 pointer-events-none hidden sm:block"
       />
 
-      <div className="max-w-6xl mx-auto text-center relative z-10" id="waitlist">
+      <div
+        className="max-w-6xl mx-auto text-center relative z-10"
+        id="waitlist"
+      >
         {/* === Heading === */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -112,9 +120,9 @@ export default function FutureHealthCare() {
 
         {/* === Subtitle === */}
         <p className="mt-3 text-sm sm:text-base text-[#4A5D6A] max-w-2xl mx-auto leading-relaxed px-2">
-          PrivaCure is currently in the MVP stage. We’re inviting forward-thinking
-          hospitals, HMOs, and clinics to join our early access program and shape
-          the future of African healthcare interoperability.
+          PrivaCure is currently in the MVP stage. We’re inviting
+          forward-thinking hospitals, HMOs, and clinics to join our early access
+          program and shape the future of African healthcare interoperability.
         </p>
 
         {/* === Benefits cards === */}
@@ -212,8 +220,8 @@ export default function FutureHealthCare() {
           </form>
 
           <p className="mt-4 text-center text-[11px] sm:text-[12px] text-white/80 leading-snug relative z-10">
-            We respect your privacy. Your information will only be used to contact
-            you about PrivaCure updates.
+            We respect your privacy. Your information will only be used to
+            contact you about PrivaCure updates.
           </p>
         </motion.div>
       </div>

@@ -3,14 +3,30 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
+import { Plus, X } from "lucide-react";
 
 export default function FAQSection() {
   const faqs = [
-    { question: "How does patient consent work?" },
-    { question: "Is PrivaCure compliant with privacy laws?" },
-    { question: "Can hospitals not on PrivaCure receive records?" },
-    { question: "Who can use or access PrivaCure?" },
-    { question: "How efficient can PrivaCure handle data records?" },
+    { 
+      question: "How does patient consent work?",
+      answer: "Only authorized healthcare professionals (doctors, nurses, pharmacists, lab technicians) with the right permissions can access records and only after patient approval."
+    },
+    { 
+      question: "Is PrivaCure compliant with privacy laws?",
+      answer: "Yes, it is compliant with privacy law.\nIt also complies with major data protection standards like NDPR, GDPR, and HIPAA."
+    },
+    { 
+      question: "Can hospitals not on PrivaCure receive records?",
+      answer: "Yes, they can receive records."
+    },
+    { 
+      question: "Who can use or access PrivaCure?",
+      answer: "PrivaCure is built for:\n- Hospitals\n- Health facilities."
+    },
+    { 
+      question: "How efficient can PrivaCure handle data records?",
+      answer: "PrivaCure is built to handle healthcare data securely, quickly, and at scale through a combination of interoperability, structured records, and controlled access."
+    },
   ];
 
   const [active, setActive] = useState<number | null>(null);
@@ -60,8 +76,8 @@ export default function FAQSection() {
                     <span className="text-[15px] font-medium text-[#1E2E3B]">
                       {item.question}
                     </span>
-                    <span className="text-black font-bold text-xl">
-                      {active === i ? "–" : "+"}
+                    <span className="text-black font-bold text-xl flex items-center justify-center">
+                      {active === i ? <X size={20} /> : <Plus size={20} />}
                     </span>
                   </button>
                   {active === i && (
@@ -70,9 +86,9 @@ export default function FAQSection() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="mt-2 text-sm text-gray-600"
+                      className="mt-2 text-sm text-gray-600 whitespace-pre-wrap"
                     >
-                      This will contain a detailed explanation for the selected question.
+                      {item.answer}
                     </motion.p>
                   )}
                 </motion.div>
