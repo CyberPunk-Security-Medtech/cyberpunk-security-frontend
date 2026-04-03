@@ -102,7 +102,7 @@ export default function HowItWorks() {
             className="relative flex justify-center"
           >
             <Image
-              src="/how-our-platform-works-doctor.svg"
+              src="/nurse-pic.png"
               alt="Certified Team"
               width={400}
               height={400}

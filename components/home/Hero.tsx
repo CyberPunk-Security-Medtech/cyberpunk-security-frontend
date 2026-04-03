@@ -4,9 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-
 export default function HeroSection() {
-
   const router = useRouter();
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#15BDB0]/20 via-[#F8FCFF]/40 to-white pt-24 pb-16 sm:pt-32 sm:pb-24">
@@ -32,12 +30,16 @@ export default function HeroSection() {
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-6 w-full sm:w-auto items-center justify-center md:justify-start">
-            <button onClick={() => router.push("/#waitlist")} className="w-full sm:w-auto rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base">
+            <button
+              onClick={() => router.push("/#waitlist")}
+              className="w-full sm:w-auto rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base"
+            >
               Join the Waitlist
             </button>
             <button
-            onClick={() => router.push("/")}
-             className="w-full sm:w-auto rounded-[15px] border border-[#00A9B7] px-6 py-3 font-semibold text-black hover:bg-[#00A9B710] transition text-sm sm:text-base">
+              onClick={() => router.push("/")}
+              className="w-full sm:w-auto rounded-[15px] border border-[#00A9B7] px-6 py-3 font-semibold text-black hover:bg-[#00A9B710] transition text-sm sm:text-base"
+            >
               Request Early Access
             </button>
           </div>
@@ -60,8 +62,18 @@ export default function HeroSection() {
             }}
             className="relative flex items-center justify-center w-[320px] h-[320px] md:w-[420px] md:h-[420px]"
           >
-            <Image src="/orbit1.svg" alt="orbit line 1" fill className="object-contain" />
-            <Image src="/orbit2.svg" alt="orbit line 2" fill className="object-contain opacity-90 scale-75" />
+            <Image
+              src="/orbit1.svg"
+              alt="orbit line 1"
+              fill
+              className="object-contain"
+            />
+            <Image
+              src="/orbit2.svg"
+              alt="orbit line 2"
+              fill
+              className="object-contain opacity-90 scale-75"
+            />
 
             <Image
               src="/outer-male-doc.svg"

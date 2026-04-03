@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -35,7 +34,8 @@ const unwrap = <T>(payload: T | WrappedData<T>): T => {
 };
 
 const isNotFoundError = (error: unknown): boolean => {
-  const status = (error as { response?: { status?: number } })?.response?.status;
+  const status = (error as { response?: { status?: number } })?.response
+    ?.status;
   return status === 404;
 };
 
@@ -59,21 +59,27 @@ export const authService = {
     return response.data;
   },
   requestPasswordReset: async (email: string) => {
-    const response = await api.post("/api/v1/auth/request-password-reset", { email });
+    const response = await api.post("/api/v1/auth/request-password-reset", {
+      email,
+    });
     return response.data;
   },
   verifyEmail: async (code: string, email: string) => {
-    const response = await api.post("/api/v1/auth/verify-user", { code, email });
+    const response = await api.post("/api/v1/auth/verify-user", {
+      code,
+      email,
+    });
     return response.data;
   },
   verifyPasswordReset: async (code: string, email: string) => {
-    const res = await api.post("/api/v1/auth/verify-reset-code", { code, email });
+    const res = await api.post("/api/v1/auth/verify-reset-code", {
+      code,
+      email,
+    });
     return res.data;
   },
   resendOtp: async (email: string) => {
-    return (
-      await api.post("/api/v1/auth/resend-verification", { email })
-    ).data;
+    return (await api.post("/api/v1/auth/resend-verification", { email })).data;
   },
   resetPassword: async (email: string, code: string, new_password: string) => {
     const response = await api.post("/api/v1/auth/reset-password", {
@@ -115,14 +121,16 @@ export const organizationService = {
   },
 
   getDepartments: async (org_id: string) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/departments`);
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/departments`,
+    );
     return unwrap(response.data);
   },
 
   createDepartment: async (org_id: string, payload: { name: string }) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/departments`,
-      payload
+      payload,
     );
     return unwrap(response.data);
   },
@@ -140,7 +148,7 @@ export const uploadService = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }
+      },
     );
 
     return response.data;
@@ -149,11 +157,16 @@ export const uploadService = {
 
 export const invitationService = {
   async sendInvitation(email: string, role: string, org_id: string) {
-    const res = await api.post(`/api/v1/organizations/${org_id}/invitations`, { email, role });
+    const res = await api.post(`/api/v1/organizations/${org_id}/invitations`, {
+      email,
+      role,
+    });
     return res.data;
   },
 
-  async getInviteDetails(invitation_id: string): Promise<InviteDetailsResponse> {
+  async getInviteDetails(
+    invitation_id: string,
+  ): Promise<InviteDetailsResponse> {
     const res = await api.get(`/api/v1/invitations/${invitation_id}`);
     return res.data.data;
   },
@@ -164,23 +177,27 @@ export const invitationService = {
 
   async revokeInvitation(org_id: string, inv_id: string) {
     await api.post(
-      `/api/v1/organizations/${org_id}/invitations/${inv_id}/revoke`
+      `/api/v1/organizations/${org_id}/invitations/${inv_id}/revoke`,
     );
   },
 
-  async registerInvitedUser(invitation_id: string, payload: {
-    email: string;
-    first_name: string;
-    last_name: string;
-    password: string;
-  }): Promise<void> {
-    await api.post(`/api/v1/invitations/${invitation_id}/register-user`, payload);
+  async registerInvitedUser(
+    invitation_id: string,
+    payload: {
+      email: string;
+      first_name: string;
+      last_name: string;
+      password: string;
+    },
+  ): Promise<void> {
+    await api.post(
+      `/api/v1/invitations/${invitation_id}/register-user`,
+      payload,
+    );
   },
 
   async getOrganizationInvitations(orgId: string) {
-    const res = await api.get(
-      `/api/v1/organizations/${orgId}/invitations`
-    );
+    const res = await api.get(`/api/v1/organizations/${orgId}/invitations`);
     return res.data.data;
   },
 };
@@ -216,27 +233,38 @@ export const patientService = {
   },
 
   createPatient: async (org_id: string, payload: PatientCreatePayload) => {
-    const response = await api.post(`/api/v1/organizations/${org_id}/patients`, payload);
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/patients`,
+      payload,
+    );
     return unwrap(response.data);
   },
 
   getPatient: async (org_id: string, patient_id: string) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}`);
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}`,
+    );
     return unwrap(response.data);
   },
 
   getPatientDiagnoses: async (org_id: string, patient_id: string) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}/diagnoses`);
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}/diagnoses`,
+    );
     return unwrap(response.data);
   },
 
   getPatientLabTests: async (org_id: string, patient_id: string) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}/lab-tests`);
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}/lab-tests`,
+    );
     return unwrap(response.data);
   },
 
   getPatientPrescriptions: async (org_id: string, patient_id: string) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/patients/${patient_id}/prescriptions`);
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}/prescriptions`,
+    );
     return unwrap(response.data);
   },
 };
@@ -250,11 +278,11 @@ export const consultationService = {
       reason_for_visit: string;
       priority?: "Routine" | "Urgent" | "Emergency";
       vitals?: string | null;
-    }
+    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations`,
-      payload
+      payload,
     );
     return unwrap(response.data);
   },
@@ -264,18 +292,21 @@ export const consultationService = {
     params?: {
       status_filter?: "Pending" | "In Progress" | "Completed" | "Cancelled";
       department_id?: string;
-    }
+    },
   ) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/consultations`, {
-      params,
-    });
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/consultations`,
+      {
+        params,
+      },
+    );
     return unwrap(response.data);
   },
 
   attendConsultation: async (org_id: string, consultation_id: string) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/attend`,
-      {}
+      {},
     );
     return unwrap(response.data);
   },
@@ -287,11 +318,11 @@ export const consultationService = {
       status?: "Pending" | "In Progress" | "Completed" | "Cancelled";
       clinical_notes?: string | null;
       doctor_id?: string | null;
-    }
+    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/complete`,
-      payload ?? {}
+      payload ?? {},
     );
     return unwrap(response.data);
   },
@@ -303,11 +334,11 @@ export const consultationService = {
       primary_diagnosis: string;
       secondary_diagnosis?: string | null;
       symptoms?: string | null;
-    }
+    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/diagnoses`,
-      diagnosisData
+      diagnosisData,
     );
     return unwrap(response.data);
   },
@@ -320,11 +351,11 @@ export const consultationService = {
       test_category?: string | null;
       priority?: string;
       clinical_notes?: string | null;
-    }
+    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/lab-tests`,
-      labData
+      labData,
     );
     return unwrap(response.data);
   },
@@ -340,11 +371,11 @@ export const consultationService = {
       route?: string | null;
       start_date?: string | null;
       instructions?: string | null;
-    }
+    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/prescriptions`,
-      prescriptionData
+      prescriptionData,
     );
     return unwrap(response.data);
   },
@@ -352,7 +383,7 @@ export const consultationService = {
 
 const requestWithFallback = async <T>(
   paths: string[],
-  request: (path: string) => Promise<T>
+  request: (path: string) => Promise<T>,
 ): Promise<T> => {
   let lastError: unknown;
 
@@ -435,13 +466,12 @@ export const labService = {
 // Backward-compatible aliases for older dashboard components.
 // Prefer patientService / organizationService / consultationService in new code.
 export const PatientService = {
-  createPatient: async (org_id: string, payload: Record<string, unknown>) =>
-    ({
-      data: await patientService.createPatient(
-        org_id,
-        payload as PatientCreatePayload
-      ),
-    }),
+  createPatient: async (org_id: string, payload: Record<string, unknown>) => ({
+    data: await patientService.createPatient(
+      org_id,
+      payload as PatientCreatePayload,
+    ),
+  }),
   getPatients: async (org_id: string) => ({
     data: await patientService.getPatients(org_id),
   }),
@@ -459,14 +489,19 @@ export const PatientService = {
       reason_for_visit?: string;
       priority?: string;
       vitals?: string;
-    }
+    },
   ) => {
     return {
       data: await consultationService.createConsultation(org_id, {
         patient_id: payload.patient_id,
         department_id: payload.department_id ?? "",
         reason_for_visit: payload.reason_for_visit ?? "",
-        priority: (payload.priority as "Routine" | "Urgent" | "Emergency" | undefined) ?? "Routine",
+        priority:
+          (payload.priority as
+            | "Routine"
+            | "Urgent"
+            | "Emergency"
+            | undefined) ?? "Routine",
         vitals: payload.vitals ?? null,
       }),
     };
@@ -478,14 +513,18 @@ export const PatientService = {
       primary_diagnosis: string;
       secondary_diagnosis?: string | null;
       symptoms?: string | null;
-    }
+    },
   ) => ({
-    data: await consultationService.addDiagnosis(org_id, consultation_id, payload),
+    data: await consultationService.addDiagnosis(
+      org_id,
+      consultation_id,
+      payload,
+    ),
   }),
   createDepartment: async (org_id: string, payload: { name: string }) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/departments`,
-      payload
+      payload,
     );
     return { data: unwrap(response.data) };
   },

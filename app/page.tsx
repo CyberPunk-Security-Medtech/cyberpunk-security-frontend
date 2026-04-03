@@ -29,7 +29,7 @@ export default function Home() {
         <Testimonials />
         <CTASection />
         <FutureHealthcare />
-        <Appointment />
+        {/* <Appointment /> */}
         <FAQ />
       </main>
 
