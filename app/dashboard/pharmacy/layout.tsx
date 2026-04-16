@@ -1,0 +1,63 @@
+"use client";
+
+import { useState } from "react";
+import { LayoutDashboard, Package2, Sparkles, BarChart3 } from "lucide-react";
+import Sidebar from "@components/SideBar";
+import Header from "@components/Header";
+import { MenuItem, UserProfile } from "@/types/index";
+import { useAuth } from "@context/AuthContext";
+
+const pharmacyMenu: MenuItem[] = [
+  { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/pharmacy" },
+  { name: "Inventory", icon: Package2, href: "/dashboard/pharmacy/inventory" },
+  { name: "Reports", icon: BarChart3, href: "/dashboard/pharmacy/reports" },
+  { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
+];
+
+const buildDisplayName = (user: {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+} | null) => {
+  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+  if (fullName) return fullName;
+  return user?.email?.split("@")[0] || "Eleanor Pena";
+};
+
+export default function PharmacyDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, activeWorkspace } = useAuth();
+  const [sidebarMinimize, setSidebarMinimize] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const profile: UserProfile = {
+    name: buildDisplayName(user),
+    role: activeWorkspace?.role ?? "Pharmacist",
+    avatar: "/avatars/eleanor.png",
+  };
+
+  return (
+    <div className="font-sans flex h-screen overflow-hidden">
+      <Sidebar
+        sidebarMinimize={sidebarMinimize}
+        setSidebarMinimize={setSidebarMinimize}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        menuItems={pharmacyMenu}
+        user={profile}
+        backgroundColor="rgba(0, 37, 34, 1)"
+      />
+
+      <div className="flex min-w-0 flex-1 flex-col bg-[#F9FAFB]">
+        <Header
+          setSidebarOpen={setSidebarOpen}
+          desktopPaddingClassName="md:px-8"
+        />
+        <main className="min-w-0 flex-1 overflow-auto px-4 py-5 md:px-8">{children}</main>
+      </div>
+    </div>
+  );
+}
