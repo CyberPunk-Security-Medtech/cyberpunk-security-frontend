@@ -22,38 +22,63 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
   const [loading, setLoading] = useState(false)
   const [departments, setDepartments] = useState<Department[]>([])
   const [loadingDepartments, setLoadingDepartments] = useState(false)
+  const [doctors, setDoctors] = useState<any[]>([]);
+const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [form, setForm] = useState({
-    department_id: '',
+     department_id: '',
     reason_for_visit: '',
     priority: 'Routine',
-    vitals: ''
+    vitals: '',
+    doctor_id: '',
   })
 
   useEffect(() => {
-    const fetchDepartments = async () => {
+    const fetchData = async() => {
       if (!open) return
 
       const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}")
       const orgId = workspace?.id
-      if (!orgId) {
-        setDepartments([])
-        return
-      }
+     if (!orgId) return;
 
-      setLoadingDepartments(true)
-      try {
-        const data = await organizationService.getDepartments(orgId)
-        setDepartments(Array.isArray(data) ? data : [])
-      } catch (error) {
-        console.error("Failed to fetch departments", error)
-        setDepartments([])
-      } finally {
-        setLoadingDepartments(false)
-      }
+    setLoadingDepartments(true);
+    setLoadingDoctors(true);
+
+    try {
+      const [deptRes, memberRes] = await Promise.all([
+        organizationService.getDepartments(orgId),
+        organizationService.getMyMembership(orgId), 
+      ]);
+      
+console.log("Membership Response:" , memberRes)
+      setDepartments(Array.isArray(deptRes) ? deptRes : []);
+
+      const memberships = Array.isArray(memberRes)
+  ? memberRes
+  : [memberRes]; 
+
+const doctorsOnly = memberships
+  .filter((m: any) => m.role?.toLowerCase() === "doctor")
+  .map((m: any) => ({
+    id: m.user.id,
+    first_name: m.user.first_name,
+    last_name: m.user.last_name,
+  }));
+
+console.log("doctorsOnly:", doctorsOnly);
+
+setDoctors(doctorsOnly);
+    } catch (error) {
+      console.error("Failed to fetch data", error);
+      setDepartments([]);
+      setDoctors([]);
+    } finally {
+      setLoadingDepartments(false);
+      setLoadingDoctors(false);
     }
+  };
 
-    fetchDepartments()
-  }, [open])
+  fetchData();
+}, [open]);
 
   const handleSubmit = async () => {
     const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}")
@@ -68,7 +93,7 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
       })
       const consultationId = res.data.id
       onCreated(consultationId)
-      setForm({ department_id: '', reason_for_visit: '', priority: 'Routine', vitals: '' })
+      setForm({ department_id: '', reason_for_visit: '', priority: 'Routine', vitals: '', doctor_id:"" })
       onClose()
     } catch (err) {
       console.error("Failed to create consultation", err)
@@ -126,7 +151,22 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
             <option value="Emergency">Emergency</option>
           </Select>
         </div>
+<div>
+ <Select
+  value={form.doctor_id}
+  onChange={(e) => setForm({ ...form, doctor_id: e.target.value })}
+>
+  <option value="">
+    {loadingDoctors ? "Loading doctors..." : "Select Doctor"}
+  </option>
 
+  {doctors.map((doc) => (
+    <option key={doc.id} value={doc.id}>
+      {doc.first_name} {doc.last_name}
+    </option>
+  ))}
+</Select>
+</div>
         <div>
           <FieldLabel htmlFor="vitals">Vitals / Notes</FieldLabel>
           <Textarea

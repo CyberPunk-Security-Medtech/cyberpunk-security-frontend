@@ -415,51 +415,109 @@ export const waitlistService = {
   },
 };
 
+// export const labService = {
+//   listLabOrders: async (org_id: string, status?: LabOrderStatusFilter) => {
+//     const paths = [
+//       `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders`,
+//       `/api/v1/dashboard/lab/lab-orders`,
+//       `/dashboard/lab/lab-orders`,
+//     ];
+
+//     return requestWithFallback(paths, async (path) => {
+//       const response = await api.get(path, {
+//         params: status ? { status } : undefined,
+//       });
+//       return unwrap(response.data);
+//     });
+//   },
+
+//   getLabOrderDetails: async (org_id: string, lab_order_id: string) => {
+//     const paths = [
+//       `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}`,
+//       `/api/v1/organizations/${org_id}/lab-orders/${lab_order_id}`,
+//       `/api/v1/dashboard/lab/lab-orders/${lab_order_id}`,
+//       `/api/v1/lab-orders/${lab_order_id}`,
+//       `/dashboard/lab/lab-orders/${lab_order_id}`,
+//       `/lab-orders/${lab_order_id}`,
+//     ];
+
+//     return requestWithFallback(paths, async (path) => {
+//       const response = await api.get(path);
+//       return unwrap(response.data);
+//     });
+//   },
+//   startLabOrder: async (org_id: string, lab_order_id: string) => {
+//     const paths = [
+//       `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}/start`,
+//       `/api/v1/organizations/${org_id}/lab-orders/${lab_order_id}/start`,
+//       `/api/v1/dashboard/lab/lab-orders/${lab_order_id}/start`,
+//       `/api/v1/lab-orders/${lab_order_id}/start`,
+//       `/dashboard/lab/lab-orders/${lab_order_id}/start`,
+//       `/lab-orders/${lab_order_id}/start`,
+//     ];
+
+//     return requestWithFallback(paths, async (path) => {
+//       const response = await api.post(path, {});
+//       return unwrap(response.data);
+//     });
+//   },
+// };
+
 export const labService = {
-  listLabOrders: async (org_id: string, status?: LabOrderStatusFilter) => {
-    const paths = [
-      `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders`,
-      `/api/v1/dashboard/lab/lab-orders`,
-      `/dashboard/lab/lab-orders`,
-    ];
-
-    return requestWithFallback(paths, async (path) => {
-      const response = await api.get(path, {
-        params: status ? { status } : undefined,
-      });
-      return unwrap(response.data);
-    });
+async createLabTest(
+  orgId: string,
+  consultationId: string,
+  payload: {
+    test_type: string;
+    priority: string;
+    notes?: string;
+    test_name: string
+  }
+) {
+  const res = await api.post(
+    `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`,
+    payload
+  );
+  return res.data;
+},
+async listOrganizationLabTests(orgId: string, params?: {statuses?: string[]}){
+  const res = await api.get(`api/v1/organizations/${orgId}/lab-tests`,{
+    params: {statuses: params?.statuses?.join(",")},
+  });
+  return res.data;
+},
+  
+ async listLabTests(orgId: string, consultationId: string) {
+    const res = await api.get(
+      `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`
+    );
+    return res.data;
   },
 
-  getLabOrderDetails: async (org_id: string, lab_order_id: string) => {
-    const paths = [
-      `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}`,
-      `/api/v1/organizations/${org_id}/lab-orders/${lab_order_id}`,
-      `/api/v1/dashboard/lab/lab-orders/${lab_order_id}`,
-      `/api/v1/lab-orders/${lab_order_id}`,
-      `/dashboard/lab/lab-orders/${lab_order_id}`,
-      `/lab-orders/${lab_order_id}`,
-    ];
-
-    return requestWithFallback(paths, async (path) => {
-      const response = await api.get(path);
-      return unwrap(response.data);
-    });
+  async updateLabTestStatus(
+    orgId: string,
+    labTestId: string,
+    status: "pending" | "in_progress" | "completed"
+  ) {
+    const res = await api.patch(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/status`,
+      { status }
+    );
+    return res.data;
   },
-  startLabOrder: async (org_id: string, lab_order_id: string) => {
-    const paths = [
-      `/api/v1/organizations/${org_id}/dashboard/lab/lab-orders/${lab_order_id}/start`,
-      `/api/v1/organizations/${org_id}/lab-orders/${lab_order_id}/start`,
-      `/api/v1/dashboard/lab/lab-orders/${lab_order_id}/start`,
-      `/api/v1/lab-orders/${lab_order_id}/start`,
-      `/dashboard/lab/lab-orders/${lab_order_id}/start`,
-      `/lab-orders/${lab_order_id}/start`,
-    ];
 
-    return requestWithFallback(paths, async (path) => {
-      const response = await api.post(path, {});
-      return unwrap(response.data);
-    });
+  async getLabTestDetails(
+    orgId: string,
+    consultationId: string,
+    labTestId: string
+  ) {
+    const res = await api.get(
+      `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`
+    );
+
+    // Find the specific test inside the list
+  const tests = res.data?.data ?? [];
+return tests.find((item: any) => item.id === labTestId);
   },
 };
 

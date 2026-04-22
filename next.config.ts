@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+   allowedDevOrigins: ["http://localhost:3001",
+    "10.23.180.78"
+  ],
 
   async rewrites() {
     return [

@@ -83,7 +83,7 @@ export default function LabTestTab() {
         <button
           disabled={!isSelectedConsultationActive || !selectedConsultationId}
           onClick={() => setOpen(true)}
-          className="rounded-md bg-brand-navy px-4 py-2.5 text-sm font-medium text-white hover:bg-[#141a66] disabled:opacity-50"
+          className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
           + Order Lab Test
         </button>
@@ -163,7 +163,7 @@ export default function LabTestTab() {
             </button>
             <button
               disabled={submitting || !orgId || !selectedConsultationId}
-              className="rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              className="rounded-full bg-[#1A2380] hover:bg-[#00B8A8] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
               type="submit"
             >
               {submitting ? "Submitting..." : "Submit Test Request"}
