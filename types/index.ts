@@ -13,8 +13,9 @@ export interface Patient {
 
 export interface MenuItem {
     name: string;
-    icon: any; // Using any for Lucide icons for simplicity, or ideally React.ElementType
+    icon?: any; // Using any for Lucide icons for simplicity, or ideally React.ElementType
     href: string;
+    children?: MenuItem[];
 }
 
 export interface UserProfile {

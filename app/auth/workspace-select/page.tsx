@@ -136,10 +136,10 @@ const resolveDashboardPath = (rawRole?: string) => {
   const normalized = (rawRole ?? "").toLowerCase().trim();
 
   const roleRoutes: Record<string, string> = {
-    admin: "/dashboard/admin-dashboard",
-    doctor: "/dashboard/doctor-dashboard",
-    nurse: "/dashboard/nurse-dashboard",
-    pharmacist: "/dashboard/admin-dashboard",
+    admin: "/dashboard/admin",
+    doctor: "/dashboard/doctor",
+    nurse: "/dashboard/nurse",
+    pharmacist: "/dashboard/pharmacy",
     lab: "/dashboard/lab-scientist",
     "lab_technician": "/dashboard/lab-scientist",
     "lab-technician": "/dashboard/lab-scientist",
@@ -150,10 +150,10 @@ const resolveDashboardPath = (rawRole?: string) => {
 
   const compact = normalized.replace(/[^a-z]/g, "");
   if (compact === "labtechnician") return "/dashboard/lab-scientist";
-  if (compact === "doctor") return "/dashboard/doctor-dashboard";
-  if (compact === "nurse") return "/dashboard/nurse-dashboard";
-  if (compact === "admin") return "/dashboard/admin-dashboard";
-  if (compact === "pharmacist") return "/dashboard/admin-dashboard";
+  if (compact === "doctor") return "/dashboard/doctor";
+  if (compact === "nurse") return "/dashboard/nurse";
+  if (compact === "admin") return "/dashboard/admin";
+  if (compact === "pharmacist") return "/dashboard/pharmacy";
 
   return null;
 };

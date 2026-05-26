@@ -75,9 +75,7 @@ export default function SideBar({
       )}
 
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] text-white transition-all duration-300 flex flex-col justify-between py-6 ${
-          sidebarMinimize ? "lg:w-20" : "lg:w-[260px]"
-        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] text-white transition-all duration-300 flex flex-col py-6 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         style={{ backgroundColor }}
       >
         <div>
@@ -114,7 +112,7 @@ export default function SideBar({
             </button>
           </div>
 
-          <nav className="space-y-1">
+          {/* <nav className="space-y-1">
             {menuItems.map(({ name, icon: Icon, href }) => {
               const isActive = pathname === href;
               return (
@@ -136,7 +134,75 @@ export default function SideBar({
                 </Link>
               );
             })}
-          </nav>
+          </nav> */}
+          <nav className="space-y-0.5">
+  {menuItems.map((item) => {
+    const Icon = item.icon;
+    const hasChildren = item.children && item.children.length > 0;
+
+    const isParentActive =
+      pathname === item.href ||
+      item.children?.some((child) => pathname === child.href || pathname.startsWith(child.href));
+
+    return (
+      <div key={item.name}>
+        <Link
+          href={item.href}
+          onClick={() => setSidebarOpen?.(false)}
+        >
+          <div
+            className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-all border-l-4 ${
+              isParentActive
+                ? "bg-[rgba(0,184,168,0.18)] border-[rgba(0,184,168,0.9)] text-white"
+                : "border-transparent hover:bg-[#11143B] text-gray-400 hover:text-white"
+            }`}
+          >
+            <Icon
+              size={18}
+              color={isParentActive ? "#00B8A8" : "currentColor"}
+            />
+
+            {(!sidebarMinimize || sidebarOpen) && (
+              <span>{item.name}</span>
+            )}
+          </div>
+        </Link>
+
+        {hasChildren && (!sidebarMinimize || sidebarOpen) && (
+          <div className="mt-1 space-y-1">
+            {item.children?.map((child) => {
+              const ChildIcon = child.icon;
+              const isChildActive =
+                pathname === child.href || pathname.startsWith(child.href);
+
+              return (
+                <Link
+                  key={child.name}
+                  href={child.href}
+                  onClick={() => setSidebarOpen?.(false)}
+                >
+                  <div
+                    className={`ml-6 mr-3 flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm cursor-pointer transition-all ${
+                      isChildActive
+                        ? "bg-[rgba(0,184,168,0.9)] text-white"
+                        : "text-gray-400 hover:bg-[#11143B] hover:text-white"
+                    }`}
+                  >
+                    {/* <ChildIcon
+                      size={16}
+                      color={isChildActive ? "white" : "currentColor"}
+                    /> */}
+                    <span>{child.name}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  })}
+</nav>
         </div>
 
         <div className="px-6 mt-auto border-t border-white/10 pt-6">

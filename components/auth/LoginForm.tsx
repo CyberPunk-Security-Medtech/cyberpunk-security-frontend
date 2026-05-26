@@ -49,21 +49,36 @@ if(redirect){
   router,
 ]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+const getErrorMessage = (err: any) => {
+  return (
+    err?.response?.data?.detail ||
+    err?.response?.data?.message ||
+    err?.response?.data?.error ||
+    err?.data?.detail ||
+    err?.data?.message ||
+    err?.message ||
+    "Something went wrong. Please try again."
+  );
+};
 
-    try {
-      await login(email, password);
-      setHasSubmitted(true);
-      toast.success("Login successful!");
 
-    } catch (err: any) {
-      toast.error(err?.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    await login(email, password);
+
+    setHasSubmitted(true);
+
+    toast.success("Login successful!");
+  } catch (err: any) {
+    toast.error(getErrorMessage(err));
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
