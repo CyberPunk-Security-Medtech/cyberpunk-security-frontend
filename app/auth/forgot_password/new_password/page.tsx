@@ -60,10 +60,10 @@ function ResetPasswordForm() {
 
       await authService.resetPassword(email, code, new_password); 
 
-      toast.success("Password successfully changed!");
+      toast.success("Password reset successfully");
       router.push("/auth/forgot_password/new_password/successPage");
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to reset password");
+      toast.error(err?.response?.data?.detail || "Failed to reset password");
     } finally {
       setLoading(false);
     }
