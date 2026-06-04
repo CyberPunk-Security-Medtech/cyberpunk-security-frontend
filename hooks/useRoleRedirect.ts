@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 export type UserRole = "admin" | "doctor" | "nurse" | "lab" | "pharmacist";
 
 const roleRoutes: Record<UserRole, string> = {
-  admin: "/dashboard/admin-dashboard",
-  doctor: "/dashboard/doctor-dashboard",
-  nurse: "/dashboard/nurse-dashboard",
+  admin: "/dashboard/admin",
+  doctor: "/dashboard/doctor",
+  nurse: "/dashboard/nurse",
   lab: "/dashboard/lab-scientist",
   pharmacist: "/dashboard/pharmacy",
 };
