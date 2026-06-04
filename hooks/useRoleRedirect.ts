@@ -9,7 +9,7 @@ const roleRoutes: Record<UserRole, string> = {
   doctor: "/dashboard/doctor-dashboard",
   nurse: "/dashboard/nurse-dashboard",
   lab: "/dashboard/lab-scientist",
-  pharmacist: "/dashboard/admin-dashboard",
+  pharmacist: "/dashboard/pharmacy",
 };
 
 export function toUserRole(role: string): UserRole | null {

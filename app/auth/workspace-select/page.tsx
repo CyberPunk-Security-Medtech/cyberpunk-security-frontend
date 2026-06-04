@@ -136,6 +136,11 @@ const resolveDashboardPath = (rawRole?: string) => {
   const normalized = (rawRole ?? "").toLowerCase().trim();
 
   const roleRoutes: Record<string, string> = {
+    admin: "/dashboard/admin-dashboard",
+    doctor: "/dashboard/doctor-dashboard",
+    nurse: "/dashboard/nurse-dashboard",
+    pharmacist: "/dashboard/pharmacy",
+    pharmacy: "/dashboard/pharmacy",
     admin: "/dashboard/admin",
     doctor: "/dashboard/doctor",
     nurse: "/dashboard/nurse",
