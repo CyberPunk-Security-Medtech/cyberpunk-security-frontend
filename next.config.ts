@@ -6,12 +6,12 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/dashboard/lab-scientist-dashboard",
+        source: "/dashboard/lab-scientist",
         destination: "/dashboard/lab-scientist",
         permanent: false,
       },
       {
-        source: "/dashboard/lab-scientist-dashboard/:path*",
+        source: "/dashboard/lab-scientist/:path*",
         destination: "/dashboard/lab-scientist/:path*",
         permanent: false,
       },

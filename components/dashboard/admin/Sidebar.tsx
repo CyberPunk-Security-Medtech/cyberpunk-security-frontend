@@ -54,15 +54,15 @@ export default function Sidebar() {
   };
 
   const navItems = [
-    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin-dashboard" },
-    { label: "Staff management", icon: Users, href: "/dashboard/admin-dashboard/staff-management" },
-    { label: "Departments", icon: Building2, href: "/dashboard/admin-dashboard/departments" },
-    { label: "Patients Transfers", icon: Activity, href: "/dashboard/admin-dashboard/patients-transfers" },
-    { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin-dashboard/hmo-management" },
-    { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin-dashboard/compliance" },
-    { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin-dashboard/reports" },
-    { label: "Settings", icon: Settings, href: "/dashboard/admin-dashboard/settings" },
-    { label: "Help", icon: HelpCircle, href: "/dashboard/admin-dashboard/help" },
+    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
+    { label: "Staff management", icon: Users, href: "/dashboard/admin/staff-management" },
+    { label: "Departments", icon: Building2, href: "/dashboard/admin/departments" },
+    { label: "Patients Transfers", icon: Activity, href: "/dashboard/admin/patients-transfers" },
+    { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin/hmo-management" },
+    { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin/compliance" },
+    { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin/reports" },
+    { label: "Settings", icon: Settings, href: "/dashboard/admin/settings" },
+    { label: "Help", icon: HelpCircle, href: "/dashboard/admin/help" },
   ];
 
   return (

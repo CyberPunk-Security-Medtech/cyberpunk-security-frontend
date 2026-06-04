@@ -37,7 +37,7 @@ export default function InviteSuccessPage() {
 
             <button
               onClick={() =>
-                router.push("/dashboard/admin-dashboard/staff-management")
+                router.push("/dashboard/admin/staff-management")
               }
               className="w-full py-3 rounded-full bg-[#1A2380] text-white font-medium hover:opacity-90"
             >

@@ -87,8 +87,8 @@ useEffect(() => {
       exit={{ opacity: 0 }}
     >
       <SuccessScreen
-        onDashboard={() => router.push("/dashboard/admin-dashboard")}
-        onAddStaff={() => router.push("/dashboard/admin-dashboard/staff-management")}
+        onDashboard={() => router.push("/dashboard/admin")}
+        onAddStaff={() => router.push("/dashboard/admin/staff-management")}
       />
     </motion.div>
             ): step === 1 ? (
