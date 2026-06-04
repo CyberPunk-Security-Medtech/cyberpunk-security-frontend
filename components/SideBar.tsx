@@ -65,6 +65,14 @@ export default function SideBar({
     }
   };
 
+  const activeHref = menuItems.reduce<string | null>((best, item) => {
+    const matches =
+      pathname === item.href || pathname.startsWith(`${item.href}/`);
+    if (!matches) return best;
+    if (!best || item.href.length > best.length) return item.href;
+    return best;
+  }, null);
+
   return (
     <>
       {sidebarOpen && (
@@ -114,7 +122,7 @@ export default function SideBar({
 
           {/* <nav className="space-y-1">
             {menuItems.map(({ name, icon: Icon, href }) => {
-              const isActive = pathname === href;
+              const isActive = activeHref === href;
               return (
                 <Link
                   key={name}
