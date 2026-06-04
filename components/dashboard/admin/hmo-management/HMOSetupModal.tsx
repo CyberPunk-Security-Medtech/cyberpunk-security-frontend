@@ -1,22 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, } from "lucide-react";
 import Modal from "@components/Modal";
 import Image from "next/image";
 
-export default function HMOSetupModals() {
+interface HMOSetupModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
   const [step, setStep] = useState<"form" | "verifying" | "success">("form");
-  const [isOpen, setIsOpen] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setStep("verifying");
-    setTimeout(() => setStep("success"), 2500); 
+    setTimeout(() => setStep("success"), 2500);
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    onClose();
     setStep("form");
   };
 
@@ -26,8 +29,8 @@ export default function HMOSetupModals() {
         step === "form"
           ? "Add New HMO"
           : step === "verifying"
-          ? "Verifying HMO’s Status"
-          : "Verifying HMO’s Status"
+          ? "Verifying HMO's Status"
+          : "Verifying HMO's Status"
       }
       isOpen={isOpen}
       onClose={handleClose}
@@ -123,7 +126,13 @@ export default function HMOSetupModals() {
 
       {step === "verifying" && (
         <div className="flex flex-col items-center justify-center py-10 space-y-3">
-          <Image src="/spinner.svg" width={98} height={93}  alt="loading" className="text-indigo-600 animate-spin" />
+          <Image
+            src="/spinner.svg"
+            width={98}
+            height={93}
+            alt="loading"
+            className="text-indigo-600 animate-spin"
+          />
           <p className="text-indigo-600 text-lg font-medium">
             Verifying Status
           </p>
@@ -132,19 +141,19 @@ export default function HMOSetupModals() {
 
       {step === "success" && (
         <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
-            <Image
-                       src="/icons/staffOnboarding_successicon.svg" 
-                       alt="Success"
-                       width={208}
-                       height={208}
-                       className="mx-auto mb-6"
-                     />
-         
+          <Image
+            src="/icons/staffOnboarding_successicon.svg"
+            alt="Success"
+            width={208}
+            height={208}
+            className="mx-auto mb-6"
+          />
+
           <h2 className="text-xl font-semibold text-gray-800">
             HMO Setup Details Successfully!
           </h2>
           <p className="text-gray-500 max-w-sm">
-            HMO’s verification successful and automatically added to dashboard.
+            HMO's verification successful and automatically added to dashboard.
             For more information refer to dashboard.
           </p>
           <button

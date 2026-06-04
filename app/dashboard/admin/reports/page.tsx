@@ -9,7 +9,7 @@ export default function ReportsAnalyticsPage() {
       </p>
       <div className="mt-5">
         <Link
-          href="/dashboard/admin-dashboard"
+          href="/dashboard/admin"
           className="inline-flex rounded-full border border-[#1A2380] px-4 py-2 text-sm font-medium text-[#1A2380]"
         >
           Back to Dashboard

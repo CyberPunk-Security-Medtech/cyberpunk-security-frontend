@@ -69,7 +69,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() => router.push("/dashboard/nurse-dashboard/consultations")}
+          onClick={() => router.push("/dashboard/nurse/consultations")}
           className="rounded-full bg-[#ECEEFD] px-4 py-1 text-sm font-medium text-brand-navy hover:underline"
         >
           Back to Consultation Queue
@@ -77,7 +77,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
         <button
           type="button"
           onClick={() =>
-            router.push(`/dashboard/nurse-dashboard/patient/${patient?.id ?? ""}`)
+            router.push(`/dashboard/nurse/patient/${patient?.id ?? ""}`)
           }
           disabled={!patient?.id}
           className="rounded-full border border-gray-200 px-4 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"

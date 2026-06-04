@@ -17,7 +17,7 @@ export default function HMOTable() {
   ];
 
   const handleRowClick = (id: number) => {
-    router.push("/dashboard/admin-dashboard/hmo-management/view-hmo"); 
+    router.push("/dashboard/admin/hmo-management/view-hmo"); 
   };
 
   return (
