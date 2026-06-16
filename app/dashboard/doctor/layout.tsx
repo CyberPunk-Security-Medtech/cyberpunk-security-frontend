@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Sidebar from '@components/SideBar';
 import Header from '@components/Header';
-import { ClipboardList, LayoutDashboard, Users, Sparkles, ArrowLeftRight, UserCheck, ShieldAlert, FileInput } from "lucide-react";
+import { ClipboardList, LayoutDashboard, Users, Sparkles, ArrowLeftRight } from "lucide-react";
 import { MenuItem, UserProfile } from '@/types/index';
 import { useAuth } from '@context/AuthContext';
 
@@ -18,23 +18,11 @@ const doctorMenu: MenuItem[] = [
     href: "/dashboard/doctor/patient-transfers",
     children: [
       {
-        name: "Patient Consent",
-        // icon: UserCheck,
-        href: "/dashboard/doctor/patient-transfers/patient-consent",
+        name: "Sharing Permissions",
+        href: "/dashboard/doctor/patient-transfers/sharing-permissions",
       },
-      {
-        name: "Patients Overview",
-        // icon: Users,
-        href: "/dashboard/doctor/patient-transfers/patient-overview",
-      },
-      // {
-      //   name: "Emergency Override",
-      //   icon: ShieldAlert,
-      //   href: "/dashboard/doctor-dashboard/patient-transfers/emergency-override",
-      // },
       {
         name: "Incoming Records",
-        // icon: FileInput,
         href: "/dashboard/doctor/patient-transfers/incoming-records",
       },
     ],

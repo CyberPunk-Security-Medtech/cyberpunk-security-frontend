@@ -102,6 +102,21 @@ export interface CreateOrganizationPayload {
   image_url?: string | null;
 }
 
+export type OrganizationDirectoryEntry = {
+  id: string;
+  name: string;
+  slug: string;
+  image_url?: string | null;
+  accepts_referrals: boolean;
+};
+
+export type OrganizationDirectoryParams = {
+  q?: string;
+  accepts_referrals?: boolean;
+  limit?: number;
+  offset?: number;
+};
+
 export const organizationService = {
   createOrganization: async (payload: CreateOrganizationPayload) => {
     const response = await api.post("/api/v1/organizations", payload, {
@@ -113,6 +128,28 @@ export const organizationService = {
   getOrganizations: async () => {
     const response = await api.get("/api/v1/organizations");
     return response.data;
+  },
+
+  getOrganization: async (org_id: string) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}`);
+    return unwrap(response.data);
+  },
+
+  getDirectory: async (
+    params?: OrganizationDirectoryParams,
+  ): Promise<OrganizationDirectoryEntry[]> => {
+    const response = await api.get("/api/v1/organizations/directory", {
+      params,
+    });
+    return unwrap(response.data);
+  },
+
+  updateOrganization: async (
+    org_id: string,
+    payload: { name?: string | null; accepts_referrals?: boolean | null },
+  ) => {
+    const response = await api.patch(`/api/v1/organizations/${org_id}`, payload);
+    return unwrap(response.data);
   },
 
   getMyMembership: async (org_id: string) => {
@@ -226,9 +263,145 @@ export type PatientCreatePayload = {
   policy_expiry_date?: string | null;
 };
 
+export type ShareScope =
+  | "demographics"
+  | "history"
+  | "consultations"
+  | "lab_results"
+  | "prescriptions"
+  | "immunizations";
+
+export type SharePurpose =
+  | "referral"
+  | "continuity_of_care"
+  | "lab_fulfillment"
+  | "second_opinion"
+  | "emergency";
+
+export type ConsentMethod =
+  | "email_link"
+  | "sms_link"
+  | "in_person_attestation"
+  | "voice";
+
+export type GrantStatus =
+  | "pending_patient"
+  | "active"
+  | "revoked"
+  | "expired"
+  | "verification_failed";
+
+export type ReferralPriority = "routine" | "urgent" | "emergency";
+
+export type ReferralStatus =
+  | "sent"
+  | "accepted"
+  | "declined"
+  | "completed"
+  | "cancelled";
+
+export type DataShareGrantCreatePayload = {
+  patient_id: string;
+  recipient_org_id: string;
+  scopes: ShareScope[];
+  purpose: SharePurpose;
+  consent_method: ConsentMethod;
+  patient_email?: string | null;
+  attestation_note?: string | null;
+  expires_at?: string | null;
+};
+
+export type DataShareGrant = {
+  id: string;
+  patient_id: string;
+  source_org_id: string;
+  recipient_org_id: string;
+  scopes: string[];
+  purpose: string;
+  consent_method: string;
+  status: string;
+  granted_by_patient_at?: string | null;
+  expires_at: string;
+  created_by_user_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ShareGrantListParams = {
+  role?: "source" | "recipient" | "either";
+  status?: GrantStatus;
+  limit?: number;
+  offset?: number;
+};
+
+export type ConsentConfirmResponse = {
+  grant_id: string;
+  status: string;
+};
+
+export type ReferralCreatePayload = {
+  patient_id: string;
+  recipient_org_id: string;
+  reason: string;
+  clinical_summary?: string | null;
+  priority?: ReferralPriority;
+  source_consultation_id?: string | null;
+  scopes: ShareScope[];
+  consent_method: ConsentMethod;
+  patient_email?: string | null;
+};
+
+export type Referral = {
+  id: string;
+  patient_id: string;
+  source_org_id: string;
+  recipient_org_id: string;
+  source_consultation_id?: string | null;
+  grant_id: string;
+  reason: string;
+  clinical_summary?: string | null;
+  priority: string;
+  status: string;
+  created_by_user_id: string;
+  accepted_at?: string | null;
+  completed_at?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReferralListParams = {
+  direction?: "outgoing" | "incoming" | "either";
+  status?: ReferralStatus;
+  limit?: number;
+  offset?: number;
+};
+
+export type CrossTenantAccessLog = {
+  id: string;
+  user_id: string;
+  viewer_org_id: string;
+  patient_id: string;
+  resource_type: string;
+  resource_id?: string | null;
+  grant_id: string;
+  accessed_at: string;
+};
+
+export type CrossTenantAccessParams = {
+  as?: "viewer" | "source";
+  patient_id?: string;
+  limit?: number;
+  offset?: number;
+};
+
 export const patientService = {
-  getPatients: async (org_id: string) => {
-    const response = await api.get(`/api/v1/organizations/${org_id}/patients`);
+  getPatients: async (
+    org_id: string,
+    params?: { include_shared?: boolean },
+  ) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/patients`, {
+      params,
+    });
     return unwrap(response.data);
   },
 
@@ -269,6 +442,144 @@ export const patientService = {
   },
 };
 
+export const dataSharingService = {
+  createShareGrant: async (
+    org_id: string,
+    payload: DataShareGrantCreatePayload,
+  ): Promise<DataShareGrant> => {
+    const response = await api.post("/api/v1/share-grants", payload, {
+      params: { org_id },
+    });
+    return unwrap(response.data);
+  },
+
+  listShareGrants: async (
+    org_id: string,
+    params?: ShareGrantListParams,
+  ): Promise<DataShareGrant[]> => {
+    const response = await api.get("/api/v1/share-grants", {
+      params: { ...params, org_id },
+    });
+    return unwrap(response.data);
+  },
+
+  getShareGrant: async (
+    org_id: string,
+    grant_id: string,
+  ): Promise<DataShareGrant> => {
+    const response = await api.get(`/api/v1/share-grants/${grant_id}`, {
+      params: { org_id },
+    });
+    return unwrap(response.data);
+  },
+
+  revokeShareGrant: async (
+    org_id: string,
+    grant_id: string,
+  ): Promise<DataShareGrant> => {
+    const response = await api.post(
+      `/api/v1/share-grants/${grant_id}/revoke`,
+      {},
+      { params: { org_id } },
+    );
+    return unwrap(response.data);
+  },
+
+  confirmConsent: async (token: string): Promise<ConsentConfirmResponse> => {
+    const response = await api.post("/api/v1/share-grants/confirm", { token });
+    return unwrap(response.data);
+  },
+};
+
+export const referralService = {
+  createReferral: async (
+    org_id: string,
+    payload: ReferralCreatePayload,
+  ): Promise<Referral> => {
+    const response = await api.post("/api/v1/referrals", payload, {
+      params: { org_id },
+    });
+    return unwrap(response.data);
+  },
+
+  listReferrals: async (
+    org_id: string,
+    params?: ReferralListParams,
+  ): Promise<Referral[]> => {
+    const response = await api.get("/api/v1/referrals", {
+      params: { ...params, org_id },
+    });
+    return unwrap(response.data);
+  },
+
+  getReferral: async (org_id: string, referral_id: string): Promise<Referral> => {
+    const response = await api.get(`/api/v1/referrals/${referral_id}`, {
+      params: { org_id },
+    });
+    return unwrap(response.data);
+  },
+
+  acceptReferral: async (
+    org_id: string,
+    referral_id: string,
+  ): Promise<Referral> => {
+    const response = await api.post(
+      `/api/v1/referrals/${referral_id}/accept`,
+      {},
+      { params: { org_id } },
+    );
+    return unwrap(response.data);
+  },
+
+  declineReferral: async (
+    org_id: string,
+    referral_id: string,
+  ): Promise<Referral> => {
+    const response = await api.post(
+      `/api/v1/referrals/${referral_id}/decline`,
+      {},
+      { params: { org_id } },
+    );
+    return unwrap(response.data);
+  },
+
+  completeReferral: async (
+    org_id: string,
+    referral_id: string,
+  ): Promise<Referral> => {
+    const response = await api.post(
+      `/api/v1/referrals/${referral_id}/complete`,
+      {},
+      { params: { org_id } },
+    );
+    return unwrap(response.data);
+  },
+
+  cancelReferral: async (
+    org_id: string,
+    referral_id: string,
+  ): Promise<Referral> => {
+    const response = await api.post(
+      `/api/v1/referrals/${referral_id}/cancel`,
+      {},
+      { params: { org_id } },
+    );
+    return unwrap(response.data);
+  },
+};
+
+export const auditService = {
+  listCrossTenantAccess: async (
+    org_id: string,
+    params?: CrossTenantAccessParams,
+  ): Promise<CrossTenantAccessLog[]> => {
+    const response = await api.get("/api/v1/audit/cross-tenant-access", {
+      params: { ...params, org_id },
+    });
+    return unwrap(response.data);
+  },
+};
+
 export const consultationService = {
   createConsultation: async (
     org_id: string,
@@ -299,6 +610,13 @@ export const consultationService = {
       {
         params,
       },
+    );
+    return unwrap(response.data);
+  },
+
+  getConsultation: async (org_id: string, consultation_id: string) => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}`,
     );
     return unwrap(response.data);
   },

@@ -1,4 +1,4 @@
-import PatientTransferDashboard from "@components/patient-transfers/PatientTransferDashboard";
+import PatientTransferDashboard from "@components/patient-transfers/transferDashboard/PatientTransferDashboard";
 
 
 export default function PatientTransferPage() {
