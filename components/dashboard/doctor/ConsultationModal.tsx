@@ -37,37 +37,37 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
 
       const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}")
       const orgId = activeWorkspace?.id ?? workspace?.id
-     if (!orgId) return;
+      if (!orgId) return;
 
-    setLoadingDepartments(true);
+      setLoadingDepartments(true);
 
-    try {
-      const membership = await organizationService.getMyMembership(orgId);
-      const department = membership?.department ?? null;
-      setDoctorDepartment(department);
-      setForm((current) => ({
-        ...current,
-        department_id: department?.id ?? '',
-      }));
-    } catch (error) {
-      console.error("Failed to fetch data", error);
-      setDoctorDepartment(null);
-      setForm((current) => ({
-        ...current,
-        department_id: '',
-      }));
-    } finally {
-      setLoadingDepartments(false);
-    }
-  };
+      try {
+        const membership = await organizationService.getMyMembership(orgId);
+        const department = membership?.department ?? null;
+        setDoctorDepartment(department);
+        setForm((current) => ({
+          ...current,
+          department_id: department?.id ?? '',
+        }));
+      } catch (error) {
+        console.error("Failed to fetch doctor's department", error);
+        setDoctorDepartment(null);
+        setForm((current) => ({
+          ...current,
+          department_id: '',
+        }));
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
 
-  fetchDoctorDepartment();
-}, [activeWorkspace?.id, open]);
+    fetchDoctorDepartment();
+  }, [activeWorkspace?.id, open]);
 
   const handleSubmit = async () => {
     const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}")
-    const orgId = workspace?.id
-    if (!orgId || !patientId) return
+    const orgId = activeWorkspace?.id ?? workspace?.id
+    if (!orgId || !patientId || !form.department_id) return
 
     setLoading(true)
     try {
@@ -91,9 +91,13 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
       <form className="space-y-6">
         <div>
           <FieldLabel htmlFor="department">Department</FieldLabel>
-          <div className="rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700">
+          <div
+            id="department"
+            className="rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700"
+          >
+            <span className="font-medium">Department:</span>{" "}
             {loadingDepartments
-              ? "Loading your department..."
+              ? "Loading..."
               : doctorDepartment?.name ?? "No department assigned"}
           </div>
           {!loadingDepartments && !form.department_id && (
