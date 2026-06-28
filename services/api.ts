@@ -117,6 +117,25 @@ export type OrganizationDirectoryParams = {
   offset?: number;
 };
 
+export type Department = {
+  id: string;
+  name: string;
+  organization_id: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type Membership = {
+  role: string;
+  joined_at: string;
+  user: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  department?: Department | null;
+};
+
 export const organizationService = {
   createOrganization: async (payload: CreateOrganizationPayload) => {
     const response = await api.post("/api/v1/organizations", payload, {
@@ -152,12 +171,12 @@ export const organizationService = {
     return unwrap(response.data);
   },
 
-  getMyMembership: async (org_id: string) => {
+  getMyMembership: async (org_id: string): Promise<Membership | null> => {
     const response = await api.get(`/api/v1/membership/${org_id}`);
     return unwrap(response.data);
   },
 
-  getDepartments: async (org_id: string) => {
+  getDepartments: async (org_id: string): Promise<Department[]> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/departments`,
     );
@@ -193,10 +212,16 @@ export const uploadService = {
 };
 
 export const invitationService = {
-  async sendInvitation(email: string, role: string, org_id: string) {
+  async sendInvitation(
+    email: string,
+    role: string,
+    org_id: string,
+    department_id?: string | null,
+  ) {
     const res = await api.post(`/api/v1/organizations/${org_id}/invitations`, {
       email,
       role,
+      ...(department_id ? { department_id } : {}),
     });
     return res.data;
   },
@@ -440,6 +465,7 @@ export const patientService = {
     );
     return unwrap(response.data);
   },
+
 };
 
 export const dataSharingService = {
