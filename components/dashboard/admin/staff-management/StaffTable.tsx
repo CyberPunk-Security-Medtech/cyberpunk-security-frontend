@@ -11,6 +11,7 @@ interface Invitation {
   email: string;
   role: string;
   status: string;
+  department_id?: string | null;
 }
 
 export default function StaffTable() {
@@ -64,7 +65,8 @@ const handleResend = async (inv: Invitation) => {
     await invitationService.sendInvitation(
       inv.email,
       inv.role,
-      activeWorkspace.id
+      activeWorkspace.id,
+      inv.department_id ?? null,
     );
 
     toast.success(`Invitation resent to ${inv.email}`);
