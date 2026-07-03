@@ -147,7 +147,7 @@ export default function ConsultationsPage() {
       await consultationService.attendConsultation(orgId, row.id);
       await loadConsultations();
       router.push(
-        `/dashboard/doctor-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`
+        `/dashboard/doctor/consultations/${row.id}?patient_id=${row.patient_id}`
       );
     });
   };
@@ -161,7 +161,7 @@ export default function ConsultationsPage() {
   };
 
   const renderActionButtons = (row: ConsultationRow, rowLoading: boolean) => {
-    const detailHref = `/dashboard/doctor-dashboard/consultations/${row.id}?patient_id=${row.patient_id}`;
+    const detailHref = `/dashboard/doctor/consultations/${row.id}?patient_id=${row.patient_id}`;
 
     if (row.status === "Pending") {
       return (

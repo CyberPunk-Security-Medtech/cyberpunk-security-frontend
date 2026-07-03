@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MenuItem, UserProfile } from "@/types/index";
@@ -29,6 +29,7 @@ export default function SideBar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -64,6 +65,32 @@ export default function SideBar({
       window.location.href = "/auth/login";
     }
   };
+
+  const activeHref = menuItems.reduce<string | null>((best, item) => {
+    const matches =
+      pathname === item.href || pathname.startsWith(`${item.href}/`);
+    if (!matches) return best;
+    if (!best || item.href.length > best.length) return item.href;
+    return best;
+  }, null);
+
+  useEffect(() => {
+    setOpenGroups((current) => {
+      const next = { ...current };
+      menuItems.forEach((item) => {
+        if (
+          item.children?.some(
+            (child) => pathname === child.href || pathname.startsWith(child.href),
+          ) ||
+          pathname === item.href ||
+          pathname.startsWith(`${item.href}/`)
+        ) {
+          next[item.name] = true;
+        }
+      });
+      return next;
+    });
+  }, [menuItems, pathname]);
 
   return (
     <>
@@ -114,7 +141,7 @@ export default function SideBar({
 
           {/* <nav className="space-y-1">
             {menuItems.map(({ name, icon: Icon, href }) => {
-              const isActive = pathname === href;
+              const isActive = activeHref === href;
               return (
                 <Link
                   key={name}
@@ -139,6 +166,7 @@ export default function SideBar({
   {menuItems.map((item) => {
     const Icon = item.icon;
     const hasChildren = item.children && item.children.length > 0;
+    const isOpen = openGroups[item.name] ?? false;
 
     const isParentActive =
       pathname === item.href ||
@@ -146,10 +174,45 @@ export default function SideBar({
 
     return (
       <div key={item.name}>
-        <Link
-          href={item.href}
-          onClick={() => setSidebarOpen?.(false)}
-        >
+        {hasChildren ? (
+          <Link
+            href={item.href}
+            onClick={() =>
+              setOpenGroups((current) => ({
+                ...current,
+                [item.name]: !isOpen,
+              }))
+            }
+            className="w-full"
+          >
+            <div
+              className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-all border-l-4 ${
+                isParentActive
+                  ? "bg-[rgba(0,184,168,0.18)] border-[rgba(0,184,168,0.9)] text-white"
+                  : "border-transparent hover:bg-[#11143B] text-gray-400 hover:text-white"
+              }`}
+            >
+              <Icon
+                size={18}
+                color={isParentActive ? "#00B8A8" : "currentColor"}
+              />
+
+              {(!sidebarMinimize || sidebarOpen) && (
+                <>
+                  <span className="flex-1 text-left">{item.name}</span>
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
+                </>
+              )}
+            </div>
+          </Link>
+        ) : (
+          <Link
+            href={item.href}
+            onClick={() => setSidebarOpen?.(false)}
+          >
           <div
             className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-all border-l-4 ${
               isParentActive
@@ -166,9 +229,10 @@ export default function SideBar({
               <span>{item.name}</span>
             )}
           </div>
-        </Link>
+          </Link>
+        )}
 
-        {hasChildren && (!sidebarMinimize || sidebarOpen) && (
+        {hasChildren && isOpen && (!sidebarMinimize || sidebarOpen) && (
           <div className="mt-1 space-y-1">
             {item.children?.map((child) => {
               const ChildIcon = child.icon;

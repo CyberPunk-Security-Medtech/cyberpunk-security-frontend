@@ -98,7 +98,7 @@ export default function PatientTable() {
               <tr
                 key={patient.id}
                 className="cursor-pointer border-b hover:bg-gray-50"
-                onClick={() => router.push(`/dashboard/nurse-dashboard/patient/${patient.id}`)}
+                onClick={() => router.push(`/dashboard/nurse/patient/${patient.id}`)}
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3 font-medium text-[#1A2380]">
@@ -135,7 +135,7 @@ export default function PatientTable() {
           <button
             key={`mobile-${patient.id}`}
             type="button"
-            onClick={() => router.push(`/dashboard/nurse-dashboard/patient/${patient.id}`)}
+            onClick={() => router.push(`/dashboard/nurse/patient/${patient.id}`)}
             className="w-full rounded-lg border border-gray-200 p-4 text-left shadow-sm transition hover:bg-gray-50"
           >
             <div className="mb-3 flex items-start justify-between gap-3">

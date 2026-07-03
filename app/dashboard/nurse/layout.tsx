@@ -71,9 +71,9 @@ import { MenuItem, UserProfile } from '@/types/index';
 import { useAuth } from '@context/AuthContext';
 
 const nurseMenu: MenuItem[] = [
-  { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/nurse-dashboard" },
-  { name: "Patients Records", icon: Users, href: "/dashboard/nurse-dashboard/patient-records" },
-  { name: "Consultations", icon: ClipboardList, href: "/dashboard/nurse-dashboard/consultations" },
+  { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/nurse" },
+  { name: "Patients Records", icon: Users, href: "/dashboard/nurse/patient-records" },
+  { name: "Consultations", icon: ClipboardList, href: "/dashboard/nurse/consultations" },
   { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
 ];
 

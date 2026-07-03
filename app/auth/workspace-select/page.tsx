@@ -140,6 +140,7 @@ const resolveDashboardPath = (rawRole?: string) => {
     doctor: "/dashboard/doctor",
     nurse: "/dashboard/nurse",
     pharmacist: "/dashboard/pharmacy",
+    pharmacy: "/dashboard/pharmacy",
     lab: "/dashboard/lab-scientist",
     "lab_technician": "/dashboard/lab-scientist",
     "lab-technician": "/dashboard/lab-scientist",

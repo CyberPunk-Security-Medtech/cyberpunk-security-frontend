@@ -5,6 +5,7 @@ import Modal from '@components/Modal'
 import { FieldLabel, Textarea, Select } from '@components/Field'
 import Button from '@components/Button'
 import { organizationService, PatientService } from '@services/api'
+import { useAuth } from '@context/AuthContext'
 
 interface CreateConsultationModalProps {
   open: boolean
@@ -19,71 +20,54 @@ type Department = {
 }
 
 export function CreateConsultationModal({ open, onClose, patientId, onCreated }: CreateConsultationModalProps) {
+  const { activeWorkspace } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [departments, setDepartments] = useState<Department[]>([])
   const [loadingDepartments, setLoadingDepartments] = useState(false)
-  const [doctors, setDoctors] = useState<any[]>([]);
-const [loadingDoctors, setLoadingDoctors] = useState(false);
+  const [doctorDepartment, setDoctorDepartment] = useState<Department | null>(null)
   const [form, setForm] = useState({
      department_id: '',
     reason_for_visit: '',
     priority: 'Routine',
     vitals: '',
-    doctor_id: '',
   })
 
   useEffect(() => {
-    const fetchData = async() => {
+    const fetchDoctorDepartment = async() => {
       if (!open) return
 
       const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}")
-      const orgId = workspace?.id
-     if (!orgId) return;
+      const orgId = activeWorkspace?.id ?? workspace?.id
+      if (!orgId) return;
 
-    setLoadingDepartments(true);
-    setLoadingDoctors(true);
+      setLoadingDepartments(true);
 
-    try {
-      const [deptRes, memberRes] = await Promise.all([
-        organizationService.getDepartments(orgId),
-        organizationService.getMyMembership(orgId), 
-      ]);
-      
-console.log("Membership Response:" , memberRes)
-      setDepartments(Array.isArray(deptRes) ? deptRes : []);
+      try {
+        const membership = await organizationService.getMyMembership(orgId);
+        const department = membership?.department ?? null;
+        setDoctorDepartment(department);
+        setForm((current) => ({
+          ...current,
+          department_id: department?.id ?? '',
+        }));
+      } catch (error) {
+        console.error("Failed to fetch doctor's department", error);
+        setDoctorDepartment(null);
+        setForm((current) => ({
+          ...current,
+          department_id: '',
+        }));
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
 
-      const memberships = Array.isArray(memberRes)
-  ? memberRes
-  : [memberRes]; 
-
-const doctorsOnly = memberships
-  .filter((m: any) => m.role?.toLowerCase() === "doctor")
-  .map((m: any) => ({
-    id: m.user.id,
-    first_name: m.user.first_name,
-    last_name: m.user.last_name,
-  }));
-
-console.log("doctorsOnly:", doctorsOnly);
-
-setDoctors(doctorsOnly);
-    } catch (error) {
-      console.error("Failed to fetch data", error);
-      setDepartments([]);
-      setDoctors([]);
-    } finally {
-      setLoadingDepartments(false);
-      setLoadingDoctors(false);
-    }
-  };
-
-  fetchData();
-}, [open]);
+    fetchDoctorDepartment();
+  }, [activeWorkspace?.id, open]);
 
   const handleSubmit = async () => {
     const workspace = JSON.parse(localStorage.getItem("activeWorkspace") || "{}")
-    const orgId = workspace?.id
-    if (!orgId || !patientId) return
+    const orgId = activeWorkspace?.id ?? workspace?.id
+    if (!orgId || !patientId || !form.department_id) return
 
     setLoading(true)
     try {
@@ -93,7 +77,7 @@ setDoctors(doctorsOnly);
       })
       const consultationId = res.data.id
       onCreated(consultationId)
-      setForm({ department_id: '', reason_for_visit: '', priority: 'Routine', vitals: '', doctor_id:"" })
+      setForm({ department_id: '', reason_for_visit: '', priority: 'Routine', vitals: '' })
       onClose()
     } catch (err) {
       console.error("Failed to create consultation", err)
@@ -107,23 +91,19 @@ setDoctors(doctorsOnly);
       <form className="space-y-6">
         <div>
           <FieldLabel htmlFor="department">Department</FieldLabel>
-          <Select
+          <div
             id="department"
-            value={form.department_id}
-            onChange={(e) => setForm({ ...form, department_id: e.target.value })}
+            className="rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700"
           >
-            <option value="">
-              {loadingDepartments ? "Loading departments..." : "Select Department"}
-            </option>
-            {departments.map((dept) => (
-              <option key={dept.id} value={dept.id}>
-                {dept.name}
-              </option>
-            ))}
-          </Select>
-          {!loadingDepartments && departments.length === 0 && (
+            <span className="font-medium">Department:</span>{" "}
+            {loadingDepartments
+              ? "Loading..."
+              : doctorDepartment?.name ?? "No department assigned"}
+          </div>
+          {!loadingDepartments && !form.department_id && (
             <p className="mt-1 text-xs text-gray-500">
-              No departments found. Ask an admin to create departments from the admin dashboard.
+              Your account has no department assigned. Ask an admin to update
+              your invitation or membership.
             </p>
           )}
         </div>
@@ -151,22 +131,7 @@ setDoctors(doctorsOnly);
             <option value="Emergency">Emergency</option>
           </Select>
         </div>
-<div>
- <Select
-  value={form.doctor_id}
-  onChange={(e) => setForm({ ...form, doctor_id: e.target.value })}
->
-  <option value="">
-    {loadingDoctors ? "Loading doctors..." : "Select Doctor"}
-  </option>
 
-  {doctors.map((doc) => (
-    <option key={doc.id} value={doc.id}>
-      {doc.first_name} {doc.last_name}
-    </option>
-  ))}
-</Select>
-</div>
         <div>
           <FieldLabel htmlFor="vitals">Vitals / Notes</FieldLabel>
           <Textarea
@@ -189,7 +154,7 @@ setDoctors(doctorsOnly);
           <Button
             type="button"
             onSubmitHandler={handleSubmit}
-            disabled={loading || !form.reason_for_visit || !form.department_id || departments.length === 0}
+            disabled={loading || !form.reason_for_visit || !form.department_id}
             className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Consultation'}

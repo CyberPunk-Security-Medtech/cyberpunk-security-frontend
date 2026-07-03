@@ -11,6 +11,7 @@ import {
   BarChart2,
   Settings,
   HelpCircle,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import { authService } from "@services/api";
@@ -22,6 +23,7 @@ export default function Sidebar() {
   const { user, activeWorkspace } = useAuth();
   const pathname = usePathname();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
@@ -54,16 +56,49 @@ export default function Sidebar() {
   };
 
   const navItems = [
-    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin-dashboard" },
-    { label: "Staff management", icon: Users, href: "/dashboard/admin-dashboard/staff-management" },
-    { label: "Departments", icon: Building2, href: "/dashboard/admin-dashboard/departments" },
-    { label: "Patients Transfers", icon: Activity, href: "/dashboard/admin-dashboard/patients-transfers" },
-    { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin-dashboard/hmo-management" },
-    { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin-dashboard/compliance" },
-    { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin-dashboard/reports" },
-    { label: "Settings", icon: Settings, href: "/dashboard/admin-dashboard/settings" },
-    { label: "Help", icon: HelpCircle, href: "/dashboard/admin-dashboard/help" },
+    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
+    { label: "Staff management", icon: Users, href: "/dashboard/admin/staff-management" },
+    { label: "Departments", icon: Building2, href: "/dashboard/admin/departments" },
+    {
+      label: "Patient Transfers",
+      icon: Activity,
+      href: "/dashboard/admin/patients-transfers",
+      children: [
+        {
+          label: "Sharing Permissions",
+          href: "/dashboard/admin/patients-transfers/sharing-permissions",
+        },
+        {
+          label: "Incoming Records",
+          href: "/dashboard/admin/patients-transfers/incoming-records",
+        },
+      ],
+    },
+    { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin/hmo-management" },
+    { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin/compliance" },
+    { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin/reports" },
+    { label: "Settings", icon: Settings, href: "/dashboard/admin/settings" },
+    { label: "Help", icon: HelpCircle, href: "/dashboard/admin/help" },
   ];
+
+  useEffect(() => {
+    setOpenGroups((current) => {
+      const next = { ...current };
+      navItems.forEach((item) => {
+        if (
+          item.children?.some(
+            (child) => pathname === child.href || pathname.startsWith(child.href),
+          ) ||
+          pathname === item.href ||
+          pathname.startsWith(`${item.href}/`)
+        ) {
+          next[item.label] = true;
+        }
+      });
+      return next;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <aside className="w-72 bg-[#051466] text-slate-100 flex flex-col min-h-screen">
@@ -76,22 +111,79 @@ export default function Sidebar() {
       <nav className="flex-1 flex flex-col gap-y-1 px-3 py-6">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const hasChildren = item.children && item.children.length > 0;
+          const isOpen = openGroups[item.label] ?? false;
+          const isActive =
+            pathname === item.href ||
+            pathname.startsWith(`${item.href}/`) ||
+            item.children?.some(
+              (child) => pathname === child.href || pathname.startsWith(child.href),
+            );
 
           return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
-                ${
-                  isActive
-                    ? "bg-white text-[#051466] font-semibold"
-                    : "text-slate-200 hover:bg-white/10"
-                }`}
-            >
-              <Icon className="w-4 h-4" />
-              {item.label}
-            </Link>
+            <div key={item.label}>
+              {hasChildren ? (
+                <Link
+                  href={item.href}
+                  onClick={() =>
+                    setOpenGroups((current) => ({
+                      ...current,
+                      [item.label]: !isOpen,
+                    }))
+                  }
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition
+                    ${
+                      isActive
+                        ? "bg-white text-[#051466] font-semibold"
+                        : "text-slate-200 hover:bg-white/10"
+                    }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </Link>
+              ) : (
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+                    ${
+                      isActive
+                        ? "bg-white text-[#051466] font-semibold"
+                        : "text-slate-200 hover:bg-white/10"
+                    }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              )}
+
+              {hasChildren && isOpen && (
+                <div className="mt-1 space-y-1 pl-7">
+                  {item.children?.map((child) => {
+                    const childActive =
+                      pathname === child.href || pathname.startsWith(child.href);
+
+                    return (
+                      <Link
+                        key={child.label}
+                        href={child.href}
+                        className={`block rounded-lg px-3 py-2 text-sm transition ${
+                          childActive
+                            ? "bg-white/20 text-white"
+                            : "text-slate-300 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>
