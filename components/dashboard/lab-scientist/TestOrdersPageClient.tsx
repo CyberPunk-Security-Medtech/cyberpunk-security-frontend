@@ -1047,6 +1047,110 @@ export default function TestOrdersPageClient() {
     router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
   };
 
+  const markProcessing = (id: string, active: boolean) => {
+  setProcessingIds((prev) => {
+    const next = new Set(prev);
+
+    if (active) {
+      next.add(id);
+    } else {
+      next.delete(id);
+    }
+
+    return next;
+  });
+};
+
+
+const updateOrderStatus = (
+  id: string,
+  status: LabOrder["status"]
+) => {
+  setOrders((prev) =>
+    prev.map((order) =>
+      order.id === id
+        ? {
+            ...order,
+            status,
+          }
+        : order
+    )
+  );
+};
+
+
+const handleStartProcessing = async (order: LabOrder) => {
+  if (!orgId) return;
+
+  if (order.status !== "pending") return;
+
+  if (processingIds.has(order.id)) return;
+
+
+  markProcessing(order.id, true);
+
+  try {
+    // Backend expects:
+    // Pending | In Progress | Completed
+    await labService.updateLabTestStatus(
+      orgId,
+      order.id,
+      "In Progress"
+    );
+
+
+    // Frontend keeps:
+    // pending | in_progress | completed
+    updateOrderStatus(
+      order.id,
+      "in_progress"
+    );
+
+
+  } catch (error) {
+    console.error(
+      "Failed to start processing lab test",
+      error
+    );
+
+  } finally {
+    markProcessing(order.id, false);
+  }
+};
+
+
+const handleCompleteTest = async (order: LabOrder) => {
+  if (!orgId) return;
+
+  if (order.status !== "in_progress") return;
+
+  if (processingIds.has(order.id)) return;
+
+  markProcessing(order.id, true);
+
+  try {
+    await labService.updateLabTestStatus(
+      orgId,
+      order.id,
+      "Completed"
+    );
+
+    updateOrderStatus(
+      order.id,
+      "completed"
+    );
+
+  } catch (error) {
+    console.error(
+      "Failed to complete lab test",
+      error
+    );
+
+  } finally {
+    markProcessing(order.id, false);
+  }
+};
+
   return (
     <div className="space-y-6 py-2 sm:py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -1255,15 +1359,31 @@ export default function TestOrdersPageClient() {
                 </div>
 
                 <div className="mt-4 space-y-2">
-                  <button
-                    type="button"
-                    disabled={
-                      order.status !== "pending" || processingIds.has(order.id)
-                    }
-                    className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Start Processing
-                  </button>
+    <button
+  type="button"
+  onClick={() => {
+    if (order.status === "pending") {
+      handleStartProcessing(order);
+    }
+
+    if (order.status === "in_progress") {
+      handleCompleteTest(order);
+    }
+  }}
+  disabled={
+    order.status === "completed" ||
+    processingIds.has(order.id)
+  }
+  className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {processingIds.has(order.id)
+    ? "Updating..."
+    : order.status === "pending"
+    ? "Start Processing"
+    : order.status === "in_progress"
+    ? "Complete Test"
+    : "Completed"}
+</button>
                   <button
                     type="button"
                     onClick={() => openOrder(order.id)}
@@ -1316,16 +1436,33 @@ export default function TestOrdersPageClient() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex items-center gap-2">
-                        <button
-                          type="button"
-                          disabled={
-                            order.status !== "pending" ||
-                            processingIds.has(order.id)
-                          }
-                          className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          Start Processing
-                        </button>
+     <button
+  type="button"
+  onClick={(event) => {
+    event.stopPropagation();
+
+    if (order.status === "pending") {
+      handleStartProcessing(order);
+    }
+
+    if (order.status === "in_progress") {
+      handleCompleteTest(order);
+    }
+  }}
+  disabled={
+    order.status === "completed" ||
+    processingIds.has(order.id)
+  }
+  className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {processingIds.has(order.id)
+    ? "Updating..."
+    : order.status === "pending"
+    ? "Start Processing"
+    : order.status === "in_progress"
+    ? "Complete Test"
+    : "Completed"}
+</button>
                         <button
                           type="button"
                           onClick={(event) => {

@@ -629,6 +629,7 @@ export const consultationService = {
     params?: {
       status_filter?: "Pending" | "In Progress" | "Completed" | "Cancelled";
       department_id?: string;
+       patient_id?: string;
     },
   ) => {
     const response = await api.get(
@@ -639,6 +640,26 @@ export const consultationService = {
     );
     return unwrap(response.data);
   },
+
+  getPatientConsultations: async (
+  org_id:string,
+  patient_id:string
+)=>{
+
+ const response = await api.get(
+ `/api/v1/organizations/${org_id}/consultations`,
+ {
+   params:{
+     patient_id,
+     status_filter:"In Progress"
+   }
+ }
+ );
+
+
+ return unwrap(response.data);
+
+},
 
   getConsultation: async (org_id: string, consultation_id: string) => {
     const response = await api.get(
@@ -723,6 +744,18 @@ export const consultationService = {
     );
     return unwrap(response.data);
   },
+
+  listPrescriptions: async (
+  org_id:string,
+  consultation_id:string
+)=>{
+  const response = await api.get(
+    `/api/v1/organizations/${org_id}/consultations/${consultation_id}/prescriptions`
+  );
+
+  return unwrap(response.data);
+},
+
 };
 
 const requestWithFallback = async <T>(
@@ -838,17 +871,20 @@ async listOrganizationLabTests(orgId: string, params?: {statuses?: string[]}){
     return res.data;
   },
 
-  async updateLabTestStatus(
-    orgId: string,
-    labTestId: string,
-    status: "pending" | "in_progress" | "completed"
-  ) {
-    const res = await api.patch(
-      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/status`,
-      { status }
-    );
-    return res.data;
-  },
+async updateLabTestStatus(
+  orgId: string,
+  labTestId: string,
+  status: "Pending" | "In Progress" | "Completed"
+) {
+  const res = await api.patch(
+    `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/status`,
+    {
+      status,
+    }
+  );
+
+  return res.data;
+},
 
   async getLabTestDetails(
     orgId: string,
