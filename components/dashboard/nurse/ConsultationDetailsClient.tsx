@@ -40,9 +40,6 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     selectedConsultation,
     selectedConsultationId,
     setSelectedConsultationId,
-    isSelectedConsultationActive,
-    consultationStatus,
-    startConsultation,
   } = useConsultation();
 
   useEffect(() => {
@@ -60,9 +57,6 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     ],
     []
   );
-
-  const isPending =
-    String(selectedConsultation?.status ?? "").toLowerCase() === "pending";
 
   return (
     <div className="space-y-6 py-2 sm:py-4">
@@ -107,16 +101,6 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
             <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
               {selectedConsultation?.priority || "-"}
             </span>
-            {isPending && (
-              <button
-                type="button"
-                onClick={() => void startConsultation()}
-                disabled={consultationStatus === "starting"}
-                className="rounded-md bg-[#1A2380] px-3 py-1.5 text-sm text-white hover:bg-[#111B66] disabled:opacity-50"
-              >
-                {consultationStatus === "starting" ? "Starting..." : "Start Consultation"}
-              </button>
-            )}
           </div>
         </div>
 

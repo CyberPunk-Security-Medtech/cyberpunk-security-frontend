@@ -8,6 +8,7 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  headerClassName?: string;
 }
 
 export default function Modal({
@@ -16,6 +17,7 @@ export default function Modal({
   onClose,
   children,
   className,
+  headerClassName = "bg-[#1A2380]",
 }: ModalProps) {
   return (
     <AnimatePresence>
@@ -33,7 +35,9 @@ export default function Modal({
             className={`bg-white rounded-xl shadow-lg w-[95%] max-w-3xl max-h-[95vh] flex flex-col ${className ?? ""}`}
           >
             {/* Header */}
-            <div className="flex justify-between items-center bg-[#1A2380] text-white px-6 py-4 sticky top-0 z-10">
+            <div
+              className={`flex justify-between items-center ${headerClassName} text-white px-6 py-4 sticky top-0 z-10`}
+            >
               <h3 className="text-base font-semibold">{title}</h3>
               <button onClick={onClose} className="hover:opacity-80">
                 <X size={18} />

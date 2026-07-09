@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import PrescriptionTable from "@components/dashboard/pharmacy/PrescriptionTable";
 import { PatientPrescriptionModal } from "@components/dashboard/pharmacy/PatientPrescriptionModal";
+import { getTimeGreeting } from "@utils/greeting";
 
 const purchaseData = [
   { name: "5k", value: 18 },
@@ -142,6 +143,7 @@ const bottomMetricCards: BottomMetricCard[] = [
 
 export default function PharmacyDashboardPage() {
   const [pharmacyName, setPharmacyName] = useState("Pharm Alex");
+  const greeting = getTimeGreeting();
   const [prescriptionModal, setPrescriptionModal] =
 useState(false);
 
@@ -392,7 +394,6 @@ loadPrescriptions();
 
 
 
-
   const firstName = useMemo(
     () => pharmacyName.split(" ").filter(Boolean).slice(-1)[0] ?? "Alex",
     [pharmacyName]
@@ -403,7 +404,7 @@ loadPrescriptions();
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-[30px] leading-tight font-semibold text-[#151D48]">
-            Good morning, Pharm, {firstName}!
+            {greeting}, Pharm, {firstName}!
           </h1>
           <p className="text-sm text-[#737791]">
             A quick data overview of the inventory.
