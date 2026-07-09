@@ -217,7 +217,7 @@
 //     <div className="space-y-6 py-2 sm:py-4">
 //       <div className="space-y-1">
 //         <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">
-//           Good morning, Sci. {buildDisplayName(user)}!
+//           {greeting}, Sci. {buildDisplayName(user)}!
 //         </h2>
 //         <p className="text-sm text-gray-500">
 //           Welcome back. Review pending and active test orders from your queue.
@@ -437,6 +437,7 @@ import {
   LabOrderStatusFilter,
   labService,
 } from "@services/api";
+import { getTimeGreeting } from "@utils/greeting";
 import {
   LabOrder,
   combineUniqueOrders,
@@ -529,6 +530,7 @@ export default function LabScientistDashboardClient() {
   const router = useRouter();
   const { user, activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
+  const greeting = getTimeGreeting();
 
   const [orders, setOrders] = useState<LabOrder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -673,7 +675,7 @@ export default function LabScientistDashboardClient() {
     <div className="space-y-6 py-2 sm:py-4">
       <div className="space-y-1">
         <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">
-          Good morning, Sci. {buildDisplayName(user)}!
+          {greeting}, Sci. {buildDisplayName(user)}!
         </h2>
         <p className="text-sm text-gray-500">
           Welcome back. Review pending and active test orders from your queue.

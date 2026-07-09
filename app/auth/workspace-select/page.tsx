@@ -132,31 +132,24 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@context/AuthContext";
 
+const dashboardRouteByRole: Record<string, string> = {
+  admin: "/dashboard/admin",
+  doctor: "/dashboard/doctor",
+  nurse: "/dashboard/nurse",
+  pharmacist: "/dashboard/pharmacy",
+  pharmacy: "/dashboard/pharmacy",
+  lab: "/dashboard/lab-scientist",
+  labtechnician: "/dashboard/lab-scientist",
+  staff: "/dashboard/record-staff",
+  recordstaff: "/dashboard/record-staff",
+};
+
+const normalizeRoleKey = (role?: string) =>
+  (role ?? "").toLowerCase().replace(/[^a-z]/g, "");
+
 const resolveDashboardPath = (rawRole?: string) => {
-  const normalized = (rawRole ?? "").toLowerCase().trim();
-
-  const roleRoutes: Record<string, string> = {
-    admin: "/dashboard/admin",
-    doctor: "/dashboard/doctor",
-    nurse: "/dashboard/nurse",
-    pharmacist: "/dashboard/pharmacy",
-    pharmacy: "/dashboard/pharmacy",
-    lab: "/dashboard/lab-scientist",
-    "lab_technician": "/dashboard/lab-scientist",
-    "lab-technician": "/dashboard/lab-scientist",
-    "lab technician": "/dashboard/lab-scientist",
-  };
-
-  if (roleRoutes[normalized]) return roleRoutes[normalized];
-
-  const compact = normalized.replace(/[^a-z]/g, "");
-  if (compact === "labtechnician") return "/dashboard/lab-scientist";
-  if (compact === "doctor") return "/dashboard/doctor";
-  if (compact === "nurse") return "/dashboard/nurse";
-  if (compact === "admin") return "/dashboard/admin";
-  if (compact === "pharmacist") return "/dashboard/pharmacy";
-
-  return null;
+  const roleKey = normalizeRoleKey(rawRole);
+  return dashboardRouteByRole[roleKey] ?? null;
 };
 
 export default function WorkspaceSelectPage() {

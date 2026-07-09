@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import OverviewCards from "@components/dashboard/nurse/OverviewCards";
-import TodayAppointments from "@components/dashboard/nurse/TodaysAppointment";
+import NewPatientsAwaitingTriage from "@components/dashboard/nurse/NewPatientsAwaitingTriage";
 import { authService } from "@services/api";
+import { getTimeGreeting } from "@utils/greeting";
 
 const formatNurseName = (user: any): string => {
   const firstName = (user?.first_name ?? "").toString().trim();
@@ -12,11 +13,12 @@ const formatNurseName = (user: any): string => {
   if (fullName) return fullName;
 
   const emailPrefix = (user?.email ?? "").toString().split("@")[0]?.trim();
-  return emailPrefix || "Doctor";
+  return emailPrefix || "Nurse";
 };
 
 export default function Dashboard() {
   const [nurseName, setNurseName] = useState("Nurse");
+  const greeting = getTimeGreeting();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,12 +38,12 @@ export default function Dashboard() {
   return (
     <>
       <h2 className="text-xl font-semibold text-[#1A2380] mb-1">
-        Good morning, Nurse {nurseName}!
+        {greeting}, Nurse {nurseName}!
       </h2>
       <p className="text-gray-500 mb-8">Welcome back to PrivaCure dashboard</p>
 
       <OverviewCards />
-      <TodayAppointments />
+      <NewPatientsAwaitingTriage />
       {/* <LabTest /> */}
     </>
   );

@@ -21,25 +21,13 @@ export default function PatientHeader() {
     patientLoading,
     consultations,
     consultationLoading,
-    consultationStatus,
-    isConsultationActive,
     selectedConsultation,
     patientId,
     hasConsultation,
-    canStartConsultation,
     refreshConsultations,
-    startConsultation,
   } = useConsultation();
 
   const vitals = parseVitals(selectedConsultation?.vitals ?? consultations[0]?.vitals);
-
-  const handleStart = async () => {
-    try {
-      await startConsultation();
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const fullName = `${patient?.first_name ?? ""} ${patient?.last_name ?? ""}`.trim() || "Patient";
   const initials =
@@ -56,35 +44,19 @@ export default function PatientHeader() {
         </button>
 
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          {isConsultationActive ? (
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              In Consultation
+          {hasConsultation ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+              <span className="h-2 w-2 rounded-full bg-green-500" />
+              Routed to Department
             </span>
           ) : (
             <Button
               type="button"
-              onSubmitHandler={
-                hasConsultation
-                  ? handleStart
-                  : () => setIsCreateModalOpen(true)
-              }
-              disabled={
-                consultationLoading ||
-                consultationStatus === "starting" ||
-                (hasConsultation && !canStartConsultation)
-              }
+              onSubmitHandler={() => setIsCreateModalOpen(true)}
+              disabled={consultationLoading}
               className="w-full rounded-md bg-[#1A2380] px-4 py-2 text-white transition hover:bg-[#00B8A8] disabled:opacity-50 sm:w-auto sm:px-6"
             >
-              {consultationStatus === "starting"
-                ? "Starting..."
-                : consultationLoading
-                ? "Loading..."
-                : !hasConsultation
-                ? "Create Consultation"
-                : canStartConsultation
-                ? "Start Consultation"
-                : "No Consultation Ready"}
+              {consultationLoading ? "Loading..." : "Create Consultation"}
             </Button>
           )}
         </div>

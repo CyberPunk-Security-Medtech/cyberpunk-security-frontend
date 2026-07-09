@@ -21,6 +21,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { getTimeGreeting } from "@utils/greeting";
 
 const purchaseData = [
   { name: "5k", value: 18 },
@@ -139,6 +140,7 @@ const bottomMetricCards: BottomMetricCard[] = [
 
 export default function PharmacyDashboardPage() {
   const [pharmacyName, setPharmacyName] = useState("Pharm Alex");
+  const greeting = getTimeGreeting();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -164,7 +166,7 @@ export default function PharmacyDashboardPage() {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-[30px] leading-tight font-semibold text-[#151D48]">
-            Good morning, Pharm, {firstName}!
+            {greeting}, Pharm, {firstName}!
           </h1>
           <p className="text-sm text-[#737791]">
             A quick data overview of the inventory.

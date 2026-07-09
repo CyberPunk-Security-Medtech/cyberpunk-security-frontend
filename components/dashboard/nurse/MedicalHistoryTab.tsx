@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { StatusBadge } from "@components/StatusBadge";
 import { DiagnosisModal } from "./DiagnosisModal";
-import Button from "@components/Button";
 import { useConsultation } from "./ConsultationContext";
-import { consultationService, patientService } from "@services/api";
-import { toast } from "react-toastify";
+import { patientService } from "@services/api";
 
 export default function MedicalHistoryTab() {
   const [open, setOpen] = useState(false);
@@ -20,8 +18,6 @@ export default function MedicalHistoryTab() {
     selectedConsultation,
   } = useConsultation();
 
-  const [note, setNote] = useState("");
-  const [savingNote, setSavingNote] = useState(false);
   const isCompletedConsultation =
     String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
 
@@ -45,30 +41,8 @@ export default function MedicalHistoryTab() {
     return rows.filter((row: any) => row.consultation_id === selectedConsultationId);
   }, [rows, selectedConsultationId]);
 
-  const handleSaveNote = async () => {
-    if (!orgId || !selectedConsultationId || !note.trim()) return;
-
-    setSavingNote(true);
-    try {
-      await consultationService.completeConsultation(orgId, selectedConsultationId, {
-        clinical_notes: note.trim(),
-      });
-      setNote("");
-      toast.success("Note saved");
-    } catch (error) {
-      console.error("Failed to save note", error);
-      toast.error("Failed to save note");
-    } finally {
-      setSavingNote(false);
-    }
-  };
-
   return (
-    <div
-      className={`grid grid-cols-1 gap-6 ${
-        isCompletedConsultation ? "" : "lg:grid-cols-[2fr_1fr] lg:gap-8"
-      }`}
-    >
+    <div className="grid grid-cols-1 gap-6">
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Medical History</h3>
@@ -124,31 +98,6 @@ export default function MedicalHistoryTab() {
         />
       </section>
 
-      {!isCompletedConsultation && (
-        <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
-          <h3 className="text-lg font-semibold text-[#1A2380] mb-4">Nurse&apos;s Note</h3>
-
-          <textarea
-            placeholder={isSelectedConsultationActive ? "Add Note" : "Start consultation to add notes"}
-            disabled={!isSelectedConsultationActive || !selectedConsultationId}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="w-full border border-gray-200 rounded-md p-3 text-sm focus:ring-1 focus:ring-[#00B8A8] outline-none resize-none disabled:bg-gray-50"
-            rows={8}
-          />
-
-          <div className="flex justify-end mt-4">
-            <Button
-              type="button"
-              onSubmitHandler={handleSaveNote}
-              disabled={!isSelectedConsultationActive || savingNote || !note.trim() || !selectedConsultationId}
-              className="bg-[#1A2380] text-white px-4 py-2 rounded-md hover:bg-[#00B8A8] transition text-sm disabled:opacity-50 disabled:bg-gray-300"
-            >
-              {savingNote ? "Saving..." : "Save Note"}
-            </Button>
-          </div>
-        </section>
-      )}
     </div>
   );
 }
