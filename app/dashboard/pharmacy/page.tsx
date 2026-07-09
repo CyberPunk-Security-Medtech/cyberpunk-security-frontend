@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentType, useEffect, useMemo, useState } from "react";
+import { ComponentType, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -9,9 +9,10 @@ import {
   ChevronRight,
   CircleAlert,
   Pill,
+  Plus,
   Users,
 } from "lucide-react";
-import { authService } from "@services/api";
+import { authService, organizationService, patientService } from "@services/api";
 import {
   CartesianGrid,
   Line,
@@ -21,6 +22,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import PrescriptionTable from "@components/dashboard/pharmacy/PrescriptionTable";
+import { PatientPrescriptionModal } from "@components/dashboard/pharmacy/PatientPrescriptionModal";
 import { getTimeGreeting } from "@utils/greeting";
 
 const purchaseData = [
@@ -141,20 +144,255 @@ const bottomMetricCards: BottomMetricCard[] = [
 export default function PharmacyDashboardPage() {
   const [pharmacyName, setPharmacyName] = useState("Pharm Alex");
   const greeting = getTimeGreeting();
+  const [prescriptionModal, setPrescriptionModal] =
+useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const meRes = await authService.getMe();
-        const me = meRes?.data ?? meRes;
-        setPharmacyName(formatPharmacyName(me));
-      } catch (err) {
-        console.error("Failed to load pharmacy profile", err);
-      }
-    };
 
-    void fetchUser();
-  }, []);
+const [prescriptions,setPrescriptions] =
+useState<any[]>([]);
+
+
+const [orgId,setOrgId] =
+useState<string|null>(null);
+
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const meRes = await authService.getMe();
+  //       const me = meRes?.data ?? meRes;
+  //       setPharmacyName(formatPharmacyName(me));
+  //     } catch (err) {
+  //       console.error("Failed to load pharmacy profile", err);
+  //     }
+  //   };
+
+  //   void fetchUser();
+  // }, []);
+
+useEffect(() => {
+
+const initializePharmacy = async()=>{
+
+try{
+
+
+  const meRes = await authService.getMe();
+  const me = meRes?.data ?? meRes;
+
+
+console.log(
+"CURRENT USER:",
+me
+);
+
+
+
+setPharmacyName(
+formatPharmacyName(me)
+);
+
+
+
+const organizations =
+await organizationService.getOrganizations();
+
+
+
+console.log(
+"USER ORGANIZATIONS:",
+organizations
+);
+
+
+
+const organizationList =
+Array.isArray(organizations)
+? organizations
+: organizations.data ?? [];
+
+
+
+if(!organizationList.length){
+
+console.error(
+"No organization found for user"
+);
+
+return;
+
+}
+
+
+
+const pharmacyOrg =
+organizationList[0];
+
+
+
+console.log(
+"SELECTED PHARMACY ORG:",
+pharmacyOrg
+);
+
+
+
+setOrgId(
+pharmacyOrg.id
+);
+
+
+
+}catch(error){
+
+console.error(
+"Failed initializing pharmacy",
+error
+);
+
+
+}
+
+
+};
+
+
+
+initializePharmacy();
+
+
+
+},[]);
+
+const loadPrescriptions = useCallback(async()=>{
+
+if(!orgId)
+return;
+
+
+try {
+
+
+const patientsResponse =
+await patientService.getPatients(orgId);
+
+
+
+const patients =
+Array.isArray(patientsResponse)
+?
+patientsResponse
+:
+patientsResponse.data ??
+patientsResponse.patients ??
+[];
+
+
+
+console.log(
+"PHARMACY PATIENTS",
+patients
+);
+
+
+
+let allPrescriptions:any[]=[];
+
+
+
+for(const patient of patients){
+
+
+try{
+
+
+const response =
+await patientService.getPatientPrescriptions(
+orgId,
+patient.id
+);
+
+
+
+const prescriptions =
+Array.isArray(response)
+?
+response
+:
+response.data ??
+response.prescriptions ??
+[];
+
+
+
+console.log(
+"PATIENT PRESCRIPTIONS",
+patient.id,
+prescriptions
+);
+
+
+
+allPrescriptions.push(
+  ...prescriptions.map((prescription:any)=>({
+    ...prescription,
+    patient:{
+      id: patient.id,
+      first_name: patient.first_name,
+      last_name: patient.last_name,
+    }
+  }))
+);
+
+
+}catch(error){
+
+console.error(
+"Patient prescription error",
+patient.id,
+error
+);
+
+
+}
+
+
+}
+
+
+
+console.log(
+"FINAL PRESCRIPTIONS",
+allPrescriptions
+);
+
+
+
+setPrescriptions(
+allPrescriptions
+);
+
+
+
+}catch(error){
+
+console.error(
+"Loading prescriptions failed",
+error
+);
+
+
+}
+
+
+},[orgId]);
+
+useEffect(()=>{
+
+loadPrescriptions();
+
+},[loadPrescriptions]);
+
+
 
   const firstName = useMemo(
     () => pharmacyName.split(" ").filter(Boolean).slice(-1)[0] ?? "Alex",
@@ -217,7 +455,7 @@ export default function PharmacyDashboardPage() {
         })}
       </div>
 
-      <article className="rounded-xl border border-[#ECEFF5] bg-white p-4 md:p-6">
+      {/* <article className="rounded-xl border border-[#ECEFF5] bg-white p-4 md:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-[24px] font-semibold text-[#151D48]">Purchase Statistics</h2>
           <button className="inline-flex items-center gap-1 rounded-md border border-[#ECEFF5] px-3 py-1.5 text-xs text-[#737791]">
@@ -256,7 +494,87 @@ export default function PharmacyDashboardPage() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </article>
+      </article> */}
+
+      <article
+className="
+rounded-xl
+border
+border-[#ECEFF5]
+bg-white
+p-5
+"
+>
+
+
+<div
+className="
+flex
+items-center
+justify-between
+mb-5
+"
+>
+
+
+<h2
+className="
+text-[24px]
+font-semibold
+text-[#151D48]
+"
+>
+Patient Prescriptions
+</h2>
+
+
+
+<button
+
+onClick={()=>
+setPrescriptionModal(true)
+}
+
+className="
+flex
+items-center
+gap-2
+rounded-full
+bg-[#1A2380]
+px-5
+py-2.5
+text-sm
+font-medium
+text-white
+hover:bg-[#00B8A8]
+"
+>
+
+
+<Plus size={16}/>
+
+Add Prescription
+
+
+</button>
+
+
+
+</div>
+
+
+
+<PrescriptionTable
+
+prescriptions={
+prescriptions
+}
+
+/>
+
+
+
+</article>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {bottomMetricCards.map((card, cardIndex) => (
@@ -291,6 +609,36 @@ export default function PharmacyDashboardPage() {
           </article>
         ))}
       </div>
+
+      <PatientPrescriptionModal
+
+open={
+prescriptionModal
+}
+
+onClose={()=>
+setPrescriptionModal(false)
+}
+
+
+orgId={
+orgId
+}
+
+
+
+
+
+onCreated={()=>{
+
+setPrescriptionModal(false);
+
+loadPrescriptions();
+
+}}
+
+
+/>
 
     </section>
   );
