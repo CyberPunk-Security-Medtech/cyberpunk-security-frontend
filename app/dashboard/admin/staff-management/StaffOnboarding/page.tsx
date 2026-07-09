@@ -142,7 +142,7 @@ export default function StaffOnboarding() {
                   <option value="">Select role</option>
                   <option value="doctor">Doctor</option>
                   <option value="nurse">Nurse</option>
-                  <option value="staff">Record Staff</option>
+                  <option value="record staff">Record Staff</option>
                   <option value="lab_technician">Lab Scientist</option>
                   <option value="pharmacist">Pharmacist</option>
                 </select>
