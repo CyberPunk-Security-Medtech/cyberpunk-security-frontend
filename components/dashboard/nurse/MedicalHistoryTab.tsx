@@ -45,14 +45,14 @@ export default function MedicalHistoryTab() {
     <div className="grid grid-cols-1 gap-6">
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-lg font-semibold text-[#1A2380]">Medical History</h3>
+          <h3 className="text-lg font-semibold text-[#003C36]">Medical History</h3>
           {/* {!isCompletedConsultation && (
             <button
               onClick={() => setOpen(true)}
               disabled={!isSelectedConsultationActive || !selectedConsultationId}
               className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
                 isSelectedConsultationActive && !!selectedConsultationId
-                  ? "bg-[#1A2380] hover:bg-[#00B8A8]"
+                  ? "bg-[#006B5F] hover:bg-[#005249]"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
             >
@@ -74,7 +74,7 @@ export default function MedicalHistoryTab() {
               className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
-                <h4 className="break-words font-medium text-[#1A2380]">{h.primary_diagnosis}</h4>
+                <h4 className="break-words font-medium text-[#003C36]">{h.primary_diagnosis}</h4>
                 <p className="break-words text-xs text-gray-500">
                   {h.secondary_diagnosis || h.symptoms || "No additional notes"}
                 </p>

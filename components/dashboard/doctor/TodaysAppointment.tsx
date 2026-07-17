@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { StatusBadge } from "@components/StatusBadge";
 import { useAuth } from "@context/AuthContext";
 import { consultationService, organizationService } from "@services/api";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type ConsultationRow = {
   id: string;
@@ -127,30 +128,31 @@ export default function TodayAppointments() {
   const todaysAppointments = useMemo(() => appointments.slice(0, 8), [appointments]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <h3 className="font-semibold text-[#1A2380] mb-6">Today's Appointments</h3>
-      <table className="w-full text-sm text-left border-collapse">
+    <div className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+      <h3 className="dashboard-section-title mb-4 text-[#1A2380] sm:mb-6">Today's Appointments</h3>
+      <ResponsiveTableRegion label="Today's appointments">
+      <table className="w-full min-w-[760px] border-collapse text-left text-sm">
         <thead className="text-gray-600 border-b">
           <tr>
-            <th className="pb-3 font-medium">Patient Name</th>
-            <th className="pb-3 font-medium">Patient ID</th>
-            <th className="pb-3 font-medium">Priority</th>
-            <th className="pb-3 font-medium">Condition</th>
-            <th className="pb-3 font-medium">Status</th>
-            <th className="pb-3 font-medium">Date</th>
+            <th scope="col" className="min-w-[160px] border-b bg-white px-4 py-3 font-medium">Patient Name</th>
+            <th scope="col" className="min-w-[220px] px-4 py-3 font-medium">Patient ID</th>
+            <th scope="col" className="min-w-[100px] px-4 py-3 font-medium">Priority</th>
+            <th scope="col" className="min-w-[150px] px-4 py-3 font-medium">Condition</th>
+            <th scope="col" className="min-w-[110px] px-4 py-3 font-medium">Status</th>
+            <th scope="col" className="min-w-[100px] px-4 py-3 font-medium">Date</th>
           </tr>
         </thead>
         <tbody>
           {loading && (
             <tr>
-              <td className="py-4 text-gray-500" colSpan={6}>
+              <td className="px-4 py-6 text-center text-gray-500" colSpan={6}>
                 Loading appointments...
               </td>
             </tr>
           )}
           {!loading && todaysAppointments.length === 0 && (
             <tr>
-              <td className="py-4 text-gray-500" colSpan={6}>
+              <td className="px-4 py-6 text-center text-gray-500" colSpan={6}>
                 {emptyMessage}
               </td>
             </tr>
@@ -166,21 +168,22 @@ export default function TodayAppointments() {
                   router.push(`/dashboard/doctor/patient/${a.patient_id}`);
                 }
               }}
-              className={`border-b hover:bg-gray-50 ${
+              className={`group border-b hover:bg-gray-50 ${
                 canOpenPatient ? "cursor-pointer" : "cursor-not-allowed opacity-70"
               }`}
             >
-              <td className="py-3 font-medium text-[#1A2380]">{a.name}</td>
-              <td>{a.patient_id}</td>
-              <td>{a.priority}</td>
-              <td>{a.condition}</td>
-              <td><StatusBadge status={a.status} /></td>
-              <td>{a.date}</td>
+              <td className="bg-white px-4 py-3 font-medium text-[#1A2380] group-hover:bg-gray-50">{a.name}</td>
+              <td className="whitespace-nowrap px-4 py-3">{a.patient_id}</td>
+              <td className="whitespace-nowrap px-4 py-3">{a.priority}</td>
+              <td className="px-4 py-3">{a.condition}</td>
+              <td className="whitespace-nowrap px-4 py-3"><StatusBadge status={a.status} /></td>
+              <td className="whitespace-nowrap px-4 py-3 tabular-nums">{a.date}</td>
             </tr>
             );
           })}
         </tbody>
       </table>
+      </ResponsiveTableRegion>
     </div>
   );
 }

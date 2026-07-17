@@ -403,22 +403,22 @@ loadPrescriptions();
     <section className="space-y-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-[30px] leading-tight font-semibold text-[#151D48]">
+          <h1 className="dashboard-page-title text-[#151D48]">
             {greeting}, Pharm, {firstName}!
           </h1>
-          <p className="text-sm text-[#737791]">
+          <p className="text-sm text-[#596174]">
             A quick data overview of the inventory.
           </p>
         </div>
 
         <div className="w-full rounded-xl border border-[#E6EAF2] bg-[#F7FEFF] p-3 lg:max-w-[300px]">
           <div className="mb-1 flex items-center justify-between">
-            <p className="text-xs font-semibold text-[#00B6A0]">Notification</p>
-            <BellDot size={14} className="text-[#00B6A0]" />
+            <p className="text-xs font-semibold text-[#006B5F]">Notification</p>
+            <BellDot size={14} className="text-[#006B5F]" />
           </div>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-[#8A8FA2]">Critical alert for #P90022</span>
-            <button className="text-[#00B6A0]">View all</button>
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[#596174]">Critical alert for #P90022</span>
+            <button className="text-[#006B5F]">View all</button>
           </div>
         </div>
       </div>
@@ -427,7 +427,7 @@ loadPrescriptions();
         {statCards.map((item) => {
           const TrendIcon = item.trend.direction === "up" ? ArrowUpRight : ArrowDownRight;
           const trendColor =
-            item.trend.direction === "up" ? "text-[#2CCF99]" : "text-[#EE6D6D]";
+            item.trend.direction === "up" ? "text-[#087A5B]" : "text-[#B42318]";
           const Icon = item.icon;
 
           return (
@@ -436,7 +436,7 @@ loadPrescriptions();
               className="rounded-xl border border-[#ECEFF5] bg-white p-5 shadow-[0_1px_1px_rgba(16,24,40,0.02)]"
             >
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-xs font-medium text-[#737791]">{item.title}</h3>
+                <h2 className="text-xs font-medium text-[#596174]">{item.title}</h2>
                 <span
                   className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${item.iconBg}`}
                 >
@@ -458,7 +458,7 @@ loadPrescriptions();
       {/* <article className="rounded-xl border border-[#ECEFF5] bg-white p-4 md:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-[24px] font-semibold text-[#151D48]">Purchase Statistics</h2>
-          <button className="inline-flex items-center gap-1 rounded-md border border-[#ECEFF5] px-3 py-1.5 text-xs text-[#737791]">
+          <button className="inline-flex items-center gap-1 rounded-md border border-[#ECEFF5] px-3 py-1.5 text-xs text-[#596174]">
             October
             <ChevronRight size={14} className="rotate-90" />
           </button>
@@ -586,7 +586,7 @@ prescriptions
           >
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-medium text-[#23272E]">{card.title}</h3>
-              <button className="inline-flex items-center gap-1 text-xs text-[#737791]">
+              <button className="inline-flex items-center gap-1 text-xs text-[#596174]">
                 {card.rightLabel}
                 {card.rightLabel.includes("January") ? (
                   <ChevronRight size={14} className="rotate-90" />
@@ -602,7 +602,7 @@ prescriptions
                   <p className="text-[24px] leading-none font-semibold text-[#23272E]">
                     {row.value}
                   </p>
-                  <p className="mt-2 text-xs text-[#8D96A8]">{row.label}</p>
+                  <p className="mt-2 text-xs text-[#596174]">{row.label}</p>
                 </div>
               ))}
             </div>

@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 
 export default function LoginForm() {
@@ -82,41 +83,56 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <label htmlFor="login-email" className="sr-only">
+        Email address
+      </label>
       <input
+        id="login-email"
         type="email"
+        name="email"
+        autoComplete="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full rounded-full border px-4 py-2"
+        className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
         placeholder="Email Address"
         required
       />
 
       <div className="relative">
+        <label htmlFor="login-password" className="sr-only">
+          Password
+        </label>
         <input
+          id="login-password"
           type={showPassword ? "text" : "password"}
+          name="password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-full border px-4 py-2 pr-10"
+          className="min-h-11 w-full rounded-full border px-4 py-2 pr-12 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           placeholder="Password"
           required
         />
         <button
           type="button"
-          className="absolute right-3 top-2.5"
+          className="absolute right-1.5 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E]"
           onClick={() => setShowPassword(!showPassword)}
+          aria-label={showPassword ? "Hide password" : "Show password"}
+          aria-pressed={showPassword}
         >
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
 
       <button
+        type="submit"
         disabled={loading}
-        className="w-full bg-[#1E237E] text-white rounded-full py-2"
+        className="min-h-11 w-full rounded-full bg-[#1E237E] py-2 text-white transition-colors hover:bg-[#171B65] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>
 
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"
@@ -125,12 +141,12 @@ const handleSubmit = async (e: React.FormEvent) => {
           />
           <span>Remember for 30 days</span>
         </label>
-        <a
+        <Link
           href="/auth/forgot_password"
-          className="text-blue-700 hover:underline"
+          className="rounded-sm text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
         >
           Forgot password
-        </a>
+        </Link>
       </div>
     </form>
   );

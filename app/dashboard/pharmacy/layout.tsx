@@ -40,7 +40,7 @@ export default function PharmacyDashboardLayout({
   };
 
   return (
-    <div className="font-sans flex h-screen overflow-hidden">
+    <div className="flex h-[100dvh] min-w-0 overflow-hidden font-sans [--dashboard-accent:#00796B] [--dashboard-accent-hover:#00695F]">
       <Sidebar
         sidebarMinimize={sidebarMinimize}
         setSidebarMinimize={setSidebarMinimize}
@@ -54,6 +54,7 @@ export default function PharmacyDashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col bg-[#F9FAFB]">
         <Header
           setSidebarOpen={setSidebarOpen}
+          sidebarOpen={sidebarOpen}
           desktopPaddingClassName="md:px-8"
         />
         <main className="min-w-0 flex-1 overflow-auto px-4 py-5 md:px-8">{children}</main>

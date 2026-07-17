@@ -43,7 +43,7 @@ export default function ActivityLogTab() {
 
   return (
     <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
-      <h3 className="text-lg font-semibold text-brand-navy mb-6">Activity Log</h3>
+      <h3 className="mb-6 text-lg font-semibold text-[#003C36]">Activity Log</h3>
 
       {!selectedConsultation && (
         <div className="rounded-xl border p-4 text-sm text-gray-500">
@@ -64,7 +64,7 @@ export default function ActivityLogTab() {
               <div className="mt-1 h-2 w-2 rounded-full bg-brand-teal" />
               <div className="flex-1 pb-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium text-brand-navy">{log.type}</span>
+                  <span className="font-medium text-[#003C36]">{log.type}</span>
                   <span className="break-words text-sm text-gray-600">{log.text}</span>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">{log.time}</p>

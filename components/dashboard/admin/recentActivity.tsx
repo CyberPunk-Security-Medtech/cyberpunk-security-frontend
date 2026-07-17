@@ -16,7 +16,7 @@ export default function RecentActivity() {
             <div className="w-1.5 h-1.5 mt-1.5 rounded-full bg-emerald-500" />
             <div>
               <p className="text-slate-800">{item.title}</p>
-              <p className="text-[11px] text-slate-500">{item.time}</p>
+              <p className="text-xs text-slate-500">{item.time}</p>
             </div>
           </div>
         ))}

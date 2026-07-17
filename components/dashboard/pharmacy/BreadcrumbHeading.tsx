@@ -9,7 +9,7 @@ export default function BreadcrumbHeading({
 }: BreadcrumbHeadingProps) {
   return (
     <div>
-      <h1 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[24px] font-semibold leading-tight sm:text-[30px] lg:text-[36px]">
+      <h1 className="dashboard-page-title flex flex-wrap items-center gap-x-2 gap-y-1">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
@@ -23,7 +23,7 @@ export default function BreadcrumbHeading({
         })}
       </h1>
       {description ? (
-        <p className="mt-2 text-sm text-[#737791]">{description}</p>
+        <p className="mt-2 text-sm text-[#596174]">{description}</p>
       ) : null}
     </div>
   );

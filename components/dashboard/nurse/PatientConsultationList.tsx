@@ -29,7 +29,7 @@ export default function PatientConsultationList() {
   return (
     <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-[#1A2380]">Consultations</h3>
+        <h3 className="text-lg font-semibold text-[#003C36]">Consultations</h3>
         <p className="text-sm text-gray-500">
           Click a consultation to preview key details. Open full details for diagnosis, labs,
           prescriptions, and notes.
@@ -58,7 +58,7 @@ export default function PatientConsultationList() {
               <div
                 key={consultation.id}
                 className={`rounded-lg border p-4 transition ${
-                  isSelected ? "border-[#1A2380] bg-[#F8F9FF]" : "border-gray-200 bg-white"
+                  isSelected ? "border-[#006B5F] bg-[#F0FDF9]" : "border-gray-200 bg-white"
                 }`}
               >
                 <button
@@ -68,7 +68,7 @@ export default function PatientConsultationList() {
                 >
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
-                      <p className="break-words font-medium text-[#1A2380]">
+                      <p className="break-words font-medium text-[#003C36]">
                         {consultation.reason_for_visit || "Consultation"}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -113,7 +113,7 @@ export default function PatientConsultationList() {
                         </div>
                       </div>
 
-                      <p className="mb-4 rounded-lg border border-[#DADDFE] bg-[#EEF2FF] px-3 py-2 text-xs text-[#1A2380]">
+                      <p className="mb-4 rounded-lg border border-[#B7DED8] bg-[#ECFDF8] px-3 py-2 text-xs text-[#003C36]">
                         Preview mode uses lightweight list data. Open full details for complete
                         consultation records.
                       </p>
@@ -121,7 +121,7 @@ export default function PatientConsultationList() {
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
                           href={detailHref}
-                          className="rounded-md bg-[#1A2380] px-4 py-2 text-sm text-white hover:bg-[#111B66]"
+                          className="rounded-md bg-[#006B5F] px-4 py-2 text-sm text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none"
                         >
                           Open Full Consultation
                         </Link>

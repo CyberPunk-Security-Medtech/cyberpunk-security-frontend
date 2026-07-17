@@ -18,11 +18,11 @@ export default function EncryptionSettingsCard() {
   ];
 
   return (
-    <div className="bg-white rounded-xl border p-6 flex-1">
+    <div className="flex-1 rounded-xl border bg-white p-4 sm:p-6">
       <h3 className="font-semibold text-lg mb-4">Encryption Settings</h3>
 
       {encryptionItems.map((item) => (
-        <div key={item.id} className="flex justify-between items-center py-3 border-b last:border-none">
+        <div key={item.id} className="flex items-start justify-between gap-3 border-b py-3 last:border-none sm:items-center">
           <div>
             <p className="text-sm font-medium">{item.title}</p>
             <p className="text-xs text-slate-500">{item.desc}</p>

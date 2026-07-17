@@ -1,49 +1,34 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import LoginForm from "@components/auth/LoginForm";
 import auth_logo from "@public/auth_logo.svg";
-// import surgery_signup_img from "@public/surgery_signup_image.jpg"
 
 export default function LoginPage() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      {/* Left side (form) */}
+    <main className="flex min-h-[100dvh] w-full overflow-y-auto bg-white px-4 py-8 sm:px-6">
       <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex w-full md:w-1/2 items-start justify-center p-8 md:p-16 bg-white"
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: reduceMotion ? 0 : 0.35 }}
+        className="my-auto flex w-full items-center justify-center"
       >
-        <div className="max-w-sm w-full mt-10">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-2">
+        <div className="w-full max-w-sm">
+          <div className="mb-8 text-center">
+            <div className="mb-2 flex justify-center">
               <Image src={auth_logo} alt="PrivaCure" width={110} height={70} />
             </div>
             <h2 className="text-2xl font-bold text-gray-800">Welcome back</h2>
-            <p className="text-gray-500 text-sm mt-1">Welcome back! Please enter your details.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Welcome back! Please enter your details.
+            </p>
           </div>
           <LoginForm />
         </div>
       </motion.div>
-
-      {/* Right side (image section) */}
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative w-full md:w-1/2 h-64 md:h-auto"
-      >
-        <Image
-          src="/surgery_signup_image.jpg"
-          alt="Lab Image"
-          // width={720}
-          // height={960}
-         fill
-         priority
-        />
-      </motion.div>
-    </div>
+    </main>
   );
 }

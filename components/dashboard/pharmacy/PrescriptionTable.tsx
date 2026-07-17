@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 interface Prescription {
 
@@ -33,13 +34,13 @@ export default function PrescriptionTable({
   prescriptions,
 }: Props) {
   return (
-    <div className="overflow-x-auto">
+    <ResponsiveTableRegion label="Patient prescriptions">
 
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[940px] text-sm">
 
         <thead>
-          <tr className="border-b text-left text-[#737791]">
-            <th className="px-4 py-3">
+          <tr className="border-b text-left text-[#596174]">
+            <th scope="col" className="min-w-[180px] bg-white px-4 py-3">
 Patient
 </th>
 
@@ -79,11 +80,11 @@ Patient
               <tr>
 
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="
                   py-10
                   text-center
-                  text-gray-400
+                  text-gray-600
                   "
                 >
                   No prescriptions found
@@ -105,7 +106,7 @@ Patient
                   "
                 >
 
-                   <td className="px-4 py-3">
+                   <td className="bg-white px-4 py-3">
 
 {
 item.patient
@@ -171,6 +172,6 @@ item.patient
       </table>
 
 
-    </div>
+    </ResponsiveTableRegion>
   );
 }

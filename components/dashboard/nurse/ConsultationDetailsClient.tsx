@@ -64,7 +64,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
         <button
           type="button"
           onClick={() => router.push("/dashboard/nurse/consultations")}
-          className="rounded-full bg-[#ECEEFD] px-4 py-1 text-sm font-medium text-brand-navy hover:underline"
+          className="rounded-full bg-[#ECFDF8] px-4 py-1 text-sm font-medium text-[#003C36] hover:underline"
         >
           Back to Consultation Queue
         </button>
@@ -83,7 +83,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
-            <h2 className="break-words text-xl font-semibold text-[#1A2380]">
+            <h2 className="break-words text-xl font-semibold text-[#003C36]">
               {selectedConsultation?.reason_for_visit || "Consultation Details"}
             </h2>
             <p className="text-sm text-gray-500">

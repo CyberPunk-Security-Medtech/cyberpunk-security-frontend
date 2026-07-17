@@ -38,7 +38,7 @@ export default function PatientHeader() {
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <button
           onClick={() => history.back()}
-          className="text-sm w-fit bg-[#ECEEFD] font-medium rounded-full text-brand-navy hover:underline px-4 py-1"
+          className="text-sm w-fit bg-[#ECFDF8] font-medium rounded-full text-[#003C36] hover:underline px-4 py-1"
         >
           Back to Patients List
         </button>
@@ -54,7 +54,7 @@ export default function PatientHeader() {
               type="button"
               onSubmitHandler={() => setIsCreateModalOpen(true)}
               disabled={consultationLoading}
-              className="w-full rounded-md bg-[#1A2380] px-4 py-2 text-white transition hover:bg-[#00B8A8] disabled:opacity-50 sm:w-auto sm:px-6"
+              className="w-full rounded-md bg-[#006B5F] px-4 py-2 text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50 sm:w-auto sm:px-6"
             >
               {consultationLoading ? "Loading..." : "Create Consultation"}
             </Button>
@@ -67,7 +67,7 @@ export default function PatientHeader() {
           {initials}
         </div>
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-semibold text-brand-navy">
+          <h3 className="truncate text-lg font-semibold text-[#003C36]">
             {patientLoading ? "Loading patient..." : fullName}
           </h3>
           <p className="text-sm">
@@ -80,7 +80,7 @@ export default function PatientHeader() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {vitals.map((v) => (
           <div key={v.label} className="border rounded-lg p-4 text-center">
-            <p className="break-words font-semibold text-brand-navy">{v.value}</p>
+            <p className="break-words font-semibold text-[#003C36]">{v.value}</p>
             <p className="text-sm text-gray-500">{v.label}</p>
             <div className="mt-2"><StatusBadge status={v.status} /></div>
           </div>

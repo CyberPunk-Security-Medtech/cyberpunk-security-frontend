@@ -431,6 +431,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@components/StatusBadge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { useAuth } from "@context/AuthContext";
 import {
   consultationService,
@@ -799,11 +800,11 @@ const handleCompleteTest = async (order: LabOrder) => {
 
         {!loading && orders.length > 0 && (
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="hidden overflow-x-auto lg:block">
+            <ResponsiveTableRegion label="Lab orders awaiting action">
               <table className="w-full min-w-[980px] border-collapse text-left text-sm">
                 <thead className="border-b bg-gray-50 text-gray-600">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Patient</th>
+                    <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient</th>
                     <th className="px-4 py-3 font-medium">Test Type</th>
                     <th className="px-4 py-3 font-medium">Ordering Doctor</th>
                     <th className="px-4 py-3 font-medium">Time Ordered</th>
@@ -819,7 +820,7 @@ const handleCompleteTest = async (order: LabOrder) => {
                       className="cursor-pointer border-b hover:bg-gray-50"
                       onClick={() => openOrder(order.id)}
                     >
-                      <td className="px-4 py-3">
+                      <td className="bg-white px-4 py-3">
                         <div className="font-medium text-[#1A2380]">
                           {order.patientName || "Unknown Patient"}
                         </div>
@@ -883,9 +884,9 @@ const handleCompleteTest = async (order: LabOrder) => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ResponsiveTableRegion>
 
-            <div className="space-y-3 p-3 lg:hidden">
+            <div className="hidden">
               {orders.map((order) => (
                 <div
                   key={order.id}

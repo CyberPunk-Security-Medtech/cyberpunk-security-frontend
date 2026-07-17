@@ -7,7 +7,7 @@ export function RoleAccessCard() {
   ];
 
   return (
-    <div className="bg-white rounded-xl border mt-6 p-5 space-y-6">
+    <div className="mt-6 space-y-6 rounded-xl border bg-white p-4 sm:p-5">
       {roles.map(([role, users, permissions], i) => (
         <div key={i} className="border-b last:border-none pb-5">
           <p className="font-semibold">{role}</p>

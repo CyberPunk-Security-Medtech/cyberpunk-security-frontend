@@ -7,6 +7,14 @@ import { toast } from "react-toastify";
 import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
 import { PatientCreatePayload, patientService } from "@services/api";
+import {
+  getTodayDateInputValue,
+  isValidPatientDateOfBirth,
+} from "@utils/patientAge";
+import {
+  hasRequiredHmoDetails,
+  type CoverageType,
+} from "@utils/patientCoverage";
 
 interface Props {
   isOpen: boolean;
@@ -110,21 +118,16 @@ export default function AddNewPatientRecordModal({
 }: Props) {
   const { activeWorkspace } = useAuth();
    const [formData, setFormData] = useState<FormState>(emptyForm);
+   const [coverageType, setCoverageType] = useState<CoverageType | "">("");
    const [submitting, setSubmitting] = useState(false);
+   const [formError, setFormError] = useState("");
  
    // handle input changes
    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
      const { name, value } = e.target;
      setFormData(prev => ({ ...prev, [name]: value }));
-   };
- 
-  const validate = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.gender) {
-      toast.error("Please fill all required fields");
-      return false;
-    }
-    return true;
-  };
+     setFormError("");
+    };
 
    const handleSubmit = async () => {
     if (
@@ -135,12 +138,37 @@ export default function AddNewPatientRecordModal({
       !formData.email ||
       !formData.phone
     ) {
+      setFormError("Please complete all required personal information fields.");
       toast.error("Please complete all required fields.");
       return;
     }
 
    if (!["Male", "Female", "Other"].includes(formData.gender)) {
+        setFormError("Please select a valid gender.");
         toast.error("Please select a valid gender.");
+        return;
+      }
+
+      if (!isValidPatientDateOfBirth(formData.dob)) {
+        setFormError("Enter a valid date of birth that is not in the future.");
+        toast.error("Enter a valid date of birth that is not in the future.");
+        return;
+      }
+
+      if (!coverageType) {
+        setFormError("Select HMO/Insurance or Self-pay before submitting.");
+        return;
+      }
+
+      if (
+        coverageType === "hmo" &&
+        !hasRequiredHmoDetails({
+          hmo_provider: formData.hmoProvider,
+          hmo_plan: formData.hmoPlan,
+          hmo_number: formData.hmoNumber,
+        })
+      ) {
+        setFormError("HMO provider, plan, and enrollee number are required for HMO patients.");
         return;
       }
   
@@ -177,13 +205,18 @@ export default function AddNewPatientRecordModal({
           ["current_medications", formData.currentMedications],
           ["immunizations", formData.immunizations],
           ["lifestyle_info", formData.lifestyleInfo],
-          ["enrollee_type", formData.enrolleeType],
-          ["hmo_provider", formData.hmoProvider],
-          ["hmo_plan", formData.hmoPlan],
-          ["hmo_number", formData.hmoNumber],
-          ["policy_start_date", formData.policyStartDate],
-          ["policy_expiry_date", formData.policyExpiryDate],
         ];
+
+        if (coverageType === "hmo") {
+          optionalFields.push(
+            ["enrollee_type", formData.enrolleeType],
+            ["hmo_provider", formData.hmoProvider],
+            ["hmo_plan", formData.hmoPlan],
+            ["hmo_number", formData.hmoNumber],
+            ["policy_start_date", formData.policyStartDate],
+            ["policy_expiry_date", formData.policyExpiryDate],
+          );
+        }
   
         for (const [field, rawValue] of optionalFields) {
           const nextValue = asOptional(rawValue);
@@ -201,12 +234,17 @@ export default function AddNewPatientRecordModal({
         onCreated?.();
         onClose();
         setFormData(emptyForm);
+        setCoverageType("");
+        setFormError("");
       } catch (error) {
         console.error("Failed to create patient:", error);
         if (isAxiosError(error)) {
           const backendMessage = extractApiErrorMessage(error.response?.data);
-          toast.error(backendMessage ?? "Failed to create patient");
+          const message = backendMessage ?? "Failed to create patient";
+          setFormError(message);
+          toast.error(message);
         } else {
+          setFormError("Failed to create patient");
           toast.error("Failed to create patient");
         }
       } finally {
@@ -220,16 +258,21 @@ export default function AddNewPatientRecordModal({
       title="Add New Patient Record"
       isOpen={isOpen}
       onClose={onClose}
-      className="w-full max-w-6xl"
+      className="max-w-6xl"
+      headerClassName="bg-[#003C36]"
     >
-      <div className="max-h-[85vh] overflow-y-auto pr-2">
-        <div className="w-full space-y-6 md:space-y-8 font-sans py-2 md:py-4">
+      <div className="w-full space-y-6 py-2 font-sans md:space-y-8 md:py-4">
+          {formError && (
+            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {formError}
+            </div>
+          )}
           <section className="rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6">
 
             {/* STEP 1 */}
             <div className="space-y-4">
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wide text-[#1A2380] font-semibold">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#003C36]">
                   Step 1 of 3
                 </p>
                 <h3 className="text-sm md:text-base font-semibold text-gray-900">
@@ -279,6 +322,8 @@ export default function AddNewPatientRecordModal({
                   <input
                     type="date"
                     name="dob"
+                    max={getTodayDateInputValue()}
+                    required
                     value={formData.dob}
                     onChange={handleChange}
                     className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
@@ -366,7 +411,7 @@ export default function AddNewPatientRecordModal({
             {/* STEP 2 */}
             <div className="border-t border-gray-100 pt-6 space-y-4">
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wide text-[#1A2380] font-semibold">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#003C36]">
                   Step 2 of 3
                 </p>
                 <h3 className="text-sm md:text-base font-semibold text-gray-900">
@@ -411,17 +456,54 @@ export default function AddNewPatientRecordModal({
             {/* STEP 3 */}
             <div className="border-t border-gray-100 pt-6 space-y-4">
               <div className="space-y-1">
-                <p className="text-[10px] uppercase tracking-wide text-[#1A2380] font-semibold">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#003C36]">
                   Step 3 of 3
                 </p>
                 <h3 className="text-sm md:text-base font-semibold text-gray-900">
-                  HMO & Emergency Information
+                  Payment Coverage
                 </h3>
                 <p className="text-xs text-gray-500">
-                  This new section collects insurance details and emergency contact together
+                  Choose HMO/Insurance to add policy details, or Self-pay to continue without them.
                 </p>
               </div>
 
+              <fieldset>
+                <legend className="sr-only">Coverage type</legend>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {(["hmo", "self_pay"] as const).map((option) => (
+                    <label
+                      key={option}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#006B5F] bg-emerald-50 text-[#003C36]" : "border-gray-200 text-gray-700"}`}
+                    >
+                      <input
+                        required
+                        type="radio"
+                        name="nurse-coverage-type"
+                        value={option}
+                        checked={coverageType === option}
+                        onChange={() => {
+                          setCoverageType(option);
+                          setFormError("");
+                          if (option === "self_pay") {
+                            setFormData((current) => ({
+                              ...current,
+                              enrolleeType: "",
+                              hmoProvider: "",
+                              hmoPlan: "",
+                              hmoNumber: "",
+                              policyStartDate: "",
+                              policyExpiryDate: "",
+                            }));
+                          }
+                        }}
+                      />
+                      {option === "hmo" ? "HMO / Insurance" : "Self-pay"}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              {coverageType === "hmo" && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   ["enrolleeType", "Select Enrollee Type", ["Primary", "Dependent"]],
@@ -434,6 +516,7 @@ export default function AddNewPatientRecordModal({
                       name={name as string} 
                       value={formData[name as keyof FormState]}
                       onChange={handleChange}
+                      required={name === "hmoProvider" || name === "hmoPlan"}
                       className="w-full h-10 rounded-full border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
                     >
                       <option value="">Select</option>
@@ -449,6 +532,7 @@ export default function AddNewPatientRecordModal({
                   <label className="text-xs text-gray-500">HMO ID / Enrollee Number</label>
                   <input
                     name="hmoNumber"
+                    required
                     value={formData.hmoNumber}
                     onChange={handleChange}
                     placeholder="Enter HMO ID / Enrollee Number"
@@ -457,7 +541,7 @@ export default function AddNewPatientRecordModal({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-gray-500">Policy Start Date</label>
+                  <label className="text-xs text-gray-500">Policy Start Date (Optional)</label>
                   <input
                     type="date"
                     name="policyStartDate"
@@ -468,7 +552,7 @@ export default function AddNewPatientRecordModal({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-gray-500">Policy Expiry Date</label>
+                  <label className="text-xs text-gray-500">Policy Expiry Date (Optional)</label>
                   <input
                     type="date"
                     name="policyExpiryDate"
@@ -478,9 +562,10 @@ export default function AddNewPatientRecordModal({
                   />
                 </div>
               </div>
+              )}
 
               {/* ACTIONS */}
-              <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+              <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
                 <button
                   onClick={onClose}
                   type="button"
@@ -493,7 +578,7 @@ export default function AddNewPatientRecordModal({
                   onClick={handleSubmit}
                   disabled={submitting}
                   type="button"
-                  className="rounded-full bg-[#1A2380] text-white px-4 py-2 text-xs md:text-sm font-medium hover:bg-[#111B66] transition"
+                  className="rounded-full bg-[#006B5F] text-white px-4 py-2 text-xs md:text-sm font-medium transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
                 >
                   {submitting ? "Creating..." : "Create patient records"}
                 </button>
@@ -501,7 +586,6 @@ export default function AddNewPatientRecordModal({
             </div>
           </section>
         </div>
-      </div>
     </Modal>
   );
 }

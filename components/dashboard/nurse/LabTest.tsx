@@ -64,7 +64,7 @@ export default function LabTest() {
         {labTests.map((test, idx) => (
           <div key={idx} className="flex items-start gap-4 py-4 border-b last:border-none">
             {/* Icon */}
-            <div className="bg-blue-50 p-2 rounded-lg">
+            <div className="bg-emerald-50 p-2 rounded-lg">
               <Image src="/lab-icon.svg" alt="Lab icon" width={32} height={32} />
             </div>
 

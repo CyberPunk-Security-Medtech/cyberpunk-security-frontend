@@ -14,8 +14,8 @@ export default function ReportsAnalytics() {
     <div className="p-6 space-y-6 bg-slate-50 min-h-screen">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="dashboard-page-title text-slate-900">
           Reports / Analytics
         </h1>
 

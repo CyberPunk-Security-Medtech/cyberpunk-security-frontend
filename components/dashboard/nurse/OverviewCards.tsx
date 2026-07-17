@@ -125,7 +125,7 @@ export default function OverviewCards() {
             className="rounded-lg border bg-white p-6 shadow-sm transition hover:shadow-md"
           >
             <p className="mb-2 text-sm text-gray-500">{card.title}</p>
-            <p className="text-2xl font-semibold text-[#1A2380]">
+            <p className="text-2xl font-semibold text-[#003C36]">
               {loading ? "..." : card.value}
             </p>
           </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { consultationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { StatusBadge } from "@components/StatusBadge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type ConsultationStatus = "Pending" | "In Progress" | "Completed" | "Cancelled";
 
@@ -182,7 +183,7 @@ export default function ConsultationsPage() {
   return (
     <div className="min-w-0 space-y-6 py-2 sm:py-4">
       <div className="space-y-1">
-        <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">Consultation Queue</h2>
+        <h2 className="text-xl font-semibold text-[#003C36] sm:text-2xl">Consultation Queue</h2>
         <p className="text-sm text-gray-500">
           Track pending, active and completed consultations across your patients.
         </p>
@@ -199,7 +200,7 @@ export default function ConsultationsPage() {
                 onClick={() => setActiveTab(tab)}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
                   isActive
-                    ? "bg-[#1A2380] text-white"
+                    ? "bg-[#006B5F] text-white"
                     : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
@@ -219,11 +220,11 @@ export default function ConsultationsPage() {
       </div>
 
       <div className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="hidden overflow-x-auto xl:block">
+        <ResponsiveTableRegion label="Nurse consultations">
           <table className="w-full min-w-[980px] border-collapse text-left text-sm">
             <thead className="border-b bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Patient</th>
+                <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient</th>
                 <th className="px-4 py-3 font-medium">Department</th>
                 <th className="px-4 py-3 font-medium">Reason</th>
                 <th className="px-4 py-3 font-medium">Priority</th>
@@ -253,8 +254,8 @@ export default function ConsultationsPage() {
                 filteredRows.map((row) => {
                   return (
                     <tr key={row.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-[#1A2380]">{row.patient_name}</div>
+                      <td className="bg-white px-4 py-3">
+                        <div className="font-medium text-[#003C36]">{row.patient_name}</div>
                         <div className="break-all text-xs text-gray-500">{row.patient_id}</div>
                       </td>
                       <td className="px-4 py-3">{row.department_name}</td>
@@ -272,9 +273,9 @@ export default function ConsultationsPage() {
                 })}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTableRegion>
 
-        <div className="space-y-3 p-3 sm:p-4 xl:hidden">
+        <div className="hidden">
           {loading && (
             <div className="rounded-lg border p-4 text-sm text-gray-500">
               Loading consultations...
@@ -293,7 +294,7 @@ export default function ConsultationsPage() {
                 <div key={row.id} className="overflow-hidden rounded-lg border border-gray-200 p-4">
                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="break-words font-medium text-[#1A2380]">{row.patient_name}</p>
+                      <p className="break-words font-medium text-[#003C36]">{row.patient_name}</p>
                       <p className="break-all text-xs text-gray-500">{row.patient_id}</p>
                     </div>
                     <StatusBadge status={toBadgeStatus(row.status)} />

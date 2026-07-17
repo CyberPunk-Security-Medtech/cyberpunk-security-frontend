@@ -25,7 +25,7 @@ export default function DataRetentionPoliciesCard() {
   ];
 
   return (
-    <div className="bg-white rounded-xl border p-6 w-[380px]">
+    <div className="w-full rounded-xl border bg-white p-4 sm:p-6 xl:max-w-[380px]">
       <h3 className="font-semibold text-lg mb-4">Data Retention Policies</h3>
 
       {policies.map(({ title, desc, key }) => (

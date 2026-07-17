@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Header from "@components/Header";
-import Sidebar from "@components/dashboard/admin/Sidebar";
 import Image from "next/image";
 import {
   invitationService,
@@ -95,19 +93,13 @@ export default function StaffOnboarding() {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
-      <Sidebar />
-
-      <main className="flex-1 flex flex-col">
-        <Header />
-
-        <div className="flex justify-center items-center py-10 px-6">
-          <div className="w-full max-w-3xl bg-white rounded-2xl shadow-sm px-10 py-14 text-center">
+    <div className="flex justify-center items-center py-10 px-6">
+          <div className="w-full max-w-3xl rounded-2xl bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
             <div className="flex flex-col items-center mb-6">
               <Image src="/auth_logo.svg" width={110} height={70} alt="PrivaCure" />
             </div>
 
-            <h1 className="text-2xl font-semibold mb-1">
+            <h1 className="dashboard-page-title mb-1">
               Staff Onboarding Setup
             </h1>
             <p className="text-gray-500 mb-8">
@@ -194,8 +186,6 @@ export default function StaffOnboarding() {
               </button>
             </form>
           </div>
-        </div>
-      </main>
     </div>
   );
 }

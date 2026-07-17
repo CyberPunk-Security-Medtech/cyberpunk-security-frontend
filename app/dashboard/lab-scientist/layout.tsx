@@ -51,7 +51,7 @@ export default function LabScientistLayout({
   };
 
   return (
-    <div className="font-sans flex h-screen overflow-hidden">
+    <div className="flex h-[100dvh] min-w-0 overflow-hidden font-sans [--dashboard-accent:#007F73] [--dashboard-accent-hover:#006E64]">
       <Sidebar
         sidebarMinimize={sidebarMinimize}
         setSidebarMinimize={setSidebarMinimize}
@@ -62,9 +62,10 @@ export default function LabScientistLayout({
         backgroundColor="rgba(0, 37, 34, 1)"
       />
 
-      <div className="flex flex-1 flex-col overflow-hidden bg-[#F9FAFB]">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F9FAFB]">
         <Header
           setSidebarOpen={setSidebarOpen}
+          sidebarOpen={sidebarOpen}
           desktopPaddingClassName="md:px-6 lg:px-6 xl:px-12"
         />
         <main className="flex-1 overflow-y-auto px-4 py-4 md:px-6 lg:px-6 xl:px-12 md:py-6">

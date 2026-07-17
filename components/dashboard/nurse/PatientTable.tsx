@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PatientService } from "@services/api";
+import { PatientService, type PatientListRecord } from "@services/api";
+import { resolvePatientAge } from "@utils/patientAge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 interface Patient {
   id: string;
@@ -47,11 +49,11 @@ export default function PatientTable() {
         const res = await PatientService.getPatients(orgId);
         const data = Array.isArray(res.data) ? res.data : [];
 
-        const mappedPatients = data.map((p: any) => ({
+        const mappedPatients = (data as PatientListRecord[]).map((p) => ({
           id: p.id,
           initials: `${p.first_name?.[0] ?? ""}${p.last_name?.[0] ?? ""}`.toUpperCase(),
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
-          age: p.age || "-",
+          age: resolvePatientAge(p.age, p.dob ?? p.date_of_birth),
           gender: p.gender || "-",
           condition: p.symptoms || "N/A",
           status: p.status || "Active",
@@ -80,11 +82,11 @@ export default function PatientTable() {
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className="hidden overflow-x-auto xl:block">
+      <ResponsiveTableRegion label="Nurse patient records">
         <table className="w-full min-w-[920px] border-collapse text-left text-sm">
           <thead className="border-b bg-gray-50 text-gray-600">
             <tr>
-              <th className="px-4 py-3 font-medium">Patient Name</th>
+              <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient Name</th>
               <th className="px-4 py-3 font-medium">Patient ID</th>
               <th className="px-4 py-3 font-medium">Age</th>
               <th className="px-4 py-3 font-medium">Gender</th>
@@ -97,11 +99,11 @@ export default function PatientTable() {
             {patients.map((patient) => (
               <tr
                 key={patient.id}
-                className="cursor-pointer border-b hover:bg-gray-50"
+                className="group cursor-pointer border-b bg-white hover:bg-gray-50"
                 onClick={() => router.push(`/dashboard/nurse/patient/${patient.id}`)}
               >
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3 font-medium text-[#1A2380]">
+                <td className="bg-white px-4 py-3 group-hover:bg-gray-50">
+                  <div className="flex items-center gap-3 font-medium text-[#003C36]">
                     <div className="grid h-8 w-8 place-items-center rounded-full bg-[#E6F8F7] text-xs font-semibold text-[#00B8A8]">
                       {patient.initials || "NA"}
                     </div>
@@ -128,9 +130,9 @@ export default function PatientTable() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ResponsiveTableRegion>
 
-      <div className="space-y-3 xl:hidden">
+      <div className="hidden">
         {patients.map((patient) => (
           <button
             key={`mobile-${patient.id}`}
@@ -144,12 +146,12 @@ export default function PatientTable() {
                   {patient.initials || "NA"}
                 </div>
                 <div className="min-w-0">
-                  <p className="break-words text-sm font-semibold text-[#1A2380]">{patient.name}</p>
+                  <p className="break-words text-sm font-semibold text-[#003C36]">{patient.name}</p>
                   <p className="break-all text-xs text-gray-500">{patient.id}</p>
                 </div>
               </div>
               <span
-                className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-medium ${statusClassName(
+                className={`shrink-0 rounded-full border px-2 py-1 text-xs font-medium ${statusClassName(
                   patient.status
                 )}`}
               >
