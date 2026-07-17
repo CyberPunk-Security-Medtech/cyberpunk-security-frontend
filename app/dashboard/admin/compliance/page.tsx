@@ -2,19 +2,12 @@ import ComplianceSummaryCard from "@components/dashboard/admin/compliance/Compli
 import ComplianceTabs from "@components/dashboard/admin/compliance/ComplianceTabs";
 import DataRetentionPoliciesCard from "@components/dashboard/admin/compliance/DataRetentionPoliciesCard";
 import EncryptionSettingsCard from "@components/dashboard/admin/compliance/EncryptionSettingsCard";
-import Sidebar from "@components/dashboard/admin/Sidebar";
-import Header from "@components/Header";
 
 export default function CompliancePage() {
   return (
-     <div className="min-h-screen flex bg-slate-50 text-slate-900">
-          <Sidebar />
-    
-          <main className="flex-1 flex flex-col">
-            <Header />
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-4 sm:p-6">
       {/* Top summary cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <ComplianceSummaryCard title="NDPR Compliance" value="98%" subText="Last checked: 2 hours ago" />
         <ComplianceSummaryCard title="Access Control" value="5" subText="12 active" valueColor="text-[#6C47FF]" />
         <ComplianceSummaryCard title="Data Retention" value="0" subText="3 active" valueColor="text-[#EA580C]" />
@@ -23,12 +16,10 @@ export default function CompliancePage() {
 
       <ComplianceTabs />
 
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 xl:flex-row">
         <EncryptionSettingsCard />
         <DataRetentionPoliciesCard />
       </div>
-    </div>
-    </main>
     </div>
   );
 }

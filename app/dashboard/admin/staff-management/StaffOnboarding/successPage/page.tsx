@@ -1,7 +1,5 @@
 "use client";
 
-import Sidebar from "@components/dashboard/admin/Sidebar";
-import Header from "@components/Header";
 import { useRouter } from "next/navigation";
 import Image from 'next/image'
 
@@ -9,14 +7,8 @@ export default function InviteSuccessPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
-      <Sidebar />
-
-      <main className="flex-1 flex flex-col">
-        <Header />
-
-        <div className="flex justify-center items-center py-10 px-6">
-          <div className="w-full max-w-3xl bg-white rounded-2xl shadow-sm px-10 py-14 text-center">
+    <div className="flex justify-center items-center py-10 px-6">
+          <div className="w-full max-w-3xl rounded-2xl bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
 
             <Image
               src="/icons/staffOnboarding_successicon.svg" 
@@ -26,7 +18,7 @@ export default function InviteSuccessPage() {
               className="mx-auto mb-6"
             />
 
-            <h1 className="text-2xl font-semibold mb-2">
+            <h1 className="dashboard-page-title mb-2">
               Staff Invitation Link Sent Successfully!
             </h1>
 
@@ -44,8 +36,6 @@ export default function InviteSuccessPage() {
               Go To Staff Management
             </button>
           </div>
-        </div>
-      </main>
     </div>
   );
 }

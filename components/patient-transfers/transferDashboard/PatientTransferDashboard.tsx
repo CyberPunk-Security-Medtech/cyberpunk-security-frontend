@@ -20,6 +20,7 @@ import {
   type ReferralPriority,
   type ShareScope,
 } from "@services/api";
+import { resolvePatientAge } from "@utils/patientAge";
 
 type TransferPatient = {
   id: string;
@@ -96,25 +97,6 @@ const getInitials = (name: string) =>
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("") || "PT";
-
-const calculateAge = (dob?: string | null) => {
-  if (!dob) return "N/A";
-  const birthDate = new Date(dob);
-  if (Number.isNaN(birthDate.getTime())) return "N/A";
-
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference = today.getMonth() - birthDate.getMonth();
-
-  if (
-    monthDifference < 0 ||
-    (monthDifference === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age -= 1;
-  }
-
-  return String(age);
-};
 
 const normalizeIdentifier = (value: unknown) => {
   if (typeof value !== "string") return "";
@@ -207,7 +189,7 @@ export default function PatientTransferDashboard({
             id: patient.id,
             name: name || "Unnamed patient",
             patientCode,
-            age: calculateAge(patient.dob),
+            age: String(resolvePatientAge(patient.age, patient.dob ?? patient.date_of_birth)),
             gender: patient.gender ?? "N/A",
             email: patient.email ?? "",
             phone: patient.phone_number ?? "",

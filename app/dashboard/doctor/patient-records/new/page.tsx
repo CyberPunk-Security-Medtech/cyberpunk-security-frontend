@@ -7,6 +7,15 @@ import { ChevronLeft } from "lucide-react";
 import { toast } from "react-toastify";
 import { patientService, type PatientCreatePayload } from "@services/api";
 import { useAuth } from "@context/AuthContext";
+import {
+  hasRequiredHmoDetails,
+  omitHmoDetails,
+  type CoverageType,
+} from "@utils/patientCoverage";
+import {
+  getTodayDateInputValue,
+  isValidPatientDateOfBirth,
+} from "@utils/patientAge";
 
 const initialForm: PatientCreatePayload = {
   first_name: "",
@@ -37,7 +46,9 @@ export default function AddNewPatientRecord() {
   const { activeWorkspace, hydrated } = useAuth();
 
   const [form, setForm] = useState<PatientCreatePayload>(initialForm);
+  const [coverageType, setCoverageType] = useState<CoverageType | "">("");
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     if (!hydrated) return;
@@ -48,6 +59,7 @@ export default function AddNewPatientRecord() {
 
   const update = (key: keyof PatientCreatePayload, value: string | null) => {
     setForm((prev) => ({ ...prev, [key]: value as never }));
+    setFormError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,9 +70,25 @@ export default function AddNewPatientRecord() {
       return;
     }
 
+    if (!coverageType) {
+      setFormError("Select HMO/Insurance or Self-pay before submitting.");
+      return;
+    }
+
+    if (!isValidPatientDateOfBirth(form.dob)) {
+      setFormError("Enter a valid date of birth that is not in the future.");
+      return;
+    }
+
+    if (coverageType === "hmo" && !hasRequiredHmoDetails(form)) {
+      setFormError("HMO provider, plan, and enrollee number are required for HMO patients.");
+      return;
+    }
+
     try {
       setSubmitting(true);
-      await patientService.createPatient(activeWorkspace.id, form);
+      const payload = coverageType === "self_pay" ? omitHmoDetails(form) : form;
+      await patientService.createPatient(activeWorkspace.id, payload);
       toast.success("Patient created successfully");
       router.push("/dashboard/doctor/patient-records");
     } catch (error: any) {
@@ -68,6 +96,7 @@ export default function AddNewPatientRecord() {
         error?.response?.data?.detail ||
         error?.response?.data?.message ||
         "Failed to create patient";
+      setFormError(message);
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -94,6 +123,11 @@ export default function AddNewPatientRecord() {
         onSubmit={handleSubmit}
         className="rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6"
       >
+        {formError && (
+          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {formError}
+          </div>
+        )}
         <section className="space-y-4">
           <h3 className="text-sm md:text-base font-semibold text-gray-900">
             Personal Information
@@ -113,13 +147,17 @@ export default function AddNewPatientRecord() {
               onChange={(e) => update("last_name", e.target.value)}
               required
             />
-            <input
-              type="date"
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              value={form.dob}
-              onChange={(e) => update("dob", e.target.value)}
-              required
-            />
+            <label className="space-y-1 text-xs text-gray-500 md:text-sm">
+              <span>Date of Birth</span>
+              <input
+                type="date"
+                max={getTodayDateInputValue()}
+                className="h-10 w-full rounded-full border border-gray-200 px-4 text-xs text-gray-900 outline-none md:text-sm"
+                value={form.dob}
+                onChange={(e) => update("dob", e.target.value)}
+                required
+              />
+            </label>
             <select
               className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
               value={form.gender}
@@ -216,46 +254,62 @@ export default function AddNewPatientRecord() {
 
         <section className="space-y-4 border-t border-gray-100 pt-6">
           <h3 className="text-sm md:text-base font-semibold text-gray-900">
-            HMO Information
+            Payment Coverage
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              placeholder="Enrollee Type"
-              value={form.enrollee_type ?? ""}
-              onChange={(e) => update("enrollee_type", e.target.value)}
-            />
-            <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              placeholder="HMO Provider"
-              value={form.hmo_provider ?? ""}
-              onChange={(e) => update("hmo_provider", e.target.value)}
-            />
-            <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              placeholder="HMO Plan"
-              value={form.hmo_plan ?? ""}
-              onChange={(e) => update("hmo_plan", e.target.value)}
-            />
-            <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              placeholder="HMO ID / Enrollee Number"
-              value={form.hmo_number ?? ""}
-              onChange={(e) => update("hmo_number", e.target.value)}
-            />
-            <input
-              type="date"
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              value={form.policy_start_date ?? ""}
-              onChange={(e) => update("policy_start_date", e.target.value)}
-            />
-            <input
-              type="date"
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-              value={form.policy_expiry_date ?? ""}
-              onChange={(e) => update("policy_expiry_date", e.target.value)}
-            />
-          </div>
+          <p className="text-xs text-gray-500 md:text-sm">
+            Choose HMO/Insurance to add policy details, or Self-pay to continue without them.
+          </p>
+          <fieldset>
+            <legend className="sr-only">Coverage type</legend>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {(["hmo", "self_pay"] as const).map((option) => (
+                <label key={option} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}>
+                  <input
+                    required
+                    type="radio"
+                    name="standalone-coverage-type"
+                    value={option}
+                    checked={coverageType === option}
+                    onChange={() => {
+                      setCoverageType(option);
+                      setFormError("");
+                      if (option === "self_pay") setForm((current) => omitHmoDetails(current));
+                    }}
+                  />
+                  {option === "hmo" ? "HMO / Insurance" : "Self-pay"}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          {coverageType === "hmo" && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
+                <span>Enrollee Type (Optional)</span>
+                <input className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.enrollee_type ?? ""} onChange={(e) => update("enrollee_type", e.target.value)} />
+              </label>
+              <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
+                <span>HMO Provider</span>
+                <input required className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.hmo_provider ?? ""} onChange={(e) => update("hmo_provider", e.target.value)} />
+              </label>
+              <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
+                <span>HMO Plan</span>
+                <input required className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.hmo_plan ?? ""} onChange={(e) => update("hmo_plan", e.target.value)} />
+              </label>
+              <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
+                <span>HMO ID / Enrollee Number</span>
+                <input required className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.hmo_number ?? ""} onChange={(e) => update("hmo_number", e.target.value)} />
+              </label>
+              <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
+                <span>Policy Start Date (Optional)</span>
+                <input type="date" className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.policy_start_date ?? ""} onChange={(e) => update("policy_start_date", e.target.value)} />
+              </label>
+              <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
+                <span>Policy Expiry Date (Optional)</span>
+                <input type="date" className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.policy_expiry_date ?? ""} onChange={(e) => update("policy_expiry_date", e.target.value)} />
+              </label>
+            </div>
+          )}
         </section>
 
         <div className="flex flex-wrap items-center justify-end gap-3 pt-2">

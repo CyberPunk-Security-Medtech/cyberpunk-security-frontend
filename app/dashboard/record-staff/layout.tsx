@@ -51,7 +51,7 @@ export default function RecordStaffLayout({
   };
 
   return (
-    <div className="flex h-screen overflow-hidden font-sans">
+    <div className="flex h-[100dvh] min-w-0 overflow-hidden font-sans [--dashboard-accent:#003C36] [--dashboard-accent-hover:#002E29]">
       <Sidebar
         sidebarMinimize={sidebarMinimize}
         setSidebarMinimize={setSidebarMinimize}
@@ -65,6 +65,7 @@ export default function RecordStaffLayout({
       <div className="flex min-w-0 flex-1 flex-col bg-[#EEF2F6]">
         <Header
           setSidebarOpen={setSidebarOpen}
+          sidebarOpen={sidebarOpen}
           desktopPaddingClassName="md:px-8"
         />
         <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 md:px-8">

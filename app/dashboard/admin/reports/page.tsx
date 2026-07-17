@@ -2,8 +2,9 @@ import Link from "next/link";
 
 export default function ReportsAnalyticsPage() {
   return (
+    <div className="p-6">
     <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h1 className="text-2xl font-semibold text-[#1A2380]">Reports & Analytics</h1>
+      <h1 className="dashboard-page-title text-[#1A2380]">Reports & Analytics</h1>
       <p className="mt-2 text-sm text-gray-600">
         This page is now routed correctly in production. Reports and analytics workflow UI can be added here.
       </p>
@@ -16,5 +17,6 @@ export default function ReportsAnalyticsPage() {
         </Link>
       </div>
     </section>
+    </div>
   );
 }

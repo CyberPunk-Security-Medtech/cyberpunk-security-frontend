@@ -1,63 +1,42 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import SignupForm from "@components/auth/SignupForm";
-import auth_logo from "@public/auth_logo.svg"
-// import left_signup_img from "@public/left_signup_image.jpg"
+import auth_logo from "@public/auth_logo.svg";
 
 export default function SignupPage() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {/* LEFT SIDE - Image + Overlay Text */}
+    <main className="flex min-h-[100dvh] w-full overflow-y-auto bg-white px-4 py-8 sm:px-6">
       <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative w-full md:w-1/2 h-64 md:h-auto"
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: reduceMotion ? 0 : 0.35 }}
+        className="my-auto flex w-full items-center justify-center"
       >
-        <Image
-          src="/left_signup_image.jpg"
-          alt="Surgery background"
-          fill
-          priority
-          />
-      </motion.div>
+        <div className="w-full max-w-sm space-y-6">
+          <div className="text-center">
+            <Image
+              src={auth_logo}
+              alt="PrivaCure"
+              width={100}
+              height={60}
+              className="mx-auto"
+            />
 
-      {/* RIGHT SIDE - Sign Up Form */}
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex w-full md:w-1/2 items-start justify-center px-6 py-10 md:py-0 bg-white"
-      >
-        <div className="w-full max-w-sm space-y-6 mt-10">
-          <div className="text-center scale-[0.92] sm:scale-100 origin-top">
-  <Image
-    src={auth_logo}
-    alt="PrivaCure"
-    width={100}
-    height={60}
-    className="mx-auto"
-  />
+            <h2 className="mt-3 text-xl font-bold text-gray-900 sm:text-2xl">
+              Create Account
+            </h2>
 
-  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mt-3">
-    Create Account
-  </h2>
+            <p className="text-sm text-gray-500">Register your Hospital</p>
+          </div>
 
-  <p className="text-gray-500 text-sm">
-    Register your Hospital
-  </p>
-</div>
-
-<div className="w-full">
-  <SignupForm />
-</div>
-
-   
+          <SignupForm />
         </div>
       </motion.div>
-    </div>
+    </main>
   );
 }
 

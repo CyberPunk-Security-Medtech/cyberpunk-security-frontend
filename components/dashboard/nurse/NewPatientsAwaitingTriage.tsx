@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
-import { consultationService, patientService } from "@services/api";
+import {
+  consultationService,
+  patientService,
+  type PatientListRecord,
+} from "@services/api";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type PatientRow = {
   id: string;
@@ -33,7 +38,7 @@ const formatDate = (value?: string | null) => {
   }).format(date);
 };
 
-const mapPatient = (patient: any): PatientRow => {
+const mapPatient = (patient: PatientListRecord): PatientRow => {
   const firstName = patient?.first_name ?? "";
   const lastName = patient?.last_name ?? "";
 
@@ -87,7 +92,7 @@ export default function NewPatientsAwaitingTriage() {
         );
 
         const awaitingTriage = allPatients
-          .filter((patient: any) => patient?.id && !consultedPatientIds.has(patient.id))
+          .filter((patient: PatientListRecord) => patient?.id && !consultedPatientIds.has(patient.id))
           .map(mapPatient)
           .sort((first, second) => {
             const firstTime = new Date(first.createdAt || 0).getTime();
@@ -134,7 +139,7 @@ export default function NewPatientsAwaitingTriage() {
     <section className="mb-8 rounded-lg border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="font-semibold text-[#1A2380]">
+          <h3 className="font-semibold text-[#003C36]">
             New Patients Awaiting Triage
           </h3>
           <p className="mt-1 text-sm text-gray-500">
@@ -158,11 +163,11 @@ export default function NewPatientsAwaitingTriage() {
       )}
 
       {!loading && visiblePatients.length > 0 && (
-        <div className="overflow-x-auto">
+        <ResponsiveTableRegion label="Patients awaiting nurse triage">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="border-b bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Patient</th>
+                <th scope="col" className="min-w-[180px] bg-gray-50 px-4 py-3 font-medium">Patient</th>
                 <th className="px-4 py-3 font-medium">Patient ID</th>
                 <th className="px-4 py-3 font-medium">Gender</th>
                 <th className="px-4 py-3 font-medium">Condition</th>
@@ -173,8 +178,8 @@ export default function NewPatientsAwaitingTriage() {
             <tbody>
               {visiblePatients.map((patient) => (
                 <tr key={patient.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3 font-medium text-[#1A2380]">
+                  <td className="bg-white px-4 py-3">
+                    <div className="flex items-center gap-3 font-medium text-[#003C36]">
                       <div className="grid h-8 w-8 place-items-center rounded-full bg-[#E6F8F7] text-xs font-semibold text-[#00B8A8]">
                         {patient.initials}
                       </div>
@@ -192,7 +197,7 @@ export default function NewPatientsAwaitingTriage() {
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/dashboard/nurse/patient/${patient.id}`}
-                      className="inline-flex items-center gap-2 rounded-md bg-[#1A2380] px-3 py-2 text-xs font-semibold text-white hover:bg-[#111B66]"
+                      className="inline-flex items-center gap-2 rounded-md bg-[#006B5F] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none"
                     >
                       Open Patient
                       <ArrowRight size={14} />
@@ -202,7 +207,7 @@ export default function NewPatientsAwaitingTriage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTableRegion>
       )}
     </section>
   );

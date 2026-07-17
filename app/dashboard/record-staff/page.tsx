@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@context/AuthContext";
 import { patientService } from "@services/api";
 import { getTimeGreeting } from "@utils/greeting";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import {
   mapRecordStaffPatient,
   statusClassName,
@@ -90,10 +91,10 @@ export default function RecordStaffDashboardPage() {
   return (
     <div className="w-full space-y-7">
       <section>
-        <h1 className="text-2xl font-bold text-[#111827]">
+        <h1 className="dashboard-page-title text-[#111827]">
           {greeting}, {displayName}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-600">
           Ward census and records status — {dashboardDate}
         </p>
       </section>
@@ -119,7 +120,7 @@ export default function RecordStaffDashboardPage() {
           </h2>
           <Link
             href="/dashboard/record-staff/patient-records"
-            className="text-sm font-medium text-[#0088CC] hover:text-[#006EA6]"
+            className="text-sm font-medium text-[#006EA6] hover:text-[#005780]"
           >
             View all →
           </Link>
@@ -131,11 +132,11 @@ export default function RecordStaffDashboardPage() {
           </div>
         )}
 
-        <div className="overflow-x-auto">
+        <ResponsiveTableRegion label="Active patient records">
           <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="bg-[#F5F7FA] text-xs uppercase tracking-wide text-slate-500">
+            <thead className="bg-[#F5F7FA] text-xs uppercase tracking-wide text-slate-600">
               <tr>
-                <th className="px-5 py-3 font-semibold">Patient ID</th>
+                <th scope="col" className="min-w-[220px] bg-[#F5F7FA] px-5 py-3 font-semibold">Patient ID</th>
                 <th className="px-5 py-3 font-semibold">Name</th>
                 <th className="px-5 py-3 font-semibold">Ward</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
@@ -168,7 +169,7 @@ export default function RecordStaffDashboardPage() {
               {!loading &&
                 patients.map((record) => (
                   <tr key={record.id} className="border-t border-slate-100">
-                    <td className="px-5 py-4 font-mono text-xs text-slate-500">
+                    <td className="bg-white px-5 py-4 font-mono text-xs text-slate-600">
                       {record.id}
                     </td>
                     <td className="px-5 py-4">
@@ -207,7 +208,7 @@ export default function RecordStaffDashboardPage() {
                 ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTableRegion>
       </section>
     </div>
   );

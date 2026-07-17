@@ -288,6 +288,22 @@ export type PatientCreatePayload = {
   policy_expiry_date?: string | null;
 };
 
+export type PatientListRecord = {
+  id: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  age?: number | string | null;
+  dob?: string | null;
+  date_of_birth?: string | null;
+  gender?: string | null;
+  symptoms?: string | null;
+  status?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  department?: string | null;
+  ward?: string | null;
+};
+
 export type ShareScope =
   | "demographics"
   | "history"

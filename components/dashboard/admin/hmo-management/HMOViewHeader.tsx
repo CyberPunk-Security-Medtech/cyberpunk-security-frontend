@@ -6,9 +6,9 @@ export default function HMOViewHeader() {
   const router = useRouter();
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-1">
-        <h1 className="text-xl font-semibold">HMO’s Management</h1>
+        <h1 className="dashboard-page-title">HMO’s Management</h1>
         <p className="text-sm text-gray-500">
           HMOS <span className="mx-1">›</span> Verve HMO
         </p>

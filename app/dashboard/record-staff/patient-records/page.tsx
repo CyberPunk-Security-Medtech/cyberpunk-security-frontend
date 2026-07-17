@@ -6,8 +6,18 @@ import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Modal from "@components/Modal";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { useAuth } from "@context/AuthContext";
 import { patientService, type PatientCreatePayload } from "@services/api";
+import {
+  hasRequiredHmoDetails,
+  omitHmoDetails,
+  type CoverageType,
+} from "@utils/patientCoverage";
+import {
+  getTodayDateInputValue,
+  isValidPatientDateOfBirth,
+} from "@utils/patientAge";
 import {
   mapRecordStaffPatient,
   statusClassName,
@@ -55,8 +65,14 @@ const medicalFields: Array<[keyof PatientCreatePayload, string, string]> = [
   ["lifestyle_info", "Lifestyle Info", "Non-smoker, occasional alcohol......"],
 ];
 
-const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-  <label className="mb-2 block text-sm font-semibold text-slate-600">
+const FieldLabel = ({
+  children,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  htmlFor?: string;
+}) => (
+  <label htmlFor={htmlFor} className="mb-2 block text-sm font-semibold text-slate-600">
     {children}
   </label>
 );
@@ -76,6 +92,7 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
 export default function RecordStaffPatientRecordsPage() {
   const { activeWorkspace, hydrated } = useAuth();
   const [form, setForm] = useState<PatientCreatePayload>(initialForm);
+  const [coverageType, setCoverageType] = useState<CoverageType | "">("");
   const [patients, setPatients] = useState<RecordStaffPatientRow[]>([]);
   const [loadingPatients, setLoadingPatients] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -119,6 +136,7 @@ export default function RecordStaffPatientRecordsPage() {
 
   const resetForm = () => {
     setForm(initialForm);
+    setCoverageType("");
     setError("");
   };
 
@@ -136,10 +154,26 @@ export default function RecordStaffPatientRecordsPage() {
       return;
     }
 
+    if (!coverageType) {
+      setError("Select HMO/Insurance or Self-pay before creating the patient record.");
+      return;
+    }
+
+    if (!isValidPatientDateOfBirth(form.dob)) {
+      setError("Enter a valid date of birth that is not in the future.");
+      return;
+    }
+
+    if (coverageType === "hmo" && !hasRequiredHmoDetails(form)) {
+      setError("HMO provider, plan, and enrollee number are required for HMO patients.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError("");
-      await patientService.createPatient(activeWorkspace.id, form);
+      const payload = coverageType === "self_pay" ? omitHmoDetails(form) : form;
+      await patientService.createPatient(activeWorkspace.id, payload);
       toast.success("Patient record created successfully");
       resetForm();
       setIsModalOpen(false);
@@ -160,7 +194,7 @@ export default function RecordStaffPatientRecordsPage() {
     <div className="w-full space-y-6">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">Patient Records</h1>
+          <h1 className="dashboard-page-title text-[#111827]">Patient Records</h1>
           <p className="mt-2 text-sm text-slate-500">
             View onboarded patients and add new patient records for this organization.
           </p>
@@ -176,7 +210,7 @@ export default function RecordStaffPatientRecordsPage() {
       </section>
 
       {!isModalOpen && error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {error}
         </div>
       )}
@@ -189,11 +223,11 @@ export default function RecordStaffPatientRecordsPage() {
           </p>
         </div>
 
-        <div className="overflow-x-auto">
+        <ResponsiveTableRegion label="Record Staff patient records">
           <table className="w-full min-w-[820px] text-left text-sm">
-            <thead className="bg-[#F5F7FA] text-xs uppercase tracking-wide text-slate-500">
+            <thead className="bg-[#F5F7FA] text-xs uppercase tracking-wide text-slate-600">
               <tr>
-                <th className="px-5 py-3 font-semibold">Patient</th>
+                <th scope="col" className="min-w-[190px] bg-[#F5F7FA] px-5 py-3 font-semibold">Patient</th>
                 <th className="px-5 py-3 font-semibold">Patient ID</th>
                 <th className="px-5 py-3 font-semibold">Gender</th>
                 <th className="px-5 py-3 font-semibold">Department</th>
@@ -221,7 +255,7 @@ export default function RecordStaffPatientRecordsPage() {
               {!loadingPatients &&
                 patients.map((patient) => (
                   <tr key={patient.id} className="border-t border-slate-100">
-                    <td className="px-5 py-4">
+                    <td className="bg-white px-5 py-4">
                       <div className="flex items-center gap-3">
                         <span className="grid h-9 w-9 place-items-center rounded-full bg-teal-50 text-xs font-semibold text-teal-700">
                           {patient.initials || "NA"}
@@ -264,7 +298,7 @@ export default function RecordStaffPatientRecordsPage() {
                 ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTableRegion>
       </section>
 
       <Modal
@@ -275,7 +309,7 @@ export default function RecordStaffPatientRecordsPage() {
         headerClassName="bg-[#003C36]"
       >
         {error && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
             {error}
           </div>
         )}
@@ -316,6 +350,7 @@ export default function RecordStaffPatientRecordsPage() {
                 <input
                   required
                   type="date"
+                  max={getTodayDateInputValue()}
                   value={form.dob}
                   onChange={(event) => updateField("dob", event.target.value)}
                   className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
@@ -427,16 +462,46 @@ export default function RecordStaffPatientRecordsPage() {
           <section>
             <p className="text-sm font-semibold text-[#003C36]">Step 3 of 3</p>
             <h2 className="mt-1 text-2xl font-bold text-[#111827]">
-              HMO & Emergency Information
+              Payment Coverage
             </h2>
             <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-              This section collects insurance details and emergency contact together.
+              Choose how this patient will pay. HMO details are only needed for insured patients.
             </p>
 
+            <fieldset className="mt-7">
+              <legend className="text-sm font-semibold text-slate-700">Coverage type</legend>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {(["hmo", "self_pay"] as const).map((option) => (
+                  <label
+                    key={option}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#003C36] bg-emerald-50 text-[#003C36]" : "border-slate-200 text-slate-700"}`}
+                  >
+                    <input
+                      type="radio"
+                      name="record-staff-coverage-type"
+                      value={option}
+                      checked={coverageType === option}
+                      onChange={() => {
+                        setCoverageType(option);
+                        setError("");
+                        if (option === "self_pay") {
+                          setForm((current) => omitHmoDetails(current));
+                        }
+                      }}
+                      required
+                    />
+                    {option === "hmo" ? "HMO / Insurance" : "Self-pay"}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {coverageType === "hmo" && (
             <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               <div>
-                <FieldLabel>Enrollee Type</FieldLabel>
+                <FieldLabel htmlFor="record-enrollee-type">Enrollee Type</FieldLabel>
                 <select
+                  id="record-enrollee-type"
                   value={form.enrollee_type ?? ""}
                   onChange={(event) =>
                     updateField("enrollee_type", asOptional(event.target.value))
@@ -452,8 +517,10 @@ export default function RecordStaffPatientRecordsPage() {
                 </select>
               </div>
               <div>
-                <FieldLabel>HMO Provider</FieldLabel>
+                <FieldLabel htmlFor="record-hmo-provider">HMO Provider</FieldLabel>
                 <select
+                  id="record-hmo-provider"
+                  required
                   value={form.hmo_provider ?? ""}
                   onChange={(event) =>
                     updateField("hmo_provider", asOptional(event.target.value))
@@ -469,8 +536,10 @@ export default function RecordStaffPatientRecordsPage() {
                 </select>
               </div>
               <div>
-                <FieldLabel>HMO Plan / Coverage</FieldLabel>
+                <FieldLabel htmlFor="record-hmo-plan">HMO Plan / Coverage</FieldLabel>
                 <select
+                  id="record-hmo-plan"
+                  required
                   value={form.hmo_plan ?? ""}
                   onChange={(event) =>
                     updateField("hmo_plan", asOptional(event.target.value))
@@ -486,8 +555,10 @@ export default function RecordStaffPatientRecordsPage() {
                 </select>
               </div>
               <div>
-                <FieldLabel>HMO ID / Enrollee Number</FieldLabel>
+                <FieldLabel htmlFor="record-hmo-number">HMO ID / Enrollee Number</FieldLabel>
                 <input
+                  id="record-hmo-number"
+                  required
                   value={form.hmo_number ?? ""}
                   onChange={(event) => updateField("hmo_number", event.target.value)}
                   placeholder="Enter HMO ID / Enrollee Number"
@@ -495,8 +566,9 @@ export default function RecordStaffPatientRecordsPage() {
                 />
               </div>
               <div>
-                <FieldLabel>Policy Start Date</FieldLabel>
+                <FieldLabel htmlFor="record-policy-start">Policy Start Date (Optional)</FieldLabel>
                 <input
+                  id="record-policy-start"
                   type="date"
                   value={form.policy_start_date ?? ""}
                   onChange={(event) =>
@@ -506,8 +578,9 @@ export default function RecordStaffPatientRecordsPage() {
                 />
               </div>
               <div>
-                <FieldLabel>Policy Expiry Date</FieldLabel>
+                <FieldLabel htmlFor="record-policy-expiry">Policy Expiry Date (Optional)</FieldLabel>
                 <input
+                  id="record-policy-expiry"
                   type="date"
                   value={form.policy_expiry_date ?? ""}
                   onChange={(event) =>
@@ -517,6 +590,7 @@ export default function RecordStaffPatientRecordsPage() {
                 />
               </div>
             </div>
+            )}
           </section>
 
           <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">

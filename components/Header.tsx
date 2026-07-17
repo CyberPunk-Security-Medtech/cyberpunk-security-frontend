@@ -7,12 +7,16 @@ import Image from "next/image";
 
 interface HeaderProps {
   setSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  sidebarOpen?: boolean;
+  sidebarId?: string;
   showSearch?: boolean;
   desktopPaddingClassName?: string;
 }
 
 export default function Header({
   setSidebarOpen,
+  sidebarOpen = false,
+  sidebarId = "dashboard-sidebar",
   showSearch = true,
   desktopPaddingClassName = "md:px-8",
 }: HeaderProps) {
@@ -37,14 +41,16 @@ export default function Header({
 
   return (
     <header
-      className={`w-full flex items-center justify-between px-4 py-4 border-b border-gray-100 bg-white sticky top-0 z-40 ${desktopPaddingClassName}`}
+      className={`sticky top-0 z-40 flex w-full min-w-0 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 py-4 ${desktopPaddingClassName}`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         {setSidebarOpen && (
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden rounded-md p-2 hover:bg-gray-100 transition"
+            className="rounded-md p-2 transition hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] motion-reduce:transition-none lg:hidden"
             aria-label="Open sidebar"
+            aria-controls={sidebarId}
+            aria-expanded={sidebarOpen}
           >
             <Menu size={20} className="text-[#1A2380]" />
           </button>
@@ -56,12 +62,12 @@ export default function Header({
           height={36}
           className="h-9 w-9 rounded-full object-cover"
         />
-        <h2 className="text-lg font-semibold text-[#1A2380] truncate">
+        <h2 className="min-w-0 truncate text-base font-semibold text-[#1A2380] sm:text-lg">
           {organizationName || "Sisyphus Medical Center"}
         </h2>
       </div>
 
-      <div className="flex items-center gap-5">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-5">
         {showSearch && (
           <div className="relative hidden md:block">
             <Search

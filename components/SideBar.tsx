@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { MenuItem, UserProfile } from "@/types/index";
 import { authService } from "@services/api";
 
@@ -16,6 +16,11 @@ interface SidebarProps {
   menuItems: MenuItem[];
   user: UserProfile;
   backgroundColor?: string;
+  navigationTheme?: {
+    accentColor?: string;
+    activeBackgroundColor?: string;
+    hoverBackgroundColor?: string;
+  };
 }
 
 export default function SideBar({
@@ -26,11 +31,21 @@ export default function SideBar({
   menuItems,
   user,
   backgroundColor = "#060921",
+  navigationTheme,
 }: SidebarProps) {
   const pathname = usePathname();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [isDesktop, setIsDesktop] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const sidebarRef = useRef<HTMLElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const sidebarColors = {
+    accent: navigationTheme?.accentColor ?? "rgba(0,184,168,0.9)",
+    activeBackground:
+      navigationTheme?.activeBackgroundColor ?? "rgba(0,184,168,0.18)",
+    hoverBackground: navigationTheme?.hoverBackgroundColor ?? "#11143B",
+  };
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
@@ -49,6 +64,58 @@ export default function SideBar({
   useEffect(() => {
     if (sidebarMinimize) setIsProfileMenuOpen(false);
   }, [sidebarMinimize]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const syncViewport = () => setIsDesktop(mediaQuery.matches);
+    syncViewport();
+    mediaQuery.addEventListener("change", syncViewport);
+    return () => mediaQuery.removeEventListener("change", syncViewport);
+  }, []);
+
+  useEffect(() => {
+    if (!sidebarOpen || isDesktop) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSidebarOpen?.(false);
+        window.setTimeout(() => {
+          document
+            .querySelector<HTMLButtonElement>('[aria-controls="dashboard-sidebar"]')
+            ?.focus();
+        }, 0);
+        return;
+      }
+
+      if (event.key !== "Tab" || !sidebarRef.current) return;
+      const focusable = Array.from(
+        sidebarRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isDesktop, setSidebarOpen, sidebarOpen]);
 
   useEffect(() => {
     // Ensure mobile drawer closes after navigation.
@@ -96,14 +163,33 @@ export default function SideBar({
     <>
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen?.(false)}
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          aria-hidden="true"
+          onClick={() => {
+            setSidebarOpen?.(false);
+            window.setTimeout(() => {
+              document
+                .querySelector<HTMLButtonElement>('[aria-controls="dashboard-sidebar"]')
+                ?.focus();
+            }, 0);
+          }}
         />
       )}
 
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] text-white transition-all duration-300 flex flex-col py-6 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
-        style={{ backgroundColor }}
+        id="dashboard-sidebar"
+        ref={sidebarRef}
+        aria-hidden={!isDesktop && !sidebarOpen}
+        inert={!isDesktop && !sidebarOpen}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col py-6 text-white transition-[transform,width] duration-300 motion-reduce:transition-none lg:static ${sidebarMinimize ? "lg:w-20" : "lg:w-[260px]"} ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        style={
+          {
+            backgroundColor,
+            "--sidebar-accent": sidebarColors.accent,
+            "--sidebar-active-bg": sidebarColors.activeBackground,
+            "--sidebar-hover-bg": sidebarColors.hoverBackground,
+          } as CSSProperties
+        }
       >
         <div>
           <div className="px-6 mb-10 relative flex items-center justify-center min-h-[40px]">
@@ -119,7 +205,15 @@ export default function SideBar({
             </div>
 
             <button
-              onClick={() => setSidebarOpen?.(false)}
+              ref={closeButtonRef}
+              onClick={() => {
+                setSidebarOpen?.(false);
+                window.setTimeout(() => {
+                  document
+                    .querySelector<HTMLButtonElement>('[aria-controls="dashboard-sidebar"]')
+                    ?.focus();
+                }, 0);
+              }}
               className="lg:hidden text-white/60 hover:text-white transition absolute left-0"
               aria-label="Close sidebar"
             >
@@ -177,6 +271,7 @@ export default function SideBar({
         {hasChildren ? (
           <Link
             href={item.href}
+            aria-current={pathname === item.href ? "page" : undefined}
             onClick={() =>
               setOpenGroups((current) => ({
                 ...current,
@@ -186,15 +281,15 @@ export default function SideBar({
             className="w-full"
           >
             <div
-              className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-all border-l-4 ${
+              className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-colors motion-reduce:transition-none border-l-4 ${
                 isParentActive
-                  ? "bg-[rgba(0,184,168,0.18)] border-[rgba(0,184,168,0.9)] text-white"
-                  : "border-transparent hover:bg-[#11143B] text-gray-400 hover:text-white"
+                  ? "bg-[var(--sidebar-active-bg)] border-[var(--sidebar-accent)] text-white"
+                  : "border-transparent hover:bg-[var(--sidebar-hover-bg)] text-gray-400 hover:text-white"
               }`}
             >
               <Icon
                 size={18}
-                color={isParentActive ? "#00B8A8" : "currentColor"}
+                color={isParentActive ? sidebarColors.accent : "currentColor"}
               />
 
               {(!sidebarMinimize || sidebarOpen) && (
@@ -212,17 +307,18 @@ export default function SideBar({
           <Link
             href={item.href}
             onClick={() => setSidebarOpen?.(false)}
+            aria-current={isParentActive ? "page" : undefined}
           >
           <div
-            className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-all border-l-4 ${
+            className={`flex items-center gap-3 px-6 py-3 text-sm cursor-pointer transition-colors motion-reduce:transition-none border-l-4 ${
               isParentActive
-                ? "bg-[rgba(0,184,168,0.18)] border-[rgba(0,184,168,0.9)] text-white"
-                : "border-transparent hover:bg-[#11143B] text-gray-400 hover:text-white"
+                ? "bg-[var(--sidebar-active-bg)] border-[var(--sidebar-accent)] text-white"
+                : "border-transparent hover:bg-[var(--sidebar-hover-bg)] text-gray-400 hover:text-white"
             }`}
           >
             <Icon
               size={18}
-              color={isParentActive ? "#00B8A8" : "currentColor"}
+              color={isParentActive ? sidebarColors.accent : "currentColor"}
             />
 
             {(!sidebarMinimize || sidebarOpen) && (
@@ -244,12 +340,13 @@ export default function SideBar({
                   key={child.name}
                   href={child.href}
                   onClick={() => setSidebarOpen?.(false)}
+                  aria-current={isChildActive ? "page" : undefined}
                 >
                   <div
-                    className={`ml-6 mr-3 flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm cursor-pointer transition-all ${
+                    className={`ml-6 mr-3 flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm cursor-pointer transition-colors motion-reduce:transition-none ${
                       isChildActive
-                        ? "bg-[rgba(0,184,168,0.9)] text-white"
-                        : "text-gray-400 hover:bg-[#11143B] hover:text-white"
+                        ? "bg-[var(--sidebar-active-bg)] text-white"
+                        : "text-gray-400 hover:bg-[var(--sidebar-hover-bg)] hover:text-white"
                     }`}
                   >
                     {/* <ChildIcon
@@ -275,7 +372,6 @@ export default function SideBar({
               type="button"
               onClick={() => !sidebarMinimize && setIsProfileMenuOpen((prev) => !prev)}
               className="w-full flex items-center gap-3 text-left"
-              aria-label="Open profile menu"
             >
               <Image
                 src={user.avatar || "/avatars/eleanor.png"}

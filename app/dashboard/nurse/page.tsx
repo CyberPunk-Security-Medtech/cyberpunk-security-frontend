@@ -37,7 +37,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-[#1A2380] mb-1">
+      <h2 className="text-xl font-semibold text-[#003C36] mb-1">
         {greeting}, Nurse {nurseName}!
       </h2>
       <p className="text-gray-500 mb-8">Welcome back to PrivaCure dashboard</p>

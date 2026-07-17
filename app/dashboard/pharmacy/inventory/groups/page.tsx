@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpDown, Plus, Search, Trash2, X } from "lucide-react";
 import BreadcrumbHeading from "@components/dashboard/pharmacy/BreadcrumbHeading";
 import { pharmacyMedicineGroups } from "@components/dashboard/pharmacy/inventoryData";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 export default function MedicineGroupsPage() {
   const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
@@ -38,16 +39,12 @@ export default function MedicineGroupsPage() {
           />
         </div>
 
-        <div
-          role="region"
-          aria-label="Medicine groups table"
-          className="min-w-0 w-full max-w-full overflow-x-auto overscroll-x-contain touch-pan-x rounded border border-[#D8DEE8] bg-white [-webkit-overflow-scrolling:touch]"
-        >
+        <ResponsiveTableRegion label="Medicine groups" className="rounded border border-[#D8DEE8] bg-white">
             <div className="min-w-[880px]">
             <table className="w-full table-auto">
             <thead className="border-b border-[#D8DEE8]">
               <tr className="text-left text-sm font-medium text-[#2D3648]">
-                <th className="whitespace-nowrap px-6 py-4">
+                <th scope="col" className="whitespace-nowrap bg-white px-6 py-4">
                   <span className="inline-flex items-center gap-2">
                     Group Name
                     <ArrowUpDown size={13} className="text-[#8792A8]" />
@@ -68,7 +65,7 @@ export default function MedicineGroupsPage() {
                   key={group.id}
                   className="border-b border-[#E8EDF4] text-[13px] text-[#3A4253] last:border-b-0"
                 >
-                  <td className="whitespace-nowrap px-6 py-4">
+                  <td className="whitespace-nowrap bg-white px-6 py-4">
                     <Link
                       href={`/dashboard/pharmacy/inventory/groups/${group.id}`}
                       className="hover:text-[#00796B]"
@@ -90,7 +87,7 @@ export default function MedicineGroupsPage() {
             </tbody>
             </table>
             </div>
-        </div>
+        </ResponsiveTableRegion>
       </section>
 
       {isAddGroupModalOpen && (

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpDown, Plus, Search, Trash2, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import BreadcrumbHeading from "./BreadcrumbHeading";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type MedicineGroupDetailsClientProps = {
   groupName: string;
@@ -52,16 +53,12 @@ export default function MedicineGroupDetailsClient({
           />
         </div>
 
-        <div
-          role="region"
-          aria-label="Group medicines table"
-          className="min-w-0 w-full max-w-full overflow-x-auto overscroll-x-contain touch-pan-x rounded border border-[#D8DEE8] bg-white [-webkit-overflow-scrolling:touch]"
-        >
+        <ResponsiveTableRegion label="Group medicines" className="rounded border border-[#D8DEE8] bg-white">
             <div className="min-w-[880px]">
             <table className="w-full table-auto">
             <thead className="border-b border-[#D8DEE8]">
               <tr className="text-left text-sm font-medium text-[#2D3648]">
-                <th className="whitespace-nowrap px-6 py-4">
+                <th scope="col" className="whitespace-nowrap bg-white px-6 py-4">
                   <span className="inline-flex items-center gap-2">
                     Medicine Name
                     <ArrowUpDown size={13} className="text-[#8792A8]" />
@@ -82,7 +79,7 @@ export default function MedicineGroupDetailsClient({
                   key={medicine.name}
                   className="border-b border-[#E8EDF4] text-[13px] text-[#3A4253] last:border-b-0"
                 >
-                  <td className="whitespace-nowrap px-6 py-4">{medicine.name}</td>
+                  <td className="whitespace-nowrap bg-white px-6 py-4">{medicine.name}</td>
                   <td className="whitespace-nowrap px-6 py-4">
                     {medicine.count.toString().padStart(2, "0")}
                   </td>
@@ -97,7 +94,7 @@ export default function MedicineGroupDetailsClient({
             </tbody>
             </table>
             </div>
-        </div>
+        </ResponsiveTableRegion>
 
         <button className="inline-flex items-center gap-2 rounded border border-[#9FD0E2] bg-[#EFFBFF] px-5 py-2 text-xs text-[#00796B]">
           <Trash2 size={12} />

@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 
-import Sidebar from "@components/dashboard/admin/Sidebar";
-import Header from "@components/Header";
-
 import HMOHeader from "@components/dashboard/admin/hmo-management/HMOHeader";
 import HMOActions from "@components/dashboard/admin/hmo-management/HMOActions";
 import HMOTable from "@components/dashboard/admin/hmo-management/HMOTable";
@@ -22,18 +19,7 @@ export default function HMOManagementPage() {
 
   return (
 
-    <div className="min-h-screen flex bg-slate-50 text-slate-900">
-
-
-      <Sidebar />
-
-
-      <main className="flex-1 flex flex-col">
-
-        <Header />
-
-
-        <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6">
 
 
           <HMOHeader />
@@ -66,12 +52,6 @@ export default function HMOManagementPage() {
             </div>
 
           </div>
-
-
-        </div>
-
-
-      </main>
 
 
     </div>

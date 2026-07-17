@@ -42,7 +42,7 @@ export default function PharmacyInventoryPage() {
     <section className="space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <h1 className="text-[36px] leading-none font-semibold text-[#151D48]">
+          <h1 className="dashboard-page-title text-[#151D48]">
             Inventory
           </h1>
           <p className="mt-2 text-sm text-[#737791]">
@@ -75,12 +75,12 @@ export default function PharmacyInventoryPage() {
                 <p className="text-[24px] leading-none font-semibold text-[#23272E]">
                   {card.title}
                 </p>
-                <p className="mt-2 text-[11px] text-[#8A93A5]">{card.subtitle}</p>
+                <p className="mt-2 text-xs text-[#596174]">{card.subtitle}</p>
               </div>
 
               <Link
                 href={card.href}
-                className={`flex items-center justify-center gap-1 border-t border-[#E8ECF3] px-3 py-1.5 text-[10px] font-medium ${card.actionBg} ${card.actionColor}`}
+                className={`flex min-h-10 items-center justify-center gap-1 border-t border-[#E8ECF3] px-3 py-2 text-xs font-medium ${card.actionBg} ${card.actionColor}`}
               >
                 {card.action}
                 <ChevronRight size={12} />

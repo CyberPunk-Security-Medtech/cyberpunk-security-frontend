@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpDown, ChevronRight } from "lucide-react";
 import { pharmacyMedicines } from "@components/dashboard/pharmacy/inventoryData";
 import BreadcrumbHeading from "@components/dashboard/pharmacy/BreadcrumbHeading";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 export default function PharmacyMedicineListPage() {
   return (
@@ -22,16 +23,12 @@ export default function PharmacyMedicineListPage() {
         </Link>
       </div>
 
-      <div
-        role="region"
-        aria-label="Medicine list table"
-        className="min-w-0 w-full max-w-full overflow-x-auto overscroll-x-contain touch-pan-x rounded border border-[#D8DEE8] bg-white [-webkit-overflow-scrolling:touch]"
-      >
+      <ResponsiveTableRegion label="Medicine list" className="rounded border border-[#D8DEE8] bg-white">
           <div className="min-w-[980px]">
           <table className="w-full table-auto">
           <thead className="border-b border-[#D8DEE8] bg-white">
             <tr className="text-left text-sm font-medium text-[#2D3648]">
-              <th className="whitespace-nowrap px-6 py-4">
+              <th scope="col" className="whitespace-nowrap bg-white px-6 py-4">
                 <span className="inline-flex items-center gap-2">
                   Medicine Name
                   <ArrowUpDown size={13} className="text-[#8792A8]" />
@@ -64,7 +61,7 @@ export default function PharmacyMedicineListPage() {
                 key={medicine.medicineId}
                 className="border-b border-[#E8EDF4] text-[13px] text-[#3A4253] last:border-b-0"
               >
-                <td className="whitespace-nowrap px-6 py-4">{medicine.name}</td>
+                <td className="whitespace-nowrap bg-white px-6 py-4">{medicine.name}</td>
                 <td className="whitespace-nowrap px-6 py-4">{medicine.medicineId}</td>
                 <td className="whitespace-nowrap px-6 py-4">{medicine.group}</td>
                 <td className="whitespace-nowrap px-6 py-4">{medicine.stockQty}</td>
@@ -82,7 +79,7 @@ export default function PharmacyMedicineListPage() {
           </tbody>
           </table>
           </div>
-      </div>
+      </ResponsiveTableRegion>
 
       <div className="flex items-center justify-between text-xs text-[#8A93A5]">
         <p>Showing 1-9 from 15</p>

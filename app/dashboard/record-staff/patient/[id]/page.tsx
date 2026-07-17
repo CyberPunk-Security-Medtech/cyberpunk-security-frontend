@@ -209,7 +209,7 @@ export default function RecordStaffPatientDetailsPage() {
               {initials}
             </span>
             <div>
-              <h1 className="text-2xl font-bold text-[#111827]">{patientName}</h1>
+              <h1 className="dashboard-page-title text-[#111827]">{patientName}</h1>
               <p className="mt-1 break-all text-sm text-slate-500">
                 Patient ID: {formatValue(patient?.id)}
               </p>

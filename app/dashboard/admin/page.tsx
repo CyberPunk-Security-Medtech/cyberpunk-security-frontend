@@ -4,11 +4,9 @@ import AnalyticsOverview from "@components/dashboard/admin/AnalyticsOverview";
 import AddPatientModal from "@components/dashboard/doctor/AddPatientModal";
 import PatientTable from "@components/dashboard/admin/patientTable";
 import RecentActivity from "@components/dashboard/admin/recentActivity";
-import Sidebar from "@components/dashboard/admin/Sidebar";
 import StatCardsRow from "@components/dashboard/admin/statRowCards";
 import TotalTransfers from "@components/dashboard/admin/totalTransfers";
 import Performance from "@components/dashboard/admin/performance";
-import Header from "@components/Header";
 import Topbar from "@components/dashboard/admin/adminTopBar";
 import { useAuth } from "@context/AuthContext";
 import { useState } from "react";
@@ -30,10 +28,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900">
-      <Sidebar />
-      <main className="flex-1 flex flex-col">
-        <Header />
+    <>
         <Topbar onAddPatientClick={() => setIsAddPatientModalOpen(true)} />
         <AddPatientModal
           isOpen={isAddPatientModalOpen}
@@ -42,7 +37,7 @@ export default function AdminDashboard() {
             setPatientTableRefreshVersion((current) => current + 1)
           }
         />
-        <div className="px-8 py-6 space-y-6">
+        <div className="space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           <AnalyticsOverview />
           <StatCardsRow />
           <div className="grid lg:grid-cols-[1.4fr,1.4fr,1fr] gap-4">
@@ -52,8 +47,7 @@ export default function AdminDashboard() {
           </div>
           <PatientTable refreshVersion={patientTableRefreshVersion} />
         </div>
-      </main>
-    </div>
+    </>
   );
 }
 

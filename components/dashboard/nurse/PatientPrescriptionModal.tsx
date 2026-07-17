@@ -79,7 +79,12 @@ export function PatientPrescriptionModal({
   };
 
   return (
-    <Modal title="Create New Prescription" isOpen={open} onClose={onClose}>
+    <Modal
+      title="Create New Prescription"
+      isOpen={open}
+      onClose={onClose}
+      headerClassName="bg-[#003C36]"
+    >
       <div className="relative flex flex-col max-h-[95vh]">
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <form
@@ -207,7 +212,7 @@ export function PatientPrescriptionModal({
             <div>
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 w-full md:w-auto border border-[#1A2380] text-[#1A2380] font-medium rounded-full px-5 py-2.5 text-sm hover:bg-[#F4F5FF]"
+                className="flex items-center justify-center gap-2 w-full md:w-auto border border-[#006B5F] text-[#003C36] font-medium rounded-full px-5 py-2.5 text-sm hover:bg-[#F0FDF9]"
               >
                 <Plus size={16} />
                 Add Another Medication
@@ -225,7 +230,7 @@ export function PatientPrescriptionModal({
               <Button
                 type="submit"
                 disabled={loading || !consultationId || !orgId}
-                className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#00B8A8] transition disabled:opacity-50"
+                className="rounded-full bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#005249] transition-colors motion-reduce:transition-none disabled:opacity-50"
               >
                 {loading ? "Sending..." : "Save & Send to Pharmacist"}
               </Button>
