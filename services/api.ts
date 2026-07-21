@@ -26,6 +26,11 @@ type WrappedData<T> = {
   data: T;
 };
 
+export type PasswordChangePayload = {
+  old_password: string;
+  new_password: string;
+};
+
 const unwrap = <T>(payload: T | WrappedData<T>): T => {
   if (payload && typeof payload === "object" && "data" in (payload as object)) {
     return (payload as WrappedData<T>).data;
@@ -95,6 +100,10 @@ export const authService = {
     });
     return response.data;
   },
+  changePassword: async (payload: PasswordChangePayload) => {
+    const response = await api.post("/api/v1/users/change-password", payload);
+    return unwrap(response.data);
+  },
 };
 
 export interface CreateOrganizationPayload {
@@ -136,6 +145,8 @@ export type Membership = {
   department?: Department | null;
 };
 
+export type OrganizationMember = Membership;
+
 export const organizationService = {
   createOrganization: async (payload: CreateOrganizationPayload) => {
     const response = await api.post("/api/v1/organizations", payload, {
@@ -173,6 +184,11 @@ export const organizationService = {
 
   getMyMembership: async (org_id: string): Promise<Membership | null> => {
     const response = await api.get(`/api/v1/membership/${org_id}`);
+    return unwrap(response.data);
+  },
+
+  getMembers: async (org_id: string): Promise<OrganizationMember[]> => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/members`);
     return unwrap(response.data);
   },
 
@@ -302,6 +318,24 @@ export type PatientListRecord = {
   updated_at?: string | null;
   department?: string | null;
   ward?: string | null;
+};
+
+export type PatientSearchResult = PatientListRecord & {
+  id: string;
+  first_name: string;
+  last_name: string;
+  dob: string;
+  gender: string;
+  phone_number: string;
+  email: string;
+  nin?: string | null;
+};
+
+export type PatientSearchParams = {
+  q: string;
+  include_shared?: boolean;
+  limit?: number;
+  offset?: number;
 };
 
 export type ShareScope =
@@ -443,6 +477,17 @@ export const patientService = {
     const response = await api.get(`/api/v1/organizations/${org_id}/patients`, {
       params,
     });
+    return unwrap(response.data);
+  },
+
+  searchPatients: async (
+    org_id: string,
+    params: PatientSearchParams,
+  ): Promise<PatientSearchResult[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/search`,
+      { params },
+    );
     return unwrap(response.data);
   },
 
