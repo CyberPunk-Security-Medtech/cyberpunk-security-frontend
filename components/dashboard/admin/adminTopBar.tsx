@@ -27,7 +27,7 @@ export default function Topbar({ onAddPatientClick }: TopbarProps) {
 
         <Button
           type="button"
-          size="default"
+          size="lg"
           className="bg-[#E1E7EF] rounded-full"
         >
           <Download className="w-4 h-4" />
@@ -37,7 +37,7 @@ export default function Topbar({ onAddPatientClick }: TopbarProps) {
         <Button
           type="button"
           onSubmitHandler={onAddPatientClick}
-          size="default"
+          size="lg"
           variant="primary"
           className="rounded-full"
         >

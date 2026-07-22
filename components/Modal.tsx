@@ -12,6 +12,7 @@ interface ModalProps {
   children: ReactNode;
   className?: string;
   header?: ReactNode;
+  headerClassName?: string;
 }
 
 export default function Modal({
@@ -21,6 +22,7 @@ export default function Modal({
   children,
   className,
   header,
+  headerClassName,
 }: ModalProps) {
   const reduceMotion = useReducedMotion();
 
@@ -39,8 +41,8 @@ export default function Modal({
             exit={{ y: 40, opacity: 0 }}
             className={`bg-white rounded-xl shadow-lg w-[95%] max-w-3xl max-h-[95vh] flex flex-col ${className ?? ""}`}
           >
-            {/* Header */}
-            <div className="flex justify-between items-center bg-[#1A2380] text-white px-6 py-4 sticky top-0 z-10">
+            {/* Header - Updated to apply headerClassName or fallback to default blue */}
+            <div className={`flex justify-between items-center text-white px-6 py-4 sticky top-0 z-10 ${headerClassName || "bg-[#1A2380]"}`}>
               <div>
                 <h3 className="text-base font-semibold">{title}</h3>
                 {header ? <p className="text-sm text-slate-200">{header}</p> : null}
@@ -50,10 +52,10 @@ export default function Modal({
               </button>
             </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-                {children}
-              </div>
-           </motion.div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+              {children}
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
