@@ -53,9 +53,8 @@ export default function Modal({
               <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
                 {children}
               </div>
-            </DialogPanel>
-          </div>
-        </Dialog>
+           </motion.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
