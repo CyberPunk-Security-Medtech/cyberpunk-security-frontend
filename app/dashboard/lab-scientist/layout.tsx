@@ -4,7 +4,8 @@ import { useState } from "react";
 import { FlaskConical, LayoutDashboard, Sparkles } from "lucide-react";
 import Sidebar from "@components/SideBar";
 import Header from "@components/Header";
-import { MenuItem, UserProfile } from "@/types/index";
+import { MenuItem, UserProfile, User } from "@/types/index";
+import { buildDisplayName } from "@utils/helper";
 import { useAuth } from "@context/AuthContext";
 
 const labScientistMenu: MenuItem[] = [
@@ -25,16 +26,6 @@ const labScientistMenu: MenuItem[] = [
   },
 ];
 
-const buildDisplayName = (user: {
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-} | null) => {
-  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
-  if (fullName) return fullName;
-  return user?.email?.split("@")?.[0] || "Lab Scientist";
-};
-
 export default function LabScientistLayout({
   children,
 }: {
@@ -45,7 +36,7 @@ export default function LabScientistLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const profile: UserProfile = {
-    name: buildDisplayName(user),
+    name: buildDisplayName(user as User),
     role: activeWorkspace?.role ?? "Lab Scientist",
     avatar: "/avatars/eleanor.png",
   };

@@ -8,6 +8,7 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  header?: ReactNode;
 }
 
 export default function Modal({
@@ -16,6 +17,7 @@ export default function Modal({
   onClose,
   children,
   className,
+  header,
 }: ModalProps) {
   return (
     <AnimatePresence>
@@ -34,7 +36,10 @@ export default function Modal({
           >
             {/* Header */}
             <div className="flex justify-between items-center bg-[#1A2380] text-white px-6 py-4 sticky top-0 z-10">
-              <h3 className="text-base font-semibold">{title}</h3>
+              <div>
+                <h3 className="text-base font-semibold">{title}</h3>
+                {header ? <p className="text-sm text-slate-200">{header}</p> : null}
+              </div>
               <button onClick={onClose} className="hover:opacity-80">
                 <X size={18} />
               </button>

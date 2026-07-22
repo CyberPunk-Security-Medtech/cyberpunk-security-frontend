@@ -31,6 +31,9 @@ export default function PatientPrescriptionTab() {
 
   useEffect(() => {
     loadPrescriptions();
+    const refreshOnFocus = () => void loadPrescriptions();
+    window.addEventListener("focus", refreshOnFocus);
+    return () => window.removeEventListener("focus", refreshOnFocus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, patientId]);
 
@@ -91,7 +94,9 @@ export default function PatientPrescriptionTab() {
                   <span>{item.frequency}</span>
                   <span>{item.duration}</span>
                   <span>{item.route || "-"}</span>
-                  <StatusBadge status="Pending" />
+                  <StatusBadge
+                    status={String(item.status ?? "Pending").toLowerCase().includes("complete") || String(item.status ?? "").toLowerCase().includes("dispensed") ? "Completed" : String(item.status ?? "").toLowerCase().includes("progress") ? "In Progress" : "Pending"}
+                  />
                 </div>
               </div>
             </div>

@@ -434,7 +434,6 @@ import { StatusBadge } from "@components/StatusBadge";
 import { useAuth } from "@context/AuthContext";
 import {
   consultationService,
-  LabOrderStatusFilter,
   labService,
 } from "@services/api";
 import {
@@ -443,39 +442,16 @@ import {
   formatDateTime,
   normalizeLabOrders,
   toStatusBadgeType,
+  mapStatusToApi,
+  getConsultationsArray,
+  buildPatientName,
+  getPatientId,
+  buildDoctorName,
+  statusFilters,
+  RawConsultation,
 } from "./labOrderUtils";
-
-const statusFilters: LabOrderStatusFilter[] = ["pending", "in_progress"];
-const mapStatusToApi = (
-  status: LabOrder["status"]
-):
-  | "Pending"
-  | "In Progress"
-  | "Completed" => {
-  switch (status) {
-    case "pending":
-      return "Pending";
-
-    case "in_progress":
-      return "In Progress";
-
-    case "completed":
-      return "Completed";
-
-    default:
-      return "Pending";
-  }
-};
-
-const buildDisplayName = (user: {
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-} | null) => {
-  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
-  if (fullName) return fullName;
-  return user?.email?.split("@")?.[0] || "Lab Scientist";
-};
+import { buildDisplayName } from "@utils/helper";
+import { toast } from "react-toastify";
 
 function QueueSkeleton() {
   return (
@@ -490,61 +466,6 @@ function QueueSkeleton() {
   );
 }
 
-function getConsultationsArray(response: any) {
-  if (Array.isArray(response)) return response;
-  if (Array.isArray(response?.data)) return response.data;
-  if (Array.isArray(response?.consultations)) return response.consultations;
-  if (Array.isArray(response?.results)) return response.results;
-  return [];
-}
-
-function buildPatientName(consultation: any, fallback = "") {
-  return (
-    consultation?.patient_name ||
-    consultation?.patient?.full_name ||
-    consultation?.patient?.name ||
-    `${consultation?.patient?.first_name ?? ""} ${
-      consultation?.patient?.last_name ?? ""
-    }`.trim() ||
-    `${consultation?.patient_first_name ?? ""} ${
-      consultation?.patient_last_name ?? ""
-    }`.trim() ||
-    fallback ||
-    "Unknown Patient"
-  );
-}
-
-function getPatientId(consultation: any, fallback = "") {
-  return (
-    consultation?.patient_id ||
-    consultation?.patient?.id ||
-    consultation?.patient?.patient_id ||
-    fallback ||
-    ""
-  );
-}
-
-function buildDoctorName(consultation: any, fallback = "") {
-  return (
-    consultation?.ordering_doctor_name ||
-    consultation?.doctor_name ||
-    consultation?.doctor?.full_name ||
-    consultation?.doctor?.name ||
-    `${consultation?.doctor?.first_name ?? ""} ${
-      consultation?.doctor?.last_name ?? ""
-    }`.trim() ||
-    `${consultation?.doctor_first_name ?? ""} ${
-      consultation?.doctor_last_name ?? ""
-    }`.trim() ||
-    `${consultation?.assigned_doctor?.first_name ?? ""} ${
-      consultation?.assigned_doctor?.last_name ?? ""
-    }`.trim() ||
-    consultation?.assigned_doctor_name ||
-    fallback ||
-    "Unknown"
-  );
-}
-
 export default function LabScientistDashboardClient() {
   const router = useRouter();
   const { user, activeWorkspace } = useAuth();
@@ -553,7 +474,6 @@ export default function LabScientistDashboardClient() {
   const [orders, setOrders] = useState<LabOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [usingMockData, setUsingMockData] = useState(false);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -568,12 +488,11 @@ export default function LabScientistDashboardClient() {
     const loadOrders = async () => {
       setLoading(true);
       setHasError(false);
-      setUsingMockData(false);
 
       try {
         const [labTestsResponse, consultationsResponse] = await Promise.all([
           labService.listOrganizationLabTests(orgId, {
-            statuses: statusFilters,
+            statuses: statusFilters.map(s => mapStatusToApi(s)),
           }),
           consultationService.listConsultations(orgId),
         ]);
@@ -586,30 +505,25 @@ export default function LabScientistDashboardClient() {
 
         const consultations = getConsultationsArray(consultationsResponse);
 
-        const consultationMap = new Map(
+        const consultationMap = new Map<string, RawConsultation>(
           consultations
-            .filter((consultation: any) => consultation?.id)
-            .map((consultation: any) => [consultation.id, consultation])
+            .filter((consultation) => consultation?.id)
+            .map((consultation) => [consultation.id, consultation])
         );
 
         const normalizedOrders = normalizeLabOrders(rawLabTests);
 
         const enrichedOrders = normalizedOrders.map((order) => {
-          const consultation = consultationMap.get(order.consultation_id);
+          const consultation = consultationMap.get(order.consultation_id!);
 
           return {
             ...order,
-            patientName: buildPatientName(consultation, order.patientName),
-            patientId: getPatientId(consultation, order.patientId),
+            patientName: buildPatientName(consultation!, order.patientName),
+            patientId: getPatientId(consultation!, order.patientId),
             orderingDoctor: buildDoctorName(
-              consultation,
+              consultation!,
               order.orderingDoctor
             ),
-          //   departmentName:
-          //     consultation?.department_name ||
-          //     consultation?.department?.name ||
-          //     order.departmentName ||
-          //     "-",
           };
         });
 
@@ -654,90 +568,70 @@ export default function LabScientistDashboardClient() {
     router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
   };
 
-const markProcessing = (id: string, active: boolean) => {
-  setProcessingIds(prev => {
-    const next = new Set(prev);
+  const markProcessing = (id: string, active: boolean) => {
+    setProcessingIds((prev) => {
+      const next = new Set(prev);
+      if (active) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
 
-    if (active) next.add(id);
-    else next.delete(id);
-
-    return next;
-  });
-};
-
-const updateOrderStatus = (
-  id: string,
-  status: LabOrder["status"]
-) => {
-  setOrders(prev =>
-    prev.map(order =>
-      order.id === id
-        ? { ...order, status }
-        : order
-    )
-  );
-};
-
-const handleStartProcessing = async (order: LabOrder) => {
-  if (!orgId) return;
-
-  if (order.status !== "pending") return;
-
-  if (processingIds.has(order.id)) return;
-
-  markProcessing(order.id, true);
-
-  try {
-    const newStatus = "in_progress";
-
-await labService.updateLabTestStatus(
-  orgId,
-  order.id,
-  mapStatusToApi(newStatus)
-);
-
-updateOrderStatus(order.id, newStatus);
-  } catch (err) {
-
-
-    console.error(err);
-  } finally {
-    markProcessing(order.id, false);
-  }
-};
-
-const handleCompleteTest = async (order: LabOrder) => {
-  if (!orgId) return;
-
-  if (order.status !== "in_progress") return;
-
-  if (processingIds.has(order.id)) return;
-
-  markProcessing(order.id, true);
-
-  try {
-    await labService.updateLabTestStatus(
-      orgId,
-      order.id,
-      "Completed"
+  const updateOrderStatus = (id: string, status: LabOrder["status"]) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === id ? { ...order, status } : order
+      )
     );
+  };
 
-    updateOrderStatus(
-      order.id,
-      "completed"
-    );
+  const handleStartProcessing = async (order: LabOrder) => {
+    if (!orgId) return;
 
-  } catch (error) {
-    console.error(
-      "Failed to complete lab test",
-      error
-    );
+    if (order.status !== "pending") return;
 
-  } finally {
-    markProcessing(order.id, false);
-  }
-};
+    if (processingIds.has(order.id)) return;
 
+    markProcessing(order.id, true);
+
+    try {
+      const newStatus = "in_progress";
+      await labService.updateLabTestStatus(
+        orgId,
+        order.id,
+        mapStatusToApi(newStatus)
+      );
+      updateOrderStatus(order.id, newStatus);
+    } catch (err) {
+      console.error(err);
+      toast.error("Unable to start processing this test.");
+    } finally {
+      markProcessing(order.id, false);
+    }
+  };
+
+  const handleCompleteTest = async (order: LabOrder) => {
+    if (!orgId) return;
+
+    if (order.status !== "in_progress") return;
+
+    if (processingIds.has(order.id)) return;
+
+    markProcessing(order.id, true);
+
+    try {
+      await labService.updateLabTestStatus(orgId, order.id, "Completed");
+      updateOrderStatus(order.id, "completed");
+    } catch (error) {
+      console.error("Failed to complete lab test", error);
+      toast.error("Unable to complete this test.");
+    } finally {
+      markProcessing(order.id, false);
+    }
+  };
 
   return (
     <div className="space-y-6 py-2 sm:py-4">
@@ -840,31 +734,32 @@ const handleCompleteTest = async (order: LabOrder) => {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="inline-flex items-center gap-2">
-     <button
-  type="button"
-  onClick={() => {
-    if (order.status === "pending") {
-      handleStartProcessing(order);
-    }
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (order.status === "pending") {
+                                handleStartProcessing(order);
+                              }
 
-    if (order.status === "in_progress") {
-      handleCompleteTest(order);
-    }
-  }}
-  disabled={
-    order.status === "completed" ||
-    processingIds.has(order.id)
-  }
-  className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
->
-  {processingIds.has(order.id)
-    ? "Updating..."
-    : order.status === "pending"
-    ? "Start Processing"
-    : order.status === "in_progress"
-    ? "Complete Test"
-    : "Completed"}
-</button>
+                              if (order.status === "in_progress") {
+                                handleCompleteTest(order);
+                              }
+                            }}
+                            disabled={
+                              order.status === "completed" ||
+                              processingIds.has(order.id)
+                            }
+                            className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {processingIds.has(order.id)
+                              ? "Updating..."
+                              : order.status === "pending"
+                              ? "Start Processing"
+                              : order.status === "in_progress"
+                              ? "Complete Test"
+                              : "Completed"}
+                          </button>
                           <button
                             type="button"
                             onClick={(event) => {
@@ -907,7 +802,9 @@ const handleCompleteTest = async (order: LabOrder) => {
                         {order.patientId || "-"}
                       </p>
                     </div>
-                    <StatusBadge status={toStatusBadgeType(order.status)} />
+                    <StatusBadge
+                      status={toStatusBadgeType(order.status)}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 gap-2 text-xs text-gray-600 sm:grid-cols-2">
@@ -938,33 +835,33 @@ const handleCompleteTest = async (order: LabOrder) => {
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
- <button
-  type="button"
-  onClick={(event) => {
-    event.stopPropagation();
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
 
-    if (order.status === "pending") {
-      handleStartProcessing(order);
-    }
+                        if (order.status === "pending") {
+                          handleStartProcessing(order);
+                        }
 
-    if (order.status === "in_progress") {
-      handleCompleteTest(order);
-    }
-  }}
-  disabled={
-    order.status === "completed" ||
-    processingIds.has(order.id)
-  }
-  className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
->
-  {processingIds.has(order.id)
-    ? "Updating..."
-    : order.status === "pending"
-    ? "Start Processing"
-    : order.status === "in_progress"
-    ? "Complete Test"
-    : "Completed"}
-</button>
+                        if (order.status === "in_progress") {
+                          handleCompleteTest(order);
+                        }
+                      }}
+                      disabled={
+                        order.status === "completed" ||
+                        processingIds.has(order.id)
+                      }
+                      className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {processingIds.has(order.id)
+                        ? "Updating..."
+                        : order.status === "pending"
+                        ? "Start Processing"
+                        : order.status === "in_progress"
+                        ? "Complete Test"
+                        : "Completed"}
+                    </button>
                     <button
                       type="button"
                       onClick={(event) => {
@@ -988,12 +885,6 @@ const handleCompleteTest = async (order: LabOrder) => {
           </p>
         )}
 
-        {usingMockData && (
-          <p className="text-xs text-blue-700">
-            Backend lab-orders endpoint is not available yet. Showing sample
-            data.
-          </p>
-        )}
       </section>
     </div>
   );

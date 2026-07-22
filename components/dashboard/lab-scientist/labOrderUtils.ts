@@ -9,6 +9,7 @@
 
 // export type LabOrder = {
 //   id: string;
+//   consultation_id: string | null;
 //   patientName: string;
 //   patientId: string;
 //   patientGender: string;
@@ -97,41 +98,69 @@
 //   const doctor = asObject(raw.doctor || raw.ordering_doctor || raw.requested_by);
 //   const department = asObject(raw.department);
 
-//   const patientFirstName = firstNonEmpty(patient, ["first_name", "firstname", "given_name"]);
-//   const patientLastName = firstNonEmpty(patient, ["last_name", "lastname", "family_name"]);
+//   const patientFirstName = firstNonEmpty(patient, [
+//     "first_name",
+//     "firstname",
+//     "given_name",
+//   ]);
+//   const patientLastName = firstNonEmpty(patient, [
+//     "last_name",
+//     "lastname",
+//     "family_name",
+//   ]);
 //   const patientNameFromObject = `${patientFirstName} ${patientLastName}`.trim();
-//   const patientName = patientNameFromObject || firstNonEmpty(raw, ["patient_name"]) || "Unknown Patient";
 
-//   const doctorFirstName = firstNonEmpty(doctor, ["first_name", "firstname", "given_name"]);
-//   const doctorLastName = firstNonEmpty(doctor, ["last_name", "lastname", "family_name"]);
+//   const patientName =
+//     patientNameFromObject ||
+//     firstNonEmpty(raw, ["patient_name"]) ||
+//     "Unknown Patient";
+
+//   const doctorFirstName = firstNonEmpty(doctor, [
+//     "first_name",
+//     "firstname",
+//     "given_name",
+//   ]);
+//   const doctorLastName = firstNonEmpty(doctor, [
+//     "last_name",
+//     "lastname",
+//     "family_name",
+//   ]);
 //   const doctorNameFromObject = `${doctorFirstName} ${doctorLastName}`.trim();
+
 //   const orderingDoctor =
 //     doctorNameFromObject ||
 //     firstNonEmpty(raw, ["ordering_doctor_name", "doctor_name", "ordered_by"]) ||
 //     "Unknown Doctor";
 
 //   const testType =
-//   firstNonEmpty(raw, [
-//     "lab_test_type",
-//     "test_type",
-//     "test_name",
-//     "name",
-//   ]) || "Test";
+//     firstNonEmpty(raw, [
+//       "lab_test_type",
+//       "test_type",
+//       "test_name",
+//       "name",
+//     ]) || "Unknown Test";
 
 //   const orderedTests = normalizeTestList(raw, testType);
 //   const rawId = firstNonEmpty(raw, ["id", "order_id", "lab_order_id"]);
 //   const orderedAt =
-//     firstNonEmpty(raw, ["ordered_at", "created_at", "order_date", "requested_at"]) ||
-//     null;
+//     firstNonEmpty(raw, [
+//       "ordered_at",
+//       "created_at",
+//       "order_date",
+//       "requested_at",
+//     ]) || null;
+
 //   const generatedId = [patientName, testType, orderedAt].filter(Boolean).join("-");
 
 //   return {
 //     id: rawId || generatedId || "unknown-order",
+//     consultation_id:
+//       firstNonEmpty(raw, ["consultation_id"]) || null,
 //     patientName,
 //     patientId:
 //       firstNonEmpty(patient, ["id", "patient_id"]) ||
 //       firstNonEmpty(raw, ["patient_id"]) ||
-//       "-",
+//       "",
 //     patientGender:
 //       firstNonEmpty(patient, ["gender", "sex"]) ||
 //       firstNonEmpty(raw, ["patient_gender"]) ||
@@ -140,15 +169,20 @@
 //       firstNonEmpty(patient, ["age"]) ||
 //       firstNonEmpty(raw, ["patient_age"]) ||
 //       "-",
-//     test_type: firstNonEmpty(raw, ["test_type", "lab_test_type"]) || "Unknown Test",
-//     test_name: firstNonEmpty(raw, ["test_name", "name"]) || "Unknown Test",
+//     test_type:
+//       firstNonEmpty(raw, ["test_type", "lab_test_type", "test_name", "name"]) ||
+//       "Unknown Test",
+//     test_name:
+//       firstNonEmpty(raw, ["test_name", "name", "test_type", "lab_test_type"]) ||
+//       "Unknown Test",
 //     orderedTests,
 //     orderingDoctor,
 //     orderedAt,
-//     priority: firstNonEmpty(raw, ["priority", "urgency"]) || "-",
+//     priority: firstNonEmpty(raw, ["priority", "urgency"]) || "Routine",
 //     status: parseStatus(raw.status || raw.current_status),
 //     clinicalNotes:
-//       firstNonEmpty(raw, ["clinical_notes", "doctor_note", "notes"]) || "No clinical notes provided.",
+//       firstNonEmpty(raw, ["clinical_notes", "doctor_note", "notes"]) ||
+//       "No clinical notes provided.",
 //     departmentName:
 //       firstNonEmpty(department, ["name"]) ||
 //       firstNonEmpty(raw, ["department_name"]) ||
@@ -157,129 +191,7 @@
 //   };
 // };
 
-// // export const normalizeLabOrders = (payload: unknown): LabOrder[] => {
-// //   if (Array.isArray(payload)) {
-// //     return payload.map(mapLabOrder);
-// //   }
 
-// //   const root = asObject(payload);
-// //   const collections = [
-// //     root.items,
-// //     root.results,
-// //     root.orders,
-// //     root.lab_orders,
-// //     root.data,
-// //   ];
-
-// //   for (const collection of collections) {
-// //     if (Array.isArray(collection)) {
-// //       return collection.map(mapLabOrder);
-// //     }
-// //   }
-
-// //   if (Object.keys(root).length > 0) {
-// //     return [mapLabOrder(root)];
-// //   }
-
-// //   return [];
-// // };
-
-
-// // export function normalizeLabOrders(rawOrders: any[] = [],  consultation?: any): LabOrder[] {
-// //   if (!Array.isArray(rawOrders)) {
-// //     console.warn("normalizeLabOrders received non-array:", rawOrders);
-// //     return [];
-// //   }
-
-// //    return rawOrders.map(order => ({
-// //     id: order.id,
-// //     patientName:
-// //     consultation?.patient?.first_name
-// //       ? `${consultation.patient.first_name} ${consultation.patient.last_name ?? ""}`
-// //       :
-// //     order.patientName ??
-// //     "",
-
-// //   patientId:
-// //     consultation?.patient?.id ??
-// //     order.patientId ??
-// //     "",
-
-// //   patientGender:
-// //     consultation?.patient?.gender ??
-// //     order.patientGender ??
-// //     "-",
-
-// //   patientAge:
-// //     consultation?.patient?.age ??
-// //     order.patientAge ??
-// //     "-",
-
-// //       orderingDoctor:
-// //       order.consultation?.doctor?.first_name
-// //         ? `${order.consultation.doctor.first_name} ${order.consultation.doctor.last_name ?? ""}`
-// //         : order.orderingDoctor ?? "Unknown",
-
-   
-// //     test_type: order.test_type ?? "",
-// //     test_name: order.test_name ?? order.test_type ?? "Unknown",
-// //     orderedTests: order.orderedTests ?? [order.test_type ?? "Unknown"],
-// //     priority: order.priority ?? "Normal",
-// //     status: order.status ?? "pending",
-// //     orderedAt: order.orderedAt ?? new Date().toISOString(),
-// //     clinicalNotes: order.clinicalNotes ?? "No clinical notes provided.",
-// //     departmentName: order.departmentName ?? "-",
-// //     sampleType: order.sampleType ?? "-",
-// //   }));
-// // }
-
-// export function normalizeLabOrders(input: any): LabOrder[] {
-//   const rawOrders = Array.isArray(input)
-//     ? input
-//     : Array.isArray(input?.data)
-//     ? input.data
-//     : [];
-
-//   return rawOrders.map((item: any) => {
-//     const normalizedStatus = String(item.status ?? "pending")
-//       .toLowerCase()
-//       .replace(/\s+/g, "_");
-
-//     const testName = item.test_name || item.test_type || "Unknown Test";
-
-//     return {
-//       id: item.id,
-//       patientId: item.patient_id ?? "",
-//       patientName: item.patient_name ?? "",
-//       patientAge: item.patient_age ?? "-",
-//       patientGender: item.patient_gender ?? "-",
-//       orderingDoctor: item.ordering_doctor_name ?? "Unknown",
-//       departmentName: item.department_name ?? "-",
-//       sampleType: item.sample_type ?? "-",
-//       orderedAt: item.created_at ?? item.ordered_at ?? "",
-//       priority: item.priority ?? "Routine",
-//       status: normalizedStatus,
-//       clinicalNotes: item.clinical_notes ?? "No clinical notes provided.",
-//       orderedTests: [testName],
-//       test_name: item.test_name ?? "",
-//       test_type: testName,
-//       consultation_id: item.consultation_id ?? null,
-//     };
-//   });
-// }
-
-// export const combineUniqueOrders = (orders: LabOrder[]): LabOrder[] => {
-//   const byId = new Map<string, LabOrder>();
-//   for (const order of orders) {
-//     byId.set(order.id, order);
-//   }
-
-//   return Array.from(byId.values()).sort((a, b) => {
-//     const aTime = a.orderedAt ? new Date(a.orderedAt).getTime() : 0;
-//     const bTime = b.orderedAt ? new Date(b.orderedAt).getTime() : 0;
-//     return bTime - aTime;
-//   });
-// };
 
 // export const toReadableStatus = (status: LabOrderStatus): string => {
 //   if (status === "in_progress") return "In Progress";
@@ -303,149 +215,6 @@
 //   if (Number.isNaN(date.getTime())) return "-";
 //   return date.toLocaleString();
 // };
-
-// // const MOCK_LAB_ORDERS: LabOrder[] = [
-// //   {
-// //     id: "PT0025",
-// //     patientName: "James Carter",
-// //     patientId: "PT0025",
-// //     patientGender: "Male",
-// //     patientAge: "46",
-// //     testType: "Lipid Profile",
-// //     orderedTests: ["Lipid Profile", "HDL", "LDL", "Triglycerides"],
-// //     orderingDoctor: "Dr. Wilson Francis",
-// //     orderedAt: "2026-02-22T10:20:00.000Z",
-// //     priority: "Routine",
-// //     status: "completed",
-// //     clinicalNotes:
-// //       "Review lipid abnormalities and assess cardiovascular risk profile.",
-// //     departmentName: "Cardiology",
-// //     sampleType: "Blood Sample",
-// //   },
-// //   {
-// //     id: "PT0024",
-// //     patientName: "Emily Davis",
-// //     patientId: "PT0024",
-// //     patientGender: "Female",
-// //     patientAge: "33",
-// //     testType: "MP Widal Test",
-// //     orderedTests: ["Malaria Parasite", "Widal Test"],
-// //     orderingDoctor: "Dr. Adeyemi",
-// //     orderedAt: "2026-02-24T14:35:00.000Z",
-// //     priority: "Urgent",
-// //     status: "in_progress",
-// //     clinicalNotes:
-// //       "Persistent fever and fatigue for 4 days. Rule out malaria and typhoid.",
-// //     departmentName: "General Medicine",
-// //     sampleType: "Blood Sample",
-// //   },
-// //   {
-// //     id: "PT0023",
-// //     patientName: "Michael Johnson",
-// //     patientId: "PT0023",
-// //     patientGender: "Male",
-// //     patientAge: "54",
-// //     testType: "Blood Culture",
-// //     orderedTests: ["Blood Culture", "Sensitivity"],
-// //     orderingDoctor: "Dr. Ifeoma",
-// //     orderedAt: "2026-02-25T09:10:00.000Z",
-// //     priority: "Routine",
-// //     status: "completed",
-// //     clinicalNotes: "Recurring chills and suspected bloodstream infection.",
-// //     departmentName: "Internal Medicine",
-// //     sampleType: "Blood Sample",
-// //   },
-// //   {
-// //     id: "PT0022",
-// //     patientName: "Olivia Miller",
-// //     patientId: "PT0022",
-// //     patientGender: "Female",
-// //     patientAge: "28",
-// //     testType: "Semen Culture",
-// //     orderedTests: ["Semen Culture", "Microscopy"],
-// //     orderingDoctor: "Dr. Nnadi",
-// //     orderedAt: "2026-02-12T11:40:00.000Z",
-// //     priority: "Urgent",
-// //     status: "in_progress",
-// //     clinicalNotes: "Assess infection markers before fertility treatment cycle.",
-// //     departmentName: "Fertility Unit",
-// //     sampleType: "Semen Sample",
-// //   },
-// //   {
-// //     id: "PT0021",
-// //     patientName: "David Smith",
-// //     patientId: "PT0021",
-// //     patientGender: "Male",
-// //     patientAge: "41",
-// //     testType: "Urine Analysis",
-// //     orderedTests: ["Urinalysis", "Urine Microscopy"],
-// //     orderingDoctor: "Dr. Tolu",
-// //     orderedAt: "2026-02-15T08:55:00.000Z",
-// //     priority: "Routine",
-// //     status: "pending",
-// //     clinicalNotes: "Frequent urination and burning sensation reported.",
-// //     departmentName: "Urology",
-// //     sampleType: "Urine Sample",
-// //   },
-// //   {
-// //     id: "PT0020",
-// //     patientName: "Sophia Wilson",
-// //     patientId: "PT0020",
-// //     patientGender: "Female",
-// //     patientAge: "37",
-// //     testType: "Genotype Blood Group",
-// //     orderedTests: ["Genotype", "Blood Group"],
-// //     orderingDoctor: "Dr. Uche",
-// //     orderedAt: "2026-02-18T10:25:00.000Z",
-// //     priority: "Pending",
-// //     status: "in_progress",
-// //     clinicalNotes: "Pre-op lab request for genotype and blood group confirmation.",
-// //     departmentName: "Surgery",
-// //     sampleType: "Blood Sample",
-// //   },
-// //   {
-// //     id: "PT0019",
-// //     patientName: "Daniel Williams",
-// //     patientId: "PT0019",
-// //     patientGender: "Male",
-// //     patientAge: "50",
-// //     testType: "FBC",
-// //     orderedTests: ["Full Blood Count"],
-// //     orderingDoctor: "Dr. Mary Johnson",
-// //     orderedAt: "2026-02-25T16:15:00.000Z",
-// //     priority: "Emergency",
-// //     status: "pending",
-// //     clinicalNotes: "Critical fatigue and dizziness; urgent hematology profile needed.",
-// //     departmentName: "Emergency",
-// //     sampleType: "Blood Sample",
-// //   },
-// //   {
-// //     id: "PT0018",
-// //     patientName: "Isabella Anderson",
-// //     patientId: "PT0018",
-// //     patientGender: "Female",
-// //     patientAge: "29",
-// //     testType: "Hormonal Profile",
-// //     orderedTests: ["FSH", "LH", "Prolactin", "TSH"],
-// //     orderingDoctor: "Dr. Amina",
-// //     orderedAt: "2026-02-28T12:05:00.000Z",
-// //     priority: "Routine",
-// //     status: "completed",
-// //     clinicalNotes: "Cycle irregularities and fertility evaluation request.",
-// //     departmentName: "Endocrinology",
-// //     sampleType: "Blood Sample",
-// //   },
-// // ];
-
-// // export const getMockLabOrders = (): LabOrder[] =>
-// //   combineUniqueOrders(MOCK_LAB_ORDERS);
-
-// // export const getMockLabOrdersByStatus = (
-// //   statuses: LabOrderStatus[]
-// // ): LabOrder[] => getMockLabOrders().filter((order) => statuses.includes(order.status));
-
-// // export const getMockLabOrderById = (id: string): LabOrder | null =>
-// //   getMockLabOrders().find((order) => order.id === id) ?? null;
 
 
 
@@ -476,6 +245,55 @@ export type LabOrder = {
   departmentName: string;
   sampleType: string;
 };
+
+export interface RawPatient {
+  id: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  name?: string;
+  patient_id?: string;
+  age?: string | number;
+  gender?: string;
+  dob?: string;
+}
+
+export interface RawDoctor {
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  name?: string;
+}
+
+export interface RawConsultation {
+  id: string;
+  patient_id?: string;
+  doctor_id?: string | null;
+  patient?: RawPatient;
+  patient_name?: string;
+  patient_first_name?: string;
+  patient_last_name?: string;
+  doctor?: RawDoctor;
+  assigned_doctor?: RawDoctor;
+  doctor_name?: string;
+  ordering_doctor_name?: string;
+  doctor_first_name?: string;
+  doctor_last_name?: string;
+  assigned_doctor_name?: string;
+  department_name?: string;
+  department?: { name?: string };
+  reason_for_visit?: string;
+  clinical_notes?: string;
+}
+
+export interface Attachment {
+  id: string;
+  url: string;
+  mimetype?: string;
+  original_filename?: string;
+}
+
+export const statusFilters: LabOrderStatus[] = ["pending", "in_progress"];
 
 export const isNotFoundApiError = (error: unknown): boolean => {
   const status = (error as { response?: { status?: number } })?.response?.status;
@@ -642,45 +460,31 @@ export const mapLabOrder = (value: unknown): LabOrder => {
   };
 };
 
-export const normalizeLabOrders = (payload: unknown): LabOrder[] => {
-  if (Array.isArray(payload)) {
-    return payload.map(mapLabOrder);
-  }
+/**
+ * Maps an array of raw API lab-test records into normalized LabOrder objects.
+ * Was previously imported by several pages but never defined here, which
+ * broke the build for every consumer.
+ */
+export const normalizeLabOrders = (rawOrders: unknown[]): LabOrder[] => {
+  if (!Array.isArray(rawOrders)) return [];
+  return rawOrders.map((raw) => mapLabOrder(raw));
+};
 
-  const root = asObject(payload);
-  const collections = [
-    root.items,
-    root.results,
-    root.orders,
-    root.lab_orders,
-    root.data,
-  ];
+/**
+ * Merges one or more arrays of LabOrder into a single list with unique ids.
+ * The first occurrence of a given id wins, so callers that want a freshly
+ * created/updated order to take priority should place it first in the input.
+ */
+export const combineUniqueOrders = (orders: LabOrder[]): LabOrder[] => {
+  const seen = new Map<string, LabOrder>();
 
-  for (const collection of collections) {
-    if (Array.isArray(collection)) {
-      return collection.map(mapLabOrder);
+  for (const order of orders) {
+    if (!seen.has(order.id)) {
+      seen.set(order.id, order);
     }
   }
 
-  if (Object.keys(root).length > 0) {
-    return [mapLabOrder(root)];
-  }
-
-  return [];
-};
-
-export const combineUniqueOrders = (orders: LabOrder[]): LabOrder[] => {
-  const byId = new Map<string, LabOrder>();
-
-  for (const order of orders) {
-    byId.set(order.id, order);
-  }
-
-  return Array.from(byId.values()).sort((a, b) => {
-    const aTime = a.orderedAt ? new Date(a.orderedAt).getTime() : 0;
-    const bTime = b.orderedAt ? new Date(b.orderedAt).getTime() : 0;
-    return bTime - aTime;
-  });
+  return Array.from(seen.values());
 };
 
 export const toReadableStatus = (status: LabOrderStatus): string => {
@@ -705,3 +509,73 @@ export const formatDateTime = (value: string | null): string => {
   if (Number.isNaN(date.getTime())) return "-";
   return date.toLocaleString();
 };
+
+export const mapStatusToApi = (
+  status: LabOrderStatus
+): "Pending" | "In Progress" | "Completed" => {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "in_progress":
+      return "In Progress";
+    case "completed":
+      return "Completed";
+    default:
+      return "Pending";
+  }
+};
+
+export function getConsultationsArray(response: any): RawConsultation[] {
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response?.data)) return response.data;
+  if (Array.isArray(response?.consultations)) return response.consultations;
+  if (Array.isArray(response?.results)) return response.results;
+  return [];
+}
+
+export function buildPatientName(consultation: RawConsultation, fallback = "") {
+  return (
+    consultation?.patient_name ||
+    consultation?.patient?.full_name ||
+    consultation?.patient?.name ||
+    `${consultation?.patient?.first_name ?? ""} ${
+      consultation?.patient?.last_name ?? ""
+    }`.trim() ||
+    `${consultation?.patient_first_name ?? ""} ${
+      consultation?.patient_last_name ?? ""
+    }`.trim() ||
+    fallback ||
+    "Unknown Patient"
+  );
+}
+
+export function getPatientId(consultation: RawConsultation, fallback = "") {
+  return (
+    consultation?.patient_id ||
+    consultation?.patient?.id ||
+    consultation?.patient?.patient_id ||
+    fallback ||
+    ""
+  );
+}
+
+export function buildDoctorName(consultation: RawConsultation, fallback = "") {
+  return (
+    consultation?.ordering_doctor_name ||
+    consultation?.doctor_name ||
+    consultation?.doctor?.full_name ||
+    consultation?.doctor?.name ||
+    `${consultation?.doctor?.first_name ?? ""} ${
+      consultation?.doctor?.last_name ?? ""
+    }`.trim() ||
+    `${consultation?.doctor_first_name ?? ""} ${
+      consultation?.doctor_last_name ?? ""
+    }`.trim() ||
+    `${consultation?.assigned_doctor?.first_name ?? ""} ${
+      consultation?.assigned_doctor?.last_name ?? ""
+    }`.trim() ||
+    consultation?.assigned_doctor_name ||
+    fallback ||
+    "Unknown"
+  );
+}

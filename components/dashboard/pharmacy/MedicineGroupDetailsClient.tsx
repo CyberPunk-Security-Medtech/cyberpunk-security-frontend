@@ -1,149 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowUpDown, Plus, Search, Trash2, X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Plus, Search, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { inventoryService } from "@services/api";
+import { useAuth } from "@context/AuthContext";
+import { toast } from "react-toastify";
 import BreadcrumbHeading from "./BreadcrumbHeading";
+import AddMedicineModal from "./AddMedicineModal";
+import { collectionFromResponse, getInventoryGroup, getInventoryQuantity, InventoryItem } from "./pharmacyUtils";
 
-type MedicineGroupDetailsClientProps = {
-  groupName: string;
-  medicines: Array<{ name: string; count: number }>;
-};
+export default function MedicineGroupDetailsClient({ groupName }: { groupName: string }) {
+  const { activeWorkspace } = useAuth();
+  const orgId = activeWorkspace?.id;
+  const router = useRouter();
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-export default function MedicineGroupDetailsClient({
-  groupName,
-  medicines,
-}: MedicineGroupDetailsClientProps) {
-  const searchParams = useSearchParams();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const loadItems = useCallback(async () => {
+    if (!orgId) { setItems([]); setLoading(false); return; }
+    setLoading(true);
+    try { setItems(collectionFromResponse<InventoryItem>(await inventoryService.listInventoryItems(orgId))); }
+    catch (error) { console.error("Failed to load group", error); toast.error("Unable to load this group."); }
+    finally { setLoading(false); }
+  }, [orgId]);
+  useEffect(() => { void loadItems(); }, [loadItems]);
 
-  useEffect(() => {
-    if (searchParams.get("addMedicine") === "true") {
-      setIsAddModalOpen(true);
-    }
-  }, [searchParams]);
+  const groupItems = useMemo(() => items.filter((item) => getInventoryGroup(item).toLowerCase() === groupName.toLowerCase() && (item.name ?? "").toLowerCase().includes(query.toLowerCase())), [items, groupName, query]);
+  const remove = async (item: InventoryItem) => {
+    if (!orgId) return;
+    try { await inventoryService.updateInventoryItem(orgId, item.id, { form: "" }); setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, form: "" } : entry)); toast.success("Medicine form cleared."); void loadItems(); }
+    catch (error) { console.error("Failed to remove medicine from group", error); toast.error("Unable to update this medicine."); }
+  };
+  const deleteGroup = async () => {
+    if (!orgId || !groupItems.length || !confirm(`Remove ${groupName} from ${groupItems.length} medicine(s)?`)) return;
+    try { await Promise.all(groupItems.map((item) => inventoryService.updateInventoryItem(orgId, item.id, { form: "" }))); setItems((current) => current.map((item) => getInventoryGroup(item).toLowerCase() === groupName.toLowerCase() ? { ...item, form: "" } : item)); toast.success("Medicine form cleared."); router.push("/dashboard/pharmacy/inventory/groups"); }
+    catch (error) { console.error("Failed to delete group", error); toast.error("Unable to remove this group."); }
+  };
 
-  return (
-    <>
-      <section className="min-w-0 space-y-8">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <BreadcrumbHeading
-            items={["Inventory", "Medicine Groups", groupName]}
-            description="Detailed view of a medicine group."
-          />
-
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1 self-start rounded-sm bg-[#00796B] px-5 py-2 text-xs font-medium text-white hover:bg-[#00695F]"
-          >
-            <Plus size={12} />
-            <span>Add Medicine</span>
-          </button>
-        </div>
-
-        <div className="relative w-full max-w-[320px]">
-          <Search
-            size={14}
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA3B2]"
-          />
-          <input
-            placeholder="Search for Medicine"
-            className="h-10 w-full rounded border border-[#CED7E3] bg-white px-3 pr-9 text-xs text-[#2D3648] outline-none"
-          />
-        </div>
-
-        <div
-          role="region"
-          aria-label="Group medicines table"
-          className="min-w-0 w-full max-w-full overflow-x-auto overscroll-x-contain touch-pan-x rounded border border-[#D8DEE8] bg-white [-webkit-overflow-scrolling:touch]"
-        >
-            <div className="min-w-[880px]">
-            <table className="w-full table-auto">
-            <thead className="border-b border-[#D8DEE8]">
-              <tr className="text-left text-sm font-medium text-[#2D3648]">
-                <th className="whitespace-nowrap px-6 py-4">
-                  <span className="inline-flex items-center gap-2">
-                    Medicine Name
-                    <ArrowUpDown size={13} className="text-[#8792A8]" />
-                  </span>
-                </th>
-                <th className="whitespace-nowrap px-6 py-4">
-                  <span className="inline-flex items-center gap-2">
-                    No of Medicines
-                    <ArrowUpDown size={13} className="text-[#8792A8]" />
-                  </span>
-                </th>
-                <th className="whitespace-nowrap px-6 py-4">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {medicines.map((medicine) => (
-                <tr
-                  key={medicine.name}
-                  className="border-b border-[#E8EDF4] text-[13px] text-[#3A4253] last:border-b-0"
-                >
-                  <td className="whitespace-nowrap px-6 py-4">{medicine.name}</td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    {medicine.count.toString().padStart(2, "0")}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <button className="inline-flex items-center gap-2 text-[#EF4444]">
-                      <Trash2 size={13} />
-                      Remove from Group
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            </table>
-            </div>
-        </div>
-
-        <button className="inline-flex items-center gap-2 rounded border border-[#9FD0E2] bg-[#EFFBFF] px-5 py-2 text-xs text-[#00796B]">
-          <Trash2 size={12} />
-          Delete Group
-        </button>
-      </section>
-
-      {isAddModalOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/30 px-4">
-          <div className="relative w-full max-w-[520px] rounded bg-white p-6 shadow-xl">
-            <button
-              onClick={() => setIsAddModalOpen(false)}
-              className="absolute right-3 top-3 text-[#434B5D]"
-              aria-label="Close modal"
-            >
-              <X size={14} />
-            </button>
-
-            <h2 className="text-[36px] leading-none font-semibold text-[#1E2433]">
-              Add Medicine
-            </h2>
-
-            <div className="mt-6 space-y-2">
-              <label className="text-sm text-[#2D3648]">Medicine</label>
-              <div className="relative">
-                <input
-                  placeholder="Enter Medicine Name or Medicine ID"
-                  className="h-10 w-full rounded border border-[#CED7E3] px-3 pr-9 text-xs text-[#2D3648] outline-none"
-                />
-                <Search
-                  size={14}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA3B2]"
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsAddModalOpen(false)}
-              className="mt-4 inline-flex items-center gap-1 rounded-sm bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]"
-            >
-              <Plus size={12} />
-              Add Medicine to Group
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-  );
+  return <><section className="min-w-0 space-y-8"><div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><BreadcrumbHeading items={["Inventory", "Medicine Groups", groupName]} description="Medicines assigned to this group." /><button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-1 self-start rounded-sm bg-[#00796B] px-5 py-2 text-xs font-medium text-white"><Plus size={12} />Add medicine</button></div><div className="relative w-full max-w-[320px]"><Search size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA3B2]" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search medicines" className="h-10 w-full rounded border border-[#CED7E3] px-3 pr-9 text-xs outline-none" /></div>{loading ? <div className="h-64 animate-pulse rounded border bg-gray-100" /> : groupItems.length === 0 ? <div className="rounded border border-dashed p-8 text-center text-sm text-gray-500">No medicines currently belong to this group.</div> : <div className="overflow-x-auto rounded border border-[#D8DEE8] bg-white"><table className="min-w-[720px] w-full text-left"><thead className="border-b"><tr><th className="px-6 py-4 text-sm">Medicine</th><th className="px-6 py-4 text-sm">Stock</th><th className="px-6 py-4 text-right text-sm">Action</th></tr></thead><tbody>{groupItems.map((item) => <tr key={item.id} className="border-b last:border-0"><td className="px-6 py-4">{item.name ?? item.id}</td><td className="px-6 py-4">{getInventoryQuantity(item)}</td><td className="px-6 py-4 text-right"><button onClick={() => void remove(item)} className="inline-flex items-center gap-2 text-[#EF4444]"><Trash2 size={13} />Remove</button></td></tr>)}</tbody></table></div>}<button onClick={() => void deleteGroup()} disabled={!groupItems.length} className="inline-flex items-center gap-2 rounded border border-red-200 bg-red-50 px-5 py-2 text-xs text-red-600 disabled:opacity-50"><Trash2 size={12} />Remove group</button></section><AddMedicineModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} orgId={orgId ?? null} groupName={groupName} medicines={items} onMedicineAdded={() => void loadItems()} /></>;
 }

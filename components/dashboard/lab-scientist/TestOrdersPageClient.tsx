@@ -1,188 +1,4 @@
-// "use client";
 
-// import { useEffect, useMemo, useState } from "react";
-// import type { MouseEvent } from "react";
-// import { useRouter } from "next/navigation";
-// import { LayoutGrid, List, Search } from "lucide-react";
-// import { StatusBadge } from "@components/StatusBadge";
-// import { useAuth } from "@context/AuthContext";
-// import { consultationService, LabOrderStatusFilter, labService } from "@services/api";
-// import {
-//   LabOrder,
-//   combineUniqueOrders,
-//   formatDateTime,
-//   // getMockLabOrdersByStatus,
-//   isNotFoundApiError,
-//   normalizeLabOrders,
-//   toStatusBadgeType,
-// } from "./labOrderUtils";
-// import Modal from "@components/Modal";
-
-// type ViewMode = "cards" | "table";
-// type TabFilter = "all" | "pending" | "in_progress" | "completed" | "critical";
-
-// const FETCH_STATUSES: LabOrderStatusFilter[] = [
-//   "pending",
-//   "in_progress",
-//   "completed",
-// ];
-
-// const TAB_LABELS: Record<TabFilter, string> = {
-//   all: "All Tests",
-//   pending: "Pending Tests",
-//   in_progress: "In-Progress Tests",
-//   completed: "Completed Tests",
-//   critical: "Critical",
-// };
-
-// const isCriticalOrder = (order: LabOrder): boolean => {
-//   const normalized = order.priority.toLowerCase();
-//   return ["urgent", "emergency", "critical", "stat"].includes(normalized);
-// };
-
-// function OrdersSkeleton() {
-//   return (
-//     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-//       {Array.from({ length: 6 }).map((_, index) => (
-//         <div
-//           key={index}
-//           className="h-52 animate-pulse rounded-xl border border-gray-200 bg-white"
-//         />
-//       ))}
-//     </div>
-//   );
-// }
-
-// export default function TestOrdersPageClient() {
-//   const router = useRouter();
-//   const { activeWorkspace } = useAuth();
-//   const orgId = activeWorkspace?.id ?? null;
-
-//   const [orders, setOrders] = useState<LabOrder[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [viewMode, setViewMode] = useState<ViewMode>("cards");
-//   const [tab, setTab] = useState<TabFilter>("all");
-//   const [query, setQuery] = useState("");
-//   const [usingMockData, setUsingMockData] = useState(false);
-//   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
-//     const [isModalOpen, setIsModalOpen] = useState(false);
-//     const [consultations, setConsultations] = useState<any[]>([]);
-// const [selectedConsultationId, setSelectedConsultationId] = useState("");
-// console.log("selectedConsultationId:", selectedConsultationId, "consultations:", consultations);
-
-//      const [form, setForm] = useState({
-//    doctor: "",
-//     patientId: "",
-//     test_type: "",
-//     test_name: "",
-//     priority: "Normal",
-//   });
-  
-//   useEffect(() => {
-//   const loadConsultations = async () => {
-//     if (!orgId) return;
-
-//     const res = await consultationService.listConsultations(orgId);
-//     const data = Array.isArray(res) ? res : res?.data ?? [];
-
-//     setConsultations(data);
-//   };
-
-//   loadConsultations();
-// }, [orgId]);
-
-
-// //   useEffect(() => {
-// //     if (!orgId) {
-// //       setOrders([]);
-// //       setLoading(false);
-// //       return;
-// //     }
-
-// //     let ignore = false;
-
-// //     const loadOrders = async () => {
-// //       setLoading(true);
-// //       setUsingMockData(false);
-
-// //       try {
-// //         const consultations = await consultationService.listConsultations(orgId);
-// //          const consultationIds = consultations.map((c: any) => c.id);
-
-// // const responses = await Promise.allSettled(
-// //   consultations.map((consultation: any) =>
-// //     labService
-// //       .listLabTests(orgId, consultation.id)
-// //       .then((res) => ({
-// //         data: res.data,
-// //         consultation, 
-// //       }))
-// //   )
-// // );
-
-// //         const successfulResponses = responses
-// //           .filter(
-// //             (
-// //               result
-// //             ): result is PromiseFulfilledResult<unknown> =>
-// //               result.status === "fulfilled"
-// //           )
-// //           .map((result) => result.value);
-
-// //       const normalized = responses
-// //   .filter(
-// //     (result): result is PromiseFulfilledResult<any> =>
-// //       result.status === "fulfilled"
-// //   )
-// //   .flatMap((result) =>
-// //     normalizeLabOrders(result.value.data ?? [], result.value.consultation)
-// //   );
-
-// //         if (normalized.length > 0) {
-// //           if (!ignore) {
-// //             setOrders(combineUniqueOrders(normalized));
-// //           }
-// //           return;
-// //         }
-
-// //         const allFailuresAre404 =
-// //           responses.length > 0 &&
-// //           responses.every(
-// //             (result) =>
-// //               result.status === "rejected" && isNotFoundApiError(result.reason)
-// //           );
-
-// //         if (allFailuresAre404) {
-// //           // if (!ignore) {
-// //           //   setOrders(
-// //           //     // getMockLabOrdersByStatus(["pending", "in_progress", "completed"])
-// //           //   );
-// //           //   setUsingMockData(true);
-// //           // }
-// //           return;
-// //         }
-
-// //         if (!ignore) {
-// //           setOrders([]);
-// //         }
-// //       } catch (error) {
-// //         console.error("Failed to load test orders", error);
-// //         if (!ignore) {
-// //           setOrders([]);
-// //         }
-// //       } finally {
-// //         if (!ignore) {
-// //           setLoading(false);
-// //         }
-// //       }
-// //     };
-
-// //     void loadOrders();
-
-// //     return () => {
-// //       ignore = true;
-// //     };
-// //   }, [orgId]);
 
 //     useEffect(() => {
 //   if (!orgId) {
@@ -731,11 +547,15 @@ import {
   LabOrder,
   combineUniqueOrders,
   formatDateTime,
-  isNotFoundApiError,
   normalizeLabOrders,
   toStatusBadgeType,
+  RawConsultation,
+  getConsultationsArray,
+  buildPatientName,
+  getPatientId,
+  buildDoctorName,
 } from "./labOrderUtils";
-import Modal from "@components/Modal";
+import CreateTestOrderModal from "./CreateTestOrderModal";
 
 type ViewMode = "cards" | "table";
 type TabFilter = "all" | "pending" | "in_progress" | "completed" | "critical";
@@ -772,40 +592,6 @@ function OrdersSkeleton() {
   );
 }
 
-const getConsultationsArray = (response: any) => {
-  if (Array.isArray(response)) return response;
-  if (Array.isArray(response?.data)) return response.data;
-  if (Array.isArray(response?.consultations)) return response.consultations;
-  if (Array.isArray(response?.results)) return response.results;
-  return [];
-};
-
-const getPatientName = (consultation: any, fallback = "") =>
-  consultation?.patient_name ||
-  consultation?.patient?.full_name ||
-  consultation?.patient?.name ||
-  `${consultation?.patient?.first_name ?? ""} ${consultation?.patient?.last_name ?? ""}`.trim() ||
-  fallback ||
-  "Unknown Patient";
-
-const getPatientId = (consultation: any, fallback = "") =>
-  consultation?.patient_id ||
-  consultation?.patient?.id ||
-  consultation?.patient?.patient_id ||
-  fallback ||
-  "";
-
-const getDoctorName = (consultation: any, fallback = "") =>
-  consultation?.ordering_doctor_name ||
-  consultation?.doctor_name ||
-  consultation?.doctor?.full_name ||
-  consultation?.doctor?.name ||
-  `${consultation?.doctor?.first_name ?? ""} ${consultation?.doctor?.last_name ?? ""}`.trim() ||
-  `${consultation?.assigned_doctor?.first_name ?? ""} ${consultation?.assigned_doctor?.last_name ?? ""}`.trim() ||
-  consultation?.assigned_doctor_name ||
-  fallback ||
-  "Unknown Doctor";
-
 export default function TestOrdersPageClient() {
   const router = useRouter();
   const { activeWorkspace } = useAuth();
@@ -816,36 +602,8 @@ export default function TestOrdersPageClient() {
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [tab, setTab] = useState<TabFilter>("all");
   const [query, setQuery] = useState("");
-  const [usingMockData, setUsingMockData] = useState(false);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [consultations, setConsultations] = useState<any[]>([]);
-  const [selectedConsultationId, setSelectedConsultationId] = useState("");
-
-  const [form, setForm] = useState({
-    patientId: "",
-    test_type: "",
-    test_name: "",
-    doctor: "",
-    priority: "Routine",
-  });
-
-  useEffect(() => {
-    const loadConsultations = async () => {
-      if (!orgId) return;
-
-      try {
-        const res = await consultationService.listConsultations(orgId);
-        setConsultations(getConsultationsArray(res));
-      } catch (error) {
-        console.error("Failed to load consultations", error);
-        setConsultations([]);
-      }
-    };
-
-    void loadConsultations();
-  }, [orgId]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     if (!orgId) {
@@ -858,7 +616,6 @@ export default function TestOrdersPageClient() {
 
     const loadOrders = async () => {
       setLoading(true);
-      setUsingMockData(false);
 
       try {
         const [labTestsResponse, consultationsResponse] = await Promise.all([
@@ -868,35 +625,43 @@ export default function TestOrdersPageClient() {
           consultationService.listConsultations(orgId),
         ]);
 
-        const normalizedOrders = normalizeLabOrders(labTestsResponse?.data ?? []);
+        const rawLabTests = Array.isArray(labTestsResponse?.data)
+          ? labTestsResponse.data
+          : Array.isArray(labTestsResponse)
+            ? labTestsResponse
+            : [];
+        const normalizedOrders = normalizeLabOrders(rawLabTests);
         const consultationList = getConsultationsArray(consultationsResponse);
 
-        const consultationMap = new Map(
+        const consultationMap = new Map<string, RawConsultation>(
           consultationList
-            .filter((consultation: any) => consultation?.id)
-            .map((consultation: any) => [consultation.id, consultation])
+            .filter((consultation) => consultation?.id)
+            .map((consultation) => [consultation.id, consultation])
         );
 
         const enrichedOrders = normalizedOrders.map((order) => {
-          const consultation = consultationMap.get(order.consultation_id) as any;
-          
+          const consultation = consultationMap.get(order.consultation_id!);
+
           return {
             ...order,
-            patientName: getPatientName(consultation, order.patientName),
-            patientId: getPatientId(consultation, order.patientId),
+            patientName: buildPatientName(consultation!, order.patientName),
+            patientId: getPatientId(consultation!, order.patientId),
             patientGender:
               consultation?.patient?.gender ||
-              consultation?.patient_gender ||
+              (consultation as any)?.patient_gender ||
               order.patientGender ||
               "-",
             patientAge:
               String(
                 consultation?.patient?.age ??
-                  consultation?.patient_age ??
+                  (consultation as any)?.patient_age ??
                   order.patientAge ??
                   "-"
               ) || "-",
-            orderingDoctor: getDoctorName(consultation, order.orderingDoctor),
+            orderingDoctor: buildDoctorName(
+              consultation!,
+              order.orderingDoctor
+            ),
             departmentName:
               consultation?.department_name ||
               consultation?.department?.name ||
@@ -913,9 +678,6 @@ export default function TestOrdersPageClient() {
 
         if (!ignore) {
           setOrders([]);
-          if (isNotFoundApiError(error)) {
-            setUsingMockData(true);
-          }
         }
       } finally {
         if (!ignore) {
@@ -930,77 +692,6 @@ export default function TestOrdersPageClient() {
       ignore = true;
     };
   }, [orgId]);
-
-  const handleCreateOrder = async () => {
-    if (!orgId || !selectedConsultationId || !form.test_name) return;
-    if (!labService.createLabTest) {
-      console.error("createLabTest is not available on labService");
-      return;
-    }
-
-    try {
-      const selectedConsultation = consultations.find(
-        (c: any) => (c.id || c._id) === selectedConsultationId
-      );
-
-      const payload = {
-        test_name: form.test_name,
-        test_type: form.test_type || form.test_name,
-        priority: form.priority,
-      };
-
-      const res = await labService.createLabTest(
-        orgId,
-        selectedConsultationId,
-        payload
-      );
-
-      const created = res?.data;
-
-      const newOrder: LabOrder = {
-        id: created?.id ?? crypto.randomUUID(),
-        consultation_id: selectedConsultationId,
-        patientName: getPatientName(selectedConsultation),
-        patientId: getPatientId(selectedConsultation, form.patientId),
-        patientGender:
-          selectedConsultation?.patient?.gender ||
-          selectedConsultation?.patient_gender ||
-          "-",
-        patientAge:
-          String(
-            selectedConsultation?.patient?.age ??
-              selectedConsultation?.patient_age ??
-              "-"
-          ) || "-",
-        test_type: form.test_type || form.test_name,
-        test_name: form.test_name,
-        orderedTests: [form.test_name || form.test_type],
-        orderingDoctor: getDoctorName(selectedConsultation, form.doctor),
-        orderedAt: created?.created_at ?? new Date().toISOString(),
-        priority: form.priority,
-        status: "pending",
-        clinicalNotes: "",
-        departmentName:
-          selectedConsultation?.department_name ||
-          selectedConsultation?.department?.name ||
-          "-",
-        sampleType: "-",
-      };
-
-      setOrders((prev) => combineUniqueOrders([newOrder, ...prev]));
-      setIsModalOpen(false);
-      setSelectedConsultationId("");
-      setForm({
-        patientId: "",
-        test_type: "",
-        test_name: "",
-        doctor: "",
-        priority: "Routine",
-      });
-    } catch (error) {
-      console.error("Failed to create order", error);
-    }
-  };
 
   const counts = useMemo(() => {
     const result: Record<TabFilter, number> = {
@@ -1047,109 +738,22 @@ export default function TestOrdersPageClient() {
     router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
   };
 
-  const markProcessing = (id: string, active: boolean) => {
-  setProcessingIds((prev) => {
-    const next = new Set(prev);
-
-    if (active) {
-      next.add(id);
-    } else {
-      next.delete(id);
-    }
-
-    return next;
-  });
-};
-
-
-const updateOrderStatus = (
-  id: string,
-  status: LabOrder["status"]
-) => {
-  setOrders((prev) =>
-    prev.map((order) =>
-      order.id === id
-        ? {
-            ...order,
-            status,
-          }
-        : order
-    )
-  );
-};
-
-
-const handleStartProcessing = async (order: LabOrder) => {
-  if (!orgId) return;
-
-  if (order.status !== "pending") return;
-
-  if (processingIds.has(order.id)) return;
-
-
-  markProcessing(order.id, true);
-
-  try {
-    // Backend expects:
-    // Pending | In Progress | Completed
-    await labService.updateLabTestStatus(
-      orgId,
-      order.id,
-      "In Progress"
+  const updateOrderStatus = (id: string, status: LabOrder["status"]) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === id
+          ? {
+              ...order,
+              status,
+            }
+          : order
+      )
     );
+  };
 
-
-    // Frontend keeps:
-    // pending | in_progress | completed
-    updateOrderStatus(
-      order.id,
-      "in_progress"
-    );
-
-
-  } catch (error) {
-    console.error(
-      "Failed to start processing lab test",
-      error
-    );
-
-  } finally {
-    markProcessing(order.id, false);
-  }
-};
-
-
-const handleCompleteTest = async (order: LabOrder) => {
-  if (!orgId) return;
-
-  if (order.status !== "in_progress") return;
-
-  if (processingIds.has(order.id)) return;
-
-  markProcessing(order.id, true);
-
-  try {
-    await labService.updateLabTestStatus(
-      orgId,
-      order.id,
-      "Completed"
-    );
-
-    updateOrderStatus(
-      order.id,
-      "completed"
-    );
-
-  } catch (error) {
-    console.error(
-      "Failed to complete lab test",
-      error
-    );
-
-  } finally {
-    markProcessing(order.id, false);
-  }
-};
+  const handleOrderCreated = (order: LabOrder) => {
+    setOrders((current) => combineUniqueOrders([order, ...current]));
+  };
 
   return (
     <div className="space-y-6 py-2 sm:py-4">
@@ -1165,80 +769,18 @@ const handleCompleteTest = async (order: LabOrder) => {
 
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex h-12 items-center justify-center rounded-full bg-[#007F73] px-6 text-base font-medium text-white hover:bg-[#006E64]"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="inline-flex h-11 items-center justify-center rounded-full bg-[#007F73] px-5 text-sm font-medium text-white hover:bg-[#006E64]"
         >
-          + New Test Order
+          + Create lab test
         </button>
       </div>
 
-      <Modal
-        title="Create Test Order"
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      >
-        <div className="space-y-4">
-          <select
-            value={selectedConsultationId}
-            onChange={(e) => setSelectedConsultationId(e.target.value)}
-            className="w-full rounded border p-2"
-          >
-            <option value="">Select Consultation</option>
-            {consultations.map((c: any) => (
-              <option key={c.id || c._id} value={c.id || c._id}>
-                {`${c.patient?.first_name ?? ""} ${
-                  c.patient?.last_name ?? ""
-                }`.trim() || "Unknown Patient"}
-              </option>
-            ))}
-          </select>
-
-          <input
-            placeholder="Patient ID"
-            value={form.patientId}
-            onChange={(e) => setForm({ ...form, patientId: e.target.value })}
-            className="w-full rounded border p-2"
-          />
-
-          <input
-            placeholder="Test Type"
-            value={form.test_type}
-            onChange={(e) => setForm({ ...form, test_type: e.target.value })}
-            className="w-full rounded border p-2"
-          />
-
-          <input
-            placeholder="Test Name"
-            value={form.test_name}
-            onChange={(e) => setForm({ ...form, test_name: e.target.value })}
-            className="w-full rounded border p-2"
-          />
-
-          <input
-            placeholder="Doctor"
-            value={form.doctor}
-            onChange={(e) => setForm({ ...form, doctor: e.target.value })}
-            className="w-full rounded border p-2"
-          />
-
-          <select
-            value={form.priority}
-            onChange={(e) => setForm({ ...form, priority: e.target.value })}
-            className="w-full rounded border p-2"
-          >
-            <option value="Routine">Routine</option>
-            <option value="Urgent">Urgent</option>
-            <option value="Stat">Stat</option>
-          </select>
-
-          <button
-            onClick={handleCreateOrder}
-            className="w-full rounded bg-[#00B8A8] py-2 text-white"
-          >
-            Create Order
-          </button>
-        </div>
-      </Modal>
+      <CreateTestOrderModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onOrderCreated={handleOrderCreated}
+      />
 
       <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -1359,31 +901,6 @@ const handleCompleteTest = async (order: LabOrder) => {
                 </div>
 
                 <div className="mt-4 space-y-2">
-    <button
-  type="button"
-  onClick={() => {
-    if (order.status === "pending") {
-      handleStartProcessing(order);
-    }
-
-    if (order.status === "in_progress") {
-      handleCompleteTest(order);
-    }
-  }}
-  disabled={
-    order.status === "completed" ||
-    processingIds.has(order.id)
-  }
-  className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
->
-  {processingIds.has(order.id)
-    ? "Updating..."
-    : order.status === "pending"
-    ? "Start Processing"
-    : order.status === "in_progress"
-    ? "Complete Test"
-    : "Completed"}
-</button>
                   <button
                     type="button"
                     onClick={() => openOrder(order.id)}
@@ -1436,33 +953,6 @@ const handleCompleteTest = async (order: LabOrder) => {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex items-center gap-2">
-     <button
-  type="button"
-  onClick={(event) => {
-    event.stopPropagation();
-
-    if (order.status === "pending") {
-      handleStartProcessing(order);
-    }
-
-    if (order.status === "in_progress") {
-      handleCompleteTest(order);
-    }
-  }}
-  disabled={
-    order.status === "completed" ||
-    processingIds.has(order.id)
-  }
-  className="rounded-md border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
->
-  {processingIds.has(order.id)
-    ? "Updating..."
-    : order.status === "pending"
-    ? "Start Processing"
-    : order.status === "in_progress"
-    ? "Complete Test"
-    : "Completed"}
-</button>
                         <button
                           type="button"
                           onClick={(event) => {
@@ -1482,12 +972,6 @@ const handleCompleteTest = async (order: LabOrder) => {
           </div>
         )}
 
-        {usingMockData && (
-          <p className="text-xs text-blue-700">
-            Backend lab-orders endpoint is not available yet. Showing sample
-            data.
-          </p>
-        )}
       </section>
     </div>
   );

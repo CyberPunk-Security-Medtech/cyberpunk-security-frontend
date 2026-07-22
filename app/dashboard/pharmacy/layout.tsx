@@ -6,6 +6,8 @@ import Sidebar from "@components/SideBar";
 import Header from "@components/Header";
 import { MenuItem, UserProfile } from "@/types/index";
 import { useAuth } from "@context/AuthContext";
+import { User } from "@/types/index";
+import { buildDisplayName } from "@utils/helper";
 
 const pharmacyMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/pharmacy" },
@@ -13,16 +15,6 @@ const pharmacyMenu: MenuItem[] = [
   { name: "Reports", icon: BarChart3, href: "/dashboard/pharmacy/reports" },
   { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
 ];
-
-const buildDisplayName = (user: {
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-} | null) => {
-  const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
-  if (fullName) return fullName;
-  return user?.email?.split("@")[0] || "Eleanor Pena";
-};
 
 export default function PharmacyDashboardLayout({
   children,
@@ -34,7 +26,7 @@ export default function PharmacyDashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const profile: UserProfile = {
-    name: buildDisplayName(user),
+    name: buildDisplayName(user as User),
     role: activeWorkspace?.role ?? "Pharmacist",
     avatar: "/avatars/eleanor.png",
   };

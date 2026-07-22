@@ -1,644 +1,325 @@
+// "use client";
+
+// import Link from "next/link";
+// import { useCallback, useEffect, useMemo, useState } from "react";
+// import { Boxes, CircleAlert, Pill, Users } from "lucide-react";
+// import { inventoryService, prescriptionService } from "@services/api";
+// import { useAuth } from "@context/AuthContext";
+// import { toast } from "react-toastify";
+// import PrescriptionTable from "@components/dashboard/pharmacy/PrescriptionTable";
+// import DispensePrescriptionModal from "@components/dashboard/pharmacy/DispensePrescriptionModal";
+// import {
+//   collectionFromResponse,
+//   getInventoryGroup,
+//   getInventoryQuantity,
+//   InventoryItem,
+//   Prescription,
+// } from "@components/dashboard/pharmacy/pharmacyUtils";
+// import { buildDisplayName } from "@utils/helper";
+
+// export default function PharmacyDashboardPage() {
+//   const { activeWorkspace, user } = useAuth();
+//   const orgId = activeWorkspace?.id ?? null;
+//   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+//   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [dispensingId, setDispensingId] = useState<string | null>(null);
+//   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
+//   const [dispenseMode, setDispenseMode] = useState<"create" | "edit">("create");
+//   const [dispenseRecord, setDispenseRecord] = useState<Record<string, string | null> | null>(null);
+
+//   const loadDashboard = useCallback(async () => {
+//     if (!orgId) {
+//       setPrescriptions([]);
+//       setInventory([]);
+//       setLoading(false);
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       const [prescriptionResponse, inventoryResponse] = await Promise.all([
+//         prescriptionService.listPrescriptionsByOrg(orgId),
+//         inventoryService.listInventoryItems(orgId),
+//       ]);
+//       setPrescriptions(collectionFromResponse<Prescription>(prescriptionResponse, ["prescriptions"]));
+//       const catalogue = collectionFromResponse<InventoryItem>(inventoryResponse);
+//       const detailedInventory = await Promise.all(catalogue.map(async (item) => {
+//         try {
+//           const detailResponse = await inventoryService.getInventoryItem(orgId, item.id);
+//           const detail = (detailResponse && typeof detailResponse === "object" && "data" in detailResponse ? (detailResponse as { data: InventoryItem }).data : detailResponse) as InventoryItem;
+//           return { ...item, ...detail };
+//         } catch (detailError) {
+//           console.warn(`Unable to load stock total for ${item.id}`, detailError);
+//           return item;
+//         }
+//       }));
+//       setInventory(detailedInventory);
+//     } catch (error) {
+//       console.error("Failed to load pharmacy dashboard", error);
+//       toast.error("Unable to load pharmacy data. Please try again.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [orgId]);
+
+//   useEffect(() => {
+//     void loadDashboard();
+//   }, [loadDashboard]);
+
+//   const metrics = useMemo(() => {
+//     const pending = prescriptions.filter((item) => !["dispensed", "completed"].includes(item.status?.toLowerCase() ?? "")).length;
+//     const lowStock = inventory.filter((item) => getInventoryQuantity(item) <= 0).length;
+//     const groups = new Set(inventory.map(getInventoryGroup).filter(Boolean));
+//     return { pending, lowStock, groupCount: groups.size };
+//   }, [inventory, prescriptions]);
+
+//   const handleDispense = async (payload: { quantity: string; batch_number?: string; expiry_date?: string; substitution_note?: string; counseling_notes?: string }) => {
+//     const prescriptionId = selectedPrescription?.id;
+//     if (!orgId || dispensingId) return;
+//     if (!prescriptionId) return;
+//     setDispensingId(prescriptionId);
+//     try {
+//       if (dispenseMode === "edit") {
+//         await prescriptionService.correctDispenseRecord(orgId, prescriptionId, payload);
+//         toast.success("Dispense record corrected.");
+//       } else {
+//         await prescriptionService.dispensePrescription(orgId, prescriptionId, payload);
+//         toast.success("Prescription marked as completed.");
+//       }
+//       await loadDashboard();
+//     } catch (error) {
+//       console.error("Failed to dispense prescription", error);
+//       toast.error("Unable to dispense this prescription.");
+//     } finally {
+//       setDispensingId(null);
+//     }
+//   };
+
+//   const openCorrection = async (prescriptionId: string) => {
+//     if (!orgId) return;
+//     const prescription = prescriptions.find((item) => item.id === prescriptionId) ?? null;
+//     if (!prescription) return;
+//     try {
+//       const response = await prescriptionService.getDispenseRecord(orgId, prescriptionId);
+//       const record = (response && typeof response === "object" && "data" in response ? (response as { data: Record<string, string | null> }).data : response) as Record<string, string | null>;
+//       setSelectedPrescription(prescription);
+//       setDispenseRecord(record);
+//       setDispenseMode("edit");
+//     } catch (error) { console.error("Failed to load dispense record", error); toast.error("Unable to load this dispense record for editing."); }
+//   };
+
+//   const cards = [
+//     { label: "Prescription queue", value: prescriptions.length, detail: `${metrics.pending} awaiting dispensing`, icon: Users, color: "text-[#7E8FE5]", bg: "bg-[#EEF0FF]" },
+//     { label: "Inventory items", value: inventory.length, detail: `${metrics.groupCount} medicine groups`, icon: Boxes, color: "text-[#E5B648]", bg: "bg-[#FFF5DD]" },
+//     { label: "Dispensed", value: prescriptions.length - metrics.pending, detail: "Current prescription records", icon: Pill, color: "text-[#51C493]", bg: "bg-[#E8FBF1]" },
+//     { label: "Out of stock", value: metrics.lowStock, detail: "Items needing restock", icon: CircleAlert, color: "text-[#F08B66]", bg: "bg-[#FFF1EC]" },
+//   ];
+
+//   return (
+//     <section className="space-y-6">
+//       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+//         <div>
+//           <h1 className="text-[30px] font-semibold leading-tight text-[#151D48]">
+//             Welcome back, Pharm. {buildDisplayName(user)}
+//           </h1>
+//           <p className="mt-1 text-sm text-[#737791]">Review prescriptions, dispense medicines, and monitor stock.</p>
+//         </div>
+//         <Link href="/dashboard/pharmacy/inventory/new" className="self-start rounded-full bg-[#00796B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#00695F]">
+//           Add inventory item
+//         </Link>
+//       </div>
+
+//       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+//         {cards.map(({ label, value, detail, icon: Icon, color, bg }) => (
+//           <article key={label} className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+//             <div className="flex items-center justify-between">
+//               <p className="text-sm text-[#737791]">{label}</p>
+//               <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${bg}`}><Icon size={18} className={color} /></span>
+//             </div>
+//             <p className="mt-4 text-3xl font-semibold text-[#151D48]">{loading ? "—" : value}</p>
+//             <p className="mt-2 text-xs text-[#737791]">{detail}</p>
+//           </article>
+//         ))}
+//       </div>
+
+//       <article className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+//         <div className="mb-5 flex items-center justify-between gap-4">
+//           <div>
+//             <h2 className="text-xl font-semibold text-[#151D48]">Prescription queue</h2>
+//             <p className="text-sm text-[#737791]">Prescriptions are issued by clinicians and dispensed here.</p>
+//           </div>
+//           <Link href="/dashboard/pharmacy/inventory/list" className="text-sm font-medium text-[#00796B] hover:underline">View inventory</Link>
+//         </div>
+//         <PrescriptionTable prescriptions={prescriptions} onDispense={(id) => { setDispenseMode("create"); setDispenseRecord(null); setSelectedPrescription(prescriptions.find((item) => item.id === id) ?? null); }} onCorrectDispense={openCorrection} dispensingId={dispensingId} />
+//       </article>
+//       <DispensePrescriptionModal prescription={selectedPrescription} isOpen={Boolean(selectedPrescription)} mode={dispenseMode} initialRecord={dispenseRecord} onClose={() => { setSelectedPrescription(null); setDispenseRecord(null); }} onConfirm={handleDispense} />
+//     </section>
+//   );
+// }
+
+
 "use client";
 
-import { ComponentType, useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  BellDot,
-  Boxes,
-  ChevronRight,
-  CircleAlert,
-  Pill,
-  Plus,
-  Users,
-} from "lucide-react";
-import { authService, organizationService, patientService } from "@services/api";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Boxes, CircleAlert, Pill, Users } from "lucide-react";
+import { inventoryService, prescriptionService } from "@services/api";
+import { useAuth } from "@context/AuthContext";
+import { toast } from "react-toastify";
 import PrescriptionTable from "@components/dashboard/pharmacy/PrescriptionTable";
-import { PatientPrescriptionModal } from "@components/dashboard/pharmacy/PatientPrescriptionModal";
-
-const purchaseData = [
-  { name: "5k", value: 18 },
-  { name: "10k", value: 52 },
-  { name: "15k", value: 41 },
-  { name: "20k", value: 86 },
-  { name: "25k", value: 49 },
-  { name: "30k", value: 65 },
-  { name: "35k", value: 29 },
-  { name: "40k", value: 51 },
-  { name: "45k", value: 44 },
-  { name: "50k", value: 68 },
-  { name: "55k", value: 47 },
-  { name: "60k", value: 58 },
-];
-
-const formatPharmacyName = (user: any): string => {
-  const firstName = (user?.first_name ?? "").toString().trim();
-  const lastName = (user?.last_name ?? "").toString().trim();
-  const fullName = [firstName, lastName].filter(Boolean).join(" ");
-  if (fullName) return fullName;
-
-  const emailPrefix = (user?.email ?? "").toString().split("@")[0]?.trim();
-  return emailPrefix || "Pharm Alex";
-};
-
-type Trend = {
-  label: string;
-  direction: "up" | "down";
-};
-
-type StatCard = {
-  title: string;
-  value: string;
-  trend: Trend;
-  icon: ComponentType<{ size?: number; className?: string }>;
-  iconBg: string;
-  iconColor: string;
-};
-
-const statCards: StatCard[] = [
-  {
-    title: "Total User",
-    value: "250",
-    trend: { label: "8.9% Up from yesterday", direction: "up" },
-    icon: Users,
-    iconBg: "bg-[#EEF0FF]",
-    iconColor: "text-[#7E8FE5]",
-  },
-  {
-    title: "Inventory Status",
-    value: "298",
-    trend: { label: "1.3% Up from past week", direction: "up" },
-    icon: Boxes,
-    iconBg: "bg-[#FFF5DD]",
-    iconColor: "text-[#E5B648]",
-  },
-  {
-    title: "Medicines Available",
-    value: "180",
-    trend: { label: "4.3% Down from yesterday", direction: "down" },
-    icon: Pill,
-    iconBg: "bg-[#E8FBF1]",
-    iconColor: "text-[#51C493]",
-  },
-  {
-    title: "Critical Alerts",
-    value: "5",
-    trend: { label: "1.8% Up from yesterday", direction: "up" },
-    icon: CircleAlert,
-    iconBg: "bg-[#FFF1EC]",
-    iconColor: "text-[#F08B66]",
-  },
-];
-
-type BottomMetricCard = {
-  title: string;
-  rightLabel: string;
-  rows: Array<{ value: string; label: string }>;
-};
-
-const bottomMetricCards: BottomMetricCard[] = [
-  {
-    title: "Inventory",
-    rightLabel: "Go to Configuration",
-    rows: [
-      { value: "298", label: "Total no of Medicines" },
-      { value: "24", label: "Medicine Groups" },
-    ],
-  },
-  {
-    title: "Quick Report",
-    rightLabel: "January 2022",
-    rows: [
-      { value: "70,856", label: "Qty of Medicines Sold" },
-      { value: "5,288", label: "Invoices Generated" },
-    ],
-  },
-  {
-    title: "My Pharmacy",
-    rightLabel: "Go to User Management",
-    rows: [
-      { value: "04", label: "Total no of Suppliers" },
-      { value: "05", label: "Total no of Users" },
-    ],
-  },
-  {
-    title: "Customers",
-    rightLabel: "Go to Customers Page",
-    rows: [
-      { value: "845", label: "Total no of Customers" },
-      { value: "Adalimumab", label: "Frequently bought item" },
-    ],
-  },
-];
+import DispensePrescriptionModal from "@components/dashboard/pharmacy/DispensePrescriptionModal";
+import {
+  collectionFromResponse,
+  getInventoryGroup,
+  getInventoryQuantity,
+  InventoryItem,
+  Prescription,
+} from "@components/dashboard/pharmacy/pharmacyUtils";
+import { buildDisplayName } from "@utils/helper";
 
 export default function PharmacyDashboardPage() {
-  const [pharmacyName, setPharmacyName] = useState("Pharm Alex");
-  const [prescriptionModal, setPrescriptionModal] =
-useState(false);
-
-
-const [prescriptions,setPrescriptions] =
-useState<any[]>([]);
-
-
-const [orgId,setOrgId] =
-useState<string|null>(null);
-
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const meRes = await authService.getMe();
-  //       const me = meRes?.data ?? meRes;
-  //       setPharmacyName(formatPharmacyName(me));
-  //     } catch (err) {
-  //       console.error("Failed to load pharmacy profile", err);
-  //     }
-  //   };
-
-  //   void fetchUser();
-  // }, []);
-
-useEffect(() => {
-
-const initializePharmacy = async()=>{
-
-try{
-
-
-  const meRes = await authService.getMe();
-  const me = meRes?.data ?? meRes;
-
-
-console.log(
-"CURRENT USER:",
-me
-);
-
-
-
-setPharmacyName(
-formatPharmacyName(me)
-);
-
-
-
-const organizations =
-await organizationService.getOrganizations();
-
-
-
-console.log(
-"USER ORGANIZATIONS:",
-organizations
-);
-
-
-
-const organizationList =
-Array.isArray(organizations)
-? organizations
-: organizations.data ?? [];
-
-
-
-if(!organizationList.length){
-
-console.error(
-"No organization found for user"
-);
-
-return;
-
-}
-
-
-
-const pharmacyOrg =
-organizationList[0];
-
-
-
-console.log(
-"SELECTED PHARMACY ORG:",
-pharmacyOrg
-);
-
-
-
-setOrgId(
-pharmacyOrg.id
-);
-
-
-
-}catch(error){
-
-console.error(
-"Failed initializing pharmacy",
-error
-);
-
-
-}
-
-
-};
-
-
-
-initializePharmacy();
-
-
-
-},[]);
-
-const loadPrescriptions = useCallback(async()=>{
-
-if(!orgId)
-return;
-
-
-try {
-
-
-const patientsResponse =
-await patientService.getPatients(orgId);
-
-
-
-const patients =
-Array.isArray(patientsResponse)
-?
-patientsResponse
-:
-patientsResponse.data ??
-patientsResponse.patients ??
-[];
-
-
-
-console.log(
-"PHARMACY PATIENTS",
-patients
-);
-
-
-
-let allPrescriptions:any[]=[];
-
-
-
-for(const patient of patients){
-
-
-try{
-
-
-const response =
-await patientService.getPatientPrescriptions(
-orgId,
-patient.id
-);
-
-
-
-const prescriptions =
-Array.isArray(response)
-?
-response
-:
-response.data ??
-response.prescriptions ??
-[];
-
-
-
-console.log(
-"PATIENT PRESCRIPTIONS",
-patient.id,
-prescriptions
-);
-
-
-
-allPrescriptions.push(
-  ...prescriptions.map((prescription:any)=>({
-    ...prescription,
-    patient:{
-      id: patient.id,
-      first_name: patient.first_name,
-      last_name: patient.last_name,
+  const { activeWorkspace, user } = useAuth();
+  const orgId = activeWorkspace?.id ?? null;
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dispensingId, setDispensingId] = useState<string | null>(null);
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
+  const [dispenseMode, setDispenseMode] = useState<"create" | "edit">("create");
+  const [dispenseRecord, setDispenseRecord] = useState<Record<string, string | null> | null>(null);
+
+  const loadDashboard = useCallback(async () => {
+    if (!orgId) {
+      setPrescriptions([]);
+      setInventory([]);
+      setLoading(false);
+      return;
     }
-  }))
-);
 
+    setLoading(true);
+    try {
+      const [prescriptionResponse, inventoryResponse] = await Promise.all([
+        prescriptionService.listPrescriptionsByOrg(orgId),
+        inventoryService.listInventoryItems(orgId),
+      ]);
+      setPrescriptions(collectionFromResponse<Prescription>(prescriptionResponse, ["prescriptions"]));
+      const catalogue = collectionFromResponse<InventoryItem>(inventoryResponse);
+      const detailedInventory = await Promise.all(catalogue.map(async (item) => {
+        try {
+          const detailResponse = await inventoryService.getInventoryItem(orgId, item.id);
+          const detail = (detailResponse && typeof detailResponse === "object" && "data" in detailResponse ? (detailResponse as { data: InventoryItem }).data : detailResponse) as InventoryItem;
+          return { ...item, ...detail };
+        } catch (detailError) {
+          console.warn(`Unable to load stock total for ${item.id}`, detailError);
+          return item;
+        }
+      }));
+      setInventory(detailedInventory);
+    } catch (error) {
+      console.error("Failed to load pharmacy dashboard", error);
+      toast.error("Unable to load pharmacy data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [orgId]);
 
-}catch(error){
+  useEffect(() => {
+    void loadDashboard();
+  }, [loadDashboard]);
 
-console.error(
-"Patient prescription error",
-patient.id,
-error
-);
+  const metrics = useMemo(() => {
+    const pending = prescriptions.filter((item) => !["dispensed", "completed"].includes(item.status?.toLowerCase() ?? "")).length;
+    
+    // Calculate metrics excluding placeholders
+    const realInventory = inventory.filter(item => !item.name?.startsWith("[Group Placeholder]"));
+    const lowStock = realInventory.filter((item) => getInventoryQuantity(item) <= 0).length;
+    const groups = new Set(inventory.map(getInventoryGroup).filter(Boolean));
+    
+    return { pending, lowStock, groupCount: groups.size, realMedicineCount: realInventory.length };
+  }, [inventory, prescriptions]);
 
+  const handleDispense = async (payload: { quantity: string; batch_number?: string; expiry_date?: string; substitution_note?: string; counseling_notes?: string }) => {
+    const prescriptionId = selectedPrescription?.id;
+    if (!orgId || dispensingId) return;
+    if (!prescriptionId) return;
+    setDispensingId(prescriptionId);
+    try {
+      if (dispenseMode === "edit") {
+        await prescriptionService.correctDispenseRecord(orgId, prescriptionId, payload);
+        toast.success("Dispense record corrected.");
+      } else {
+        await prescriptionService.dispensePrescription(orgId, prescriptionId, payload);
+        toast.success("Prescription marked as completed.");
+      }
+      await loadDashboard();
+    } catch (error) {
+      console.error("Failed to dispense prescription", error);
+      toast.error("Unable to dispense this prescription.");
+    } finally {
+      setDispensingId(null);
+    }
+  };
 
-}
+  const openCorrection = async (prescriptionId: string) => {
+    if (!orgId) return;
+    const prescription = prescriptions.find((item) => item.id === prescriptionId) ?? null;
+    if (!prescription) return;
+    try {
+      const response = await prescriptionService.getDispenseRecord(orgId, prescriptionId);
+      const record = (response && typeof response === "object" && "data" in response ? (response as { data: Record<string, string | null> }).data : response) as Record<string, string | null>;
+      setSelectedPrescription(prescription);
+      setDispenseRecord(record);
+      setDispenseMode("edit");
+    } catch (error) { console.error("Failed to load dispense record", error); toast.error("Unable to load this dispense record for editing."); }
+  };
 
-
-}
-
-
-
-console.log(
-"FINAL PRESCRIPTIONS",
-allPrescriptions
-);
-
-
-
-setPrescriptions(
-allPrescriptions
-);
-
-
-
-}catch(error){
-
-console.error(
-"Loading prescriptions failed",
-error
-);
-
-
-}
-
-
-},[orgId]);
-
-useEffect(()=>{
-
-loadPrescriptions();
-
-},[loadPrescriptions]);
-
-
-
-
-  const firstName = useMemo(
-    () => pharmacyName.split(" ").filter(Boolean).slice(-1)[0] ?? "Alex",
-    [pharmacyName]
-  );
+  const cards = [
+    { label: "Prescription queue", value: prescriptions.length, detail: `${metrics.pending} awaiting dispensing`, icon: Users, color: "text-[#7E8FE5]", bg: "bg-[#EEF0FF]" },
+    // Use metrics.realMedicineCount here instead of inventory.length
+    { label: "Inventory items", value: metrics.realMedicineCount, detail: `${metrics.groupCount} medicine groups`, icon: Boxes, color: "text-[#E5B648]", bg: "bg-[#FFF5DD]" },
+    { label: "Dispensed", value: prescriptions.length - metrics.pending, detail: "Current prescription records", icon: Pill, color: "text-[#51C493]", bg: "bg-[#E8FBF1]" },
+    { label: "Out of stock", value: metrics.lowStock, detail: "Items needing restock", icon: CircleAlert, color: "text-[#F08B66]", bg: "bg-[#FFF1EC]" },
+  ];
 
   return (
-    <section className="space-y-5">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <section className="space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-[30px] leading-tight font-semibold text-[#151D48]">
-            Good morning, Pharm, {firstName}!
+          <h1 className="text-[30px] font-semibold leading-tight text-[#151D48]">
+            Welcome back, Pharm. {buildDisplayName(user)}
           </h1>
-          <p className="text-sm text-[#737791]">
-            A quick data overview of the inventory.
-          </p>
+          <p className="mt-1 text-sm text-[#737791]">Review prescriptions, dispense medicines, and monitor stock.</p>
         </div>
-
-        <div className="w-full rounded-xl border border-[#E6EAF2] bg-[#F7FEFF] p-3 lg:max-w-[300px]">
-          <div className="mb-1 flex items-center justify-between">
-            <p className="text-xs font-semibold text-[#00B6A0]">Notification</p>
-            <BellDot size={14} className="text-[#00B6A0]" />
-          </div>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-[#8A8FA2]">Critical alert for #P90022</span>
-            <button className="text-[#00B6A0]">View all</button>
-          </div>
-        </div>
+        <Link href="/dashboard/pharmacy/inventory/new" className="self-start rounded-full bg-[#00796B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#00695F]">
+          Add inventory item
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {statCards.map((item) => {
-          const TrendIcon = item.trend.direction === "up" ? ArrowUpRight : ArrowDownRight;
-          const trendColor =
-            item.trend.direction === "up" ? "text-[#2CCF99]" : "text-[#EE6D6D]";
-          const Icon = item.icon;
-
-          return (
-            <article
-              key={item.title}
-              className="rounded-xl border border-[#ECEFF5] bg-white p-5 shadow-[0_1px_1px_rgba(16,24,40,0.02)]"
-            >
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-xs font-medium text-[#737791]">{item.title}</h3>
-                <span
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${item.iconBg}`}
-                >
-                  <Icon size={18} className={item.iconColor} />
-                </span>
-              </div>
-              <p className="text-[30px] leading-none font-semibold text-[#151D48]">
-                {item.value}
-              </p>
-              <p className={`mt-3 inline-flex items-center gap-1 text-xs ${trendColor}`}>
-                <TrendIcon size={13} />
-                {item.trend.label}
-              </p>
-            </article>
-          );
-        })}
-      </div>
-
-      {/* <article className="rounded-xl border border-[#ECEFF5] bg-white p-4 md:p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-[24px] font-semibold text-[#151D48]">Purchase Statistics</h2>
-          <button className="inline-flex items-center gap-1 rounded-md border border-[#ECEFF5] px-3 py-1.5 text-xs text-[#737791]">
-            October
-            <ChevronRight size={14} className="rotate-90" />
-          </button>
-        </div>
-
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={purchaseData} margin={{ top: 8, right: 14, left: -20, bottom: 0 }}>
-              <CartesianGrid stroke="#F0F2F5" strokeDasharray="2 4" />
-              <XAxis
-                dataKey="name"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9AA3B2", fontSize: 11 }}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#9AA3B2", fontSize: 11 }}
-                ticks={[0, 20, 40, 60, 80, 100]}
-                domain={[0, 100]}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#4F7CFF"
-                strokeWidth={2.2}
-                dot={{ r: 3, fill: "#4F7CFF" }}
-                activeDot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </article> */}
-
-      <article
-className="
-rounded-xl
-border
-border-[#ECEFF5]
-bg-white
-p-5
-"
->
-
-
-<div
-className="
-flex
-items-center
-justify-between
-mb-5
-"
->
-
-
-<h2
-className="
-text-[24px]
-font-semibold
-text-[#151D48]
-"
->
-Patient Prescriptions
-</h2>
-
-
-
-<button
-
-onClick={()=>
-setPrescriptionModal(true)
-}
-
-className="
-flex
-items-center
-gap-2
-rounded-full
-bg-[#1A2380]
-px-5
-py-2.5
-text-sm
-font-medium
-text-white
-hover:bg-[#00B8A8]
-"
->
-
-
-<Plus size={16}/>
-
-Add Prescription
-
-
-</button>
-
-
-
-</div>
-
-
-
-<PrescriptionTable
-
-prescriptions={
-prescriptions
-}
-
-/>
-
-
-
-</article>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {bottomMetricCards.map((card, cardIndex) => (
-          <article
-            key={card.title}
-            className={`rounded-xl border border-[#E7EBF1] p-4 ${
-              cardIndex === 0 ? "bg-[#F3F3F4]" : "bg-white"
-            }`}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-medium text-[#23272E]">{card.title}</h3>
-              <button className="inline-flex items-center gap-1 text-xs text-[#737791]">
-                {card.rightLabel}
-                {card.rightLabel.includes("January") ? (
-                  <ChevronRight size={14} className="rotate-90" />
-                ) : (
-                  <ChevronRight size={14} />
-                )}
-              </button>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map(({ label, value, detail, icon: Icon, color, bg }) => (
+          <article key={label} className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-[#737791]">{label}</p>
+              <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${bg}`}><Icon size={18} className={color} /></span>
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {card.rows.map((row) => (
-                <div key={`${card.title}-${row.label}`}>
-                  <p className="text-[24px] leading-none font-semibold text-[#23272E]">
-                    {row.value}
-                  </p>
-                  <p className="mt-2 text-xs text-[#8D96A8]">{row.label}</p>
-                </div>
-              ))}
-            </div>
+            <p className="mt-4 text-3xl font-semibold text-[#151D48]">{loading ? "—" : value}</p>
+            <p className="mt-2 text-xs text-[#737791]">{detail}</p>
           </article>
         ))}
       </div>
 
-      <PatientPrescriptionModal
-
-open={
-prescriptionModal
-}
-
-onClose={()=>
-setPrescriptionModal(false)
-}
-
-
-orgId={
-orgId
-}
-
-
-
-
-
-onCreated={()=>{
-
-setPrescriptionModal(false);
-
-loadPrescriptions();
-
-}}
-
-
-/>
-
+      <article className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-[#151D48]">Prescription queue</h2>
+            <p className="text-sm text-[#737791]">Prescriptions are issued by clinicians and dispensed here.</p>
+          </div>
+          <Link href="/dashboard/pharmacy/inventory/list" className="text-sm font-medium text-[#00796B] hover:underline">View inventory</Link>
+        </div>
+        <PrescriptionTable prescriptions={prescriptions} onDispense={(id) => { setDispenseMode("create"); setDispenseRecord(null); setSelectedPrescription(prescriptions.find((item) => item.id === id) ?? null); }} onCorrectDispense={openCorrection} dispensingId={dispensingId} />
+      </article>
+      <DispensePrescriptionModal prescription={selectedPrescription} isOpen={Boolean(selectedPrescription)} mode={dispenseMode} initialRecord={dispenseRecord} onClose={() => { setSelectedPrescription(null); setDispenseRecord(null); }} onConfirm={handleDispense} />
     </section>
   );
 }

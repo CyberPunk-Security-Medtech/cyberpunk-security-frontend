@@ -176,6 +176,11 @@ export const organizationService = {
     return unwrap(response.data);
   },
 
+  getMembers: async (org_id: string): Promise<Membership[]> => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/members`);
+    return unwrap(response.data);
+  },
+
   getDepartments: async (org_id: string): Promise<Department[]> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/departments`,
@@ -758,6 +763,89 @@ export const consultationService = {
 
 };
 
+export const prescriptionService = {
+  createPrescription: async (
+    org_id: string,
+    consultation_id: string,
+    prescriptionData: Record<string, unknown>,
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/prescriptions`,
+      prescriptionData,
+    );
+    return unwrap(response.data);
+  },
+
+  listPrescriptionsByConsultation: async (
+    org_id: string,
+    consultation_id: string,
+  ) => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/prescriptions`,
+    );
+    return unwrap(response.data);
+  },
+
+  updatePrescriptionStatus: async (
+    org_id: string,
+    prescription_id: string,
+    status: string,
+  ) => {
+    const response = await api.patch(
+      `/api/v1/organizations/${org_id}/prescriptions/${prescription_id}/status`,
+      { status },
+    );
+    return unwrap(response.data);
+  },
+
+  listPrescriptionsByOrg: async (
+    org_id: string,
+    params?: {
+      status?: string;
+      patient_id?: string;
+      consultation_id?: string;
+      limit?: number;
+      offset?: number;
+    },
+  ) => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/prescriptions`, {
+      params,
+    });
+    return unwrap(response.data);
+  },
+
+  dispensePrescription: async (
+    org_id: string,
+    prescription_id: string,
+    payload: Record<string, unknown> = {},
+  ) => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/prescriptions/${prescription_id}/dispense`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+
+  correctDispenseRecord: async (
+    org_id: string,
+    prescription_id: string,
+    payload: Record<string, unknown> = {},
+  ) => {
+    const response = await api.put(
+      `/api/v1/organizations/${org_id}/prescriptions/${prescription_id}/dispense`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+
+  getDispenseRecord: async (org_id: string, prescription_id: string) => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/prescriptions/${prescription_id}/dispense`,
+    );
+    return unwrap(response.data);
+  },
+};
+
 const requestWithFallback = async <T>(
   paths: string[],
   request: (path: string) => Promise<T>,
@@ -841,63 +929,163 @@ export const waitlistService = {
 // };
 
 export const labService = {
-async createLabTest(
-  orgId: string,
-  consultationId: string,
-  payload: {
-    test_type: string;
-    priority: string;
-    notes?: string;
-    test_name: string
-  }
-) {
-  const res = await api.post(
-    `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`,
-    payload
-  );
-  return res.data;
-},
-async listOrganizationLabTests(orgId: string, params?: {statuses?: string[]}){
-  const res = await api.get(`api/v1/organizations/${orgId}/lab-tests`,{
-    params: {statuses: params?.statuses?.join(",")},
-  });
-  return res.data;
-},
-  
- async listLabTests(orgId: string, consultationId: string) {
-    const res = await api.get(
-      `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`
-    );
-    return res.data;
-  },
-
-async updateLabTestStatus(
-  orgId: string,
-  labTestId: string,
-  status: "Pending" | "In Progress" | "Completed"
-) {
-  const res = await api.patch(
-    `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/status`,
-    {
-      status,
-    }
-  );
-
-  return res.data;
-},
-
-  async getLabTestDetails(
+  async createLabTest(
     orgId: string,
     consultationId: string,
-    labTestId: string
+    payload: {
+      test_category?: string | null;
+      priority: string;
+      test_name: string;
+      clinical_notes?: string | null;
+    },
   ) {
-    const res = await api.get(
-      `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`
+    const res = await api.post(
+      `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`,
+      payload,
     );
+    return unwrap(res.data);
+  },
 
-    // Find the specific test inside the list
-  const tests = res.data?.data ?? [];
-return tests.find((item: any) => item.id === labTestId);
+  async listOrganizationLabTests(orgId: string, params?: { statuses?: string[] }) {
+    const res = await api.get(`/api/v1/organizations/${orgId}/lab-tests`, {
+      params: {
+        statuses: params?.statuses?.join(","),
+      },
+    });
+    return unwrap(res.data);
+  },
+
+  async listLabTests(orgId: string, consultationId: string) {
+    const res = await api.get(
+      `/api/v1/organizations/${orgId}/consultations/${consultationId}/lab-tests`,
+    );
+    return unwrap(res.data);
+  },
+
+  async getLabTestDetail(orgId: string, labTestId: string) {
+    const res = await api.get(`/api/v1/organizations/${orgId}/lab-tests/${labTestId}`);
+    return unwrap(res.data);
+  },
+
+  async updateLabTestStatus(
+    orgId: string,
+    labTestId: string,
+    status: "Pending" | "In Progress" | "Completed",
+  ) {
+    const res = await api.patch(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/status`,
+      {
+        status,
+      },
+    );
+    return unwrap(res.data);
+  },
+
+  async submitLabReport(
+    orgId: string,
+    labTestId: string,
+    reportData: Record<string, unknown>,
+  ) {
+    const res = await api.post(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report`,
+      reportData,
+    );
+    return unwrap(res.data);
+  },
+
+  async correctLabReport(
+    orgId: string,
+    labTestId: string,
+    reportData: Record<string, unknown>,
+  ) {
+    const res = await api.put(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report`,
+      reportData,
+    );
+    return unwrap(res.data);
+  },
+
+  async getLabReport(orgId: string, labTestId: string) {
+    const res = await api.get(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report`,
+    );
+    return unwrap(res.data);
+  },
+
+  // async uploadLabReportAttachment(orgId: string, labTestId: string, file: File) {
+  //   const form = new FormData();
+  //   form.append("file", file);
+  //   const res = await api.post(
+  //     `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
+  //     form,
+  //   );
+  //   return unwrap(res.data);
+  // },
+
+  // async listLabReportAttachments(orgId: string, labTestId: string) {
+  //   const res = await api.get(
+  //     `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
+  //   );
+  //   return unwrap(res.data);
+  // },
+
+  // async deleteLabReportAttachment(orgId: string, labTestId: string, attachmentId: string) {
+  //   const res = await api.delete(
+  //     `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments/${attachmentId}`,
+  //   );
+  //   return unwrap(res.data);
+  // },
+};
+
+export const inventoryService = {
+  createInventoryItem: async (
+    orgId: string,
+    payload: { name: string; unit: string; form?: string | null; strength?: string | null },
+  ) => {
+    const res = await api.post(`/api/v1/organizations/${orgId}/inventory/items`, payload);
+    return unwrap(res.data);
+  },
+
+  listInventoryItems: async (orgId: string, params?: { limit?: number; offset?: number; q?: string }) => {
+    const res = await api.get(`/api/v1/organizations/${orgId}/inventory/items`, {
+      params,
+    });
+    return unwrap(res.data);
+  },
+
+  getInventoryItem: async (orgId: string, itemId: string) => {
+    const res = await api.get(`/api/v1/organizations/${orgId}/inventory/items/${itemId}`);
+    return unwrap(res.data);
+  },
+
+  updateInventoryItem: async (
+    orgId: string,
+    itemId: string,
+    payload: { name?: string | null; unit?: string | null; form?: string | null; strength?: string | null },
+  ) => {
+    const res = await api.patch(`/api/v1/organizations/${orgId}/inventory/items/${itemId}`, payload);
+    return unwrap(res.data);
+  },
+
+  receiveStockBatch: async (
+    orgId: string,
+    itemId: string,
+    payload: { initial_quantity: number; batch_number?: string | null; expiry_date?: string | null },
+  ) => {
+    const res = await api.post(`/api/v1/organizations/${orgId}/inventory/items/${itemId}/batches`, payload);
+    return unwrap(res.data);
+  },
+
+  recordStockMovement: async (orgId: string, batchId: string, payload: Record<string, unknown>) => {
+    const res = await api.post(`/api/v1/organizations/${orgId}/inventory/batches/${batchId}/movements`, payload);
+    return unwrap(res.data);
+  },
+
+  listStockMovements: async (orgId: string, batchId: string, params?: { limit?: number; offset?: number }) => {
+    const res = await api.get(`/api/v1/organizations/${orgId}/inventory/batches/${batchId}/movements`, {
+      params,
+    });
+    return unwrap(res.data);
   },
 };
 
