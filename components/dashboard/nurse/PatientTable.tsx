@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PatientService, type PatientListRecord } from "@services/api";
+import {
+  patientService,
+  type PatientListRecord,
+  type PatientSearchResult,
+} from "@services/api";
+import { useAuth } from "@context/AuthContext";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
@@ -27,29 +32,54 @@ const statusClassName = (status: string) => {
   return "text-[#6B7280] bg-[#F3F4F6] border-[#E5E7EB]";
 };
 
-export default function PatientTable() {
+type PatientTableProps = {
+  searchQuery?: string;
+};
+
+export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
   const router = useRouter();
+  const { activeWorkspace } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const patientCacheRef = useRef<{ orgId: string; records: PatientListRecord[] } | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const normalizedQuery = searchQuery.trim();
+
     const fetchPatients = async () => {
       setLoading(true);
+      setError("");
 
       try {
-        const activeWorkspaceStr = localStorage.getItem("activeWorkspace");
-        if (!activeWorkspaceStr) {
-          console.error("No active workspace found");
+        if (!activeWorkspace?.id) {
+          if (!cancelled) setPatients([]);
           return;
         }
 
-        const activeWorkspace = JSON.parse(activeWorkspaceStr);
-        const orgId = activeWorkspace.id;
+        let data: Array<PatientListRecord | PatientSearchResult>;
 
-        const res = await PatientService.getPatients(orgId);
-        const data = Array.isArray(res.data) ? res.data : [];
+        if (normalizedQuery.length >= 2) {
+          const searchResults = await patientService.searchPatients(activeWorkspace.id, {
+              q: normalizedQuery,
+              limit: 100,
+            });
+          const cachedRecords = patientCacheRef.current?.orgId === activeWorkspace.id
+            ? patientCacheRef.current.records
+            : [];
+          const cachedById = new Map(cachedRecords.map((record) => [record.id, record]));
+          data = searchResults.map((result) => ({
+            ...result,
+            ...cachedById.get(result.id),
+          }));
+        } else {
+          const response = await patientService.getPatients(activeWorkspace.id);
+          data = Array.isArray(response) ? response as PatientListRecord[] : [];
+          patientCacheRef.current = { orgId: activeWorkspace.id, records: data };
+        }
 
-        const mappedPatients = (data as PatientListRecord[]).map((p) => ({
+        const mappedPatients = data.map((p) => ({
           id: p.id,
           initials: `${p.first_name?.[0] ?? ""}${p.last_name?.[0] ?? ""}`.toUpperCase(),
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
@@ -66,19 +96,38 @@ export default function PatientTable() {
             : "-",
         }));
 
-        setPatients(mappedPatients);
-      } catch (error) {
-        console.error("Failed to fetch patients:", error);
+        if (!cancelled) setPatients(mappedPatients);
+      } catch (requestError) {
+        console.error("Failed to fetch patients:", requestError);
+        if (!cancelled) {
+          setPatients([]);
+          setError("Unable to load patient records. Please try again.");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    void fetchPatients();
-  }, []);
+    const timer = window.setTimeout(
+      () => void fetchPatients(),
+      normalizedQuery.length >= 2 ? 300 : 0,
+    );
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [activeWorkspace?.id, searchQuery]);
 
   if (loading) return <p className="p-4 text-gray-500">Loading patients...</p>;
-  if (!loading && patients.length === 0) return <p className="p-4 text-gray-500">No patients found.</p>;
+  if (error) return <p role="alert" className="p-4 text-red-700">{error}</p>;
+  if (!loading && patients.length === 0) {
+    return (
+      <p className="p-4 text-gray-500">
+        {searchQuery.trim().length >= 2 ? `No patients found for “${searchQuery.trim()}”.` : "No patients found."}
+      </p>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">

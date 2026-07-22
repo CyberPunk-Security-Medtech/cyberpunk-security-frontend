@@ -119,6 +119,42 @@ Every Nurse-owned shared modal now receives the Nurse dark green header. The sha
 
 At `320 × 568`, the Add New Patient Record modal showed one dialog and one internal scrollbar. Its HMO/Insurance and Self-pay behavior was not changed.
 
+## Admin Settings page
+
+The Admin Settings placeholder has been replaced with a complete, responsive page based on the approved reference design. It keeps the existing PrivaCure Admin sidebar, header, navy color, type style, and spacing character.
+
+The page now includes:
+
+- **Profile:** shows the signed-in administrator's real name, email, role, and department. The fields are read-only because the current server does not support profile editing or personal photo management.
+- **Notifications:** shows the planned Email and Push & SMS preferences. The switches are clearly marked as a preview and are disabled so they cannot pretend to save settings that the server does not yet store.
+- **Security:** provides a working password-change form with clear password rules, matching-password checks, error feedback, and success feedback. Password fields are only cleared after a successful update.
+- **Admin members:** loads the current organization's members, shows their name, role, department or joined date, and active status, and links the Invite Member action to the existing Staff Onboarding page.
+- **Danger zone:** keeps the account deletion action visible, but safely disabled, because the server does not yet provide an account-deletion endpoint.
+
+Unsupported actions such as photo removal, two-factor setup, member removal, and account deletion explain why they are unavailable. The Admin sidebar's missing hard-coded avatar was also replaced with the signed-in user's initials, preventing a broken image.
+
+The page stacks cleanly on phones, keeps buttons touch-friendly, wraps long member information, and does not create page-level horizontal scrolling.
+
+The Settings column now uses the same left and right gutters as the top bar at every breakpoint. On large screens, its cards grow across the available Admin content width instead of stopping early and leaving an unbalanced empty area on the right. The Admin shell also contains the long page inside one scroll area, so scrolling to the Danger Zone no longer moves the header and sidebar away or leaves a large blank page below the dashboard.
+
+## Patient search integration
+
+The shared dashboard search bar now uses PrivaCure's organization patient-search endpoint. This makes the top-bar search work across Admin, Doctor, Nurse, Record Staff, Lab Scientist, and Pharmacy workspaces.
+
+The search:
+
+- starts after at least two characters and waits briefly while the user types, preventing unnecessary requests;
+- matches the server-supported patient details: name, phone number, email, and NIN;
+- shows loading, no-result, missing-workspace, and API-error messages;
+- limits the top-bar result list to eight clear patient summaries;
+- clears safely when the user changes page or workspace;
+- lets Doctor, Nurse, and Record Staff users open patient details directly from a result; and
+- keeps Admin, Lab Scientist, and Pharmacy results read-only because those roles currently have no patient-detail route.
+
+The Doctor and Nurse Patient Records search fields now use the same endpoint and update their tables. The normal patient list returns when the search is cleared. Existing full table information is kept from the loaded patient list when a matching search result is displayed.
+
+Medicine, consultation, test-order, transfer, and audit-log searches were not connected to this patient endpoint because they search different information. They continue using their existing local behavior until matching backend endpoints are available.
+
 ## Dashboards and people helped
 
 - **Admin:** clearer sidebar navigation and consistent patient age.
@@ -129,6 +165,27 @@ At `320 × 568`, the Add New Patient Record modal showed one dialog and one inte
 - **Patients:** uninsured patients can be registered without incorrect HMO data.
 
 ## Validation completed
+
+The Admin Settings page received the following additional checks on 21 July 2026:
+
+- TypeScript check: **Passed**.
+- Next.js production build: **Passed**. All 57 pages were generated. The first restricted-network attempt could not reach Google Fonts; the approved network run passed.
+- Git whitespace/error check (`git diff --check`): **Passed**.
+- Chrome DevTools responsive checks at `320 × 568`, `390 × 844`, `768 × 1024`, `1024 × 768`, `1440 × 900`, and `1920 × 1080`: **Passed** with no page-level overflow.
+- Settings and top-bar left and right alignment: **Passed** at all six tested widths (`16px` shared gutters on phones, `32px` on tablet and desktop).
+- Full-page overflow correction: **Passed**. At the bottom of Settings, the document remains exactly one viewport tall, the Header stays at the top, and only the Admin content area scrolls.
+- Password form client validation: **Passed** for missing required values, with accessible live error feedback.
+- Page structure and unsupported-action checks: **Passed** for one main landmark, labelled settings regions, read-only profile values, and disabled controls with clear explanations.
+- Lighthouse mobile and desktop snapshot audits: **100/100 Accessibility** and **100/100 Best Practices**.
+- The DevTools browser was not signed in to a live Admin account, so real member data and a real password change were not submitted. The page's missing-workspace state was verified without storing or requesting credentials.
+
+The patient search received these additional checks:
+
+- Live OpenAPI contract: **Verified** for `/api/v1/organizations/{org_id}/patients/search`, its two-character minimum, supported fields, pagination, and slim patient result.
+- Shared Header semantics: **Passed** for a labelled search box, keyboard-accessible clear action, Escape dismissal, live loading/result feedback, and missing-workspace guidance.
+- Lighthouse desktop snapshot after search integration: **100/100 Accessibility** and **100/100 Best Practices**.
+- Doctor and Nurse table integration: **Passed TypeScript validation** for normal-list, searching, empty, loading, and error states.
+- A live authenticated search request was not submitted in the DevTools browser because that isolated browser session had no signed-in workspace. No credentials were requested or stored.
 
 The following checks were completed on 17 July 2026:
 

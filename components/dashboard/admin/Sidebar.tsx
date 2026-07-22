@@ -308,15 +308,20 @@ export default function Sidebar({
             type="button"
             onClick={() => setIsProfileMenuOpen((prev) => !prev)}
             className="w-full flex items-center gap-3 bg-white/5 rounded-2xl px-3 py-3 text-left"
-            aria-label="Open profile menu"
+            aria-haspopup="menu"
+            aria-expanded={isProfileMenuOpen}
           >
-            <Image
-              src="/avatars/eleanor.png"
-              alt={displayName}
-              width={36}
-              height={36}
-              className="rounded-full"
-            />
+            <span
+              aria-hidden="true"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white"
+            >
+              {displayName
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part[0]?.toUpperCase())
+                .join("") || "A"}
+            </span>
             <div>
               <p className="text-sm font-medium">{displayName}</p>
               <p className="text-xs text-slate-300">{displayRole}</p>

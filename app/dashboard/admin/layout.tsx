@@ -20,7 +20,9 @@ export default function AdminDashboardLayout({
           sidebarOpen={sidebarOpen}
           sidebarId="admin-sidebar"
         />
-        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [contain:paint]">
+          {children}
+        </main>
       </div>
     </div>
   );
