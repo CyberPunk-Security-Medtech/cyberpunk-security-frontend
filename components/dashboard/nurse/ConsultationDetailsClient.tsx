@@ -40,9 +40,6 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     selectedConsultation,
     selectedConsultationId,
     setSelectedConsultationId,
-    isSelectedConsultationActive,
-    consultationStatus,
-    startConsultation,
   } = useConsultation();
 
   useEffect(() => {
@@ -61,16 +58,13 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     []
   );
 
-  const isPending =
-    String(selectedConsultation?.status ?? "").toLowerCase() === "pending";
-
   return (
     <div className="space-y-6 py-2 sm:py-4">
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={() => router.push("/dashboard/nurse/consultations")}
-          className="rounded-full bg-[#ECEEFD] px-4 py-1 text-sm font-medium text-brand-navy hover:underline"
+          className="rounded-full bg-[#ECFDF8] px-4 py-1 text-sm font-medium text-[#003C36] hover:underline"
         >
           Back to Consultation Queue
         </button>
@@ -89,7 +83,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
       <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
-            <h2 className="break-words text-xl font-semibold text-[#1A2380]">
+            <h2 className="break-words text-xl font-semibold text-[#003C36]">
               {selectedConsultation?.reason_for_visit || "Consultation Details"}
             </h2>
             <p className="text-sm text-gray-500">
@@ -107,16 +101,6 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
             <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
               {selectedConsultation?.priority || "-"}
             </span>
-            {isPending && (
-              <button
-                type="button"
-                onClick={() => void startConsultation()}
-                disabled={consultationStatus === "starting"}
-                className="rounded-md bg-[#1A2380] px-3 py-1.5 text-sm text-white hover:bg-[#111B66] disabled:opacity-50"
-              >
-                {consultationStatus === "starting" ? "Starting..." : "Start Consultation"}
-              </button>
-            )}
           </div>
         </div>
 

@@ -1,11 +1,19 @@
 'use client';
 
-import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import Modal from "@components/Modal"; 
 import { patientService, type PatientCreatePayload } from "@services/api";
 import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@context/AuthContext";
+import {
+  hasRequiredHmoDetails,
+  type CoverageType,
+} from "@utils/patientCoverage";
+import {
+  getTodayDateInputValue,
+  isValidPatientDateOfBirth,
+} from "@utils/patientAge";
 
 interface AddPatientModalProps {
   isOpen: boolean;
@@ -102,15 +110,19 @@ const extractApiErrorMessage = (responseData: unknown): string | null => {
 export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatientModalProps) {
   const { activeWorkspace } = useAuth();
   const [formData, setFormData] = useState<FormState>(emptyForm);
+  const [coverageType, setCoverageType] = useState<CoverageType | "">("");
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   // handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setFormError("");
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
     if (
       !formData.first_name ||
       !formData.last_name ||
@@ -119,12 +131,29 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
       !formData.email ||
       !formData.phone_number
     ) {
+      setFormError("Please complete all required personal information fields.");
       toast.error("Please complete all required fields.");
       return;
     }
 
     if (!["Male", "Female", "Other"].includes(formData.gender)) {
+      setFormError("Please select a valid gender.");
       toast.error("Please select a valid gender.");
+      return;
+    }
+
+    if (!isValidPatientDateOfBirth(formData.dob)) {
+      setFormError("Enter a valid date of birth that is not in the future.");
+      return;
+    }
+
+    if (!coverageType) {
+      setFormError("Select HMO/Insurance or Self-pay before submitting.");
+      return;
+    }
+
+    if (coverageType === "hmo" && !hasRequiredHmoDetails(formData)) {
+      setFormError("HMO provider, plan, and enrollee number are required for HMO patients.");
       return;
     }
 
@@ -161,13 +190,18 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
         ["current_medications", formData.current_medications],
         ["immunizations", formData.immunizations],
         ["lifestyle_info", formData.lifestyle_info],
-        ["enrollee_type", formData.enrollee_type],
-        ["hmo_provider", formData.hmo_provider],
-        ["hmo_plan", formData.hmo_plan],
-        ["hmo_number", formData.hmo_number],
-        ["policy_start_date", formData.policy_start_date],
-        ["policy_expiry_date", formData.policy_expiry_date],
       ];
+
+      if (coverageType === "hmo") {
+        optionalFields.push(
+          ["enrollee_type", formData.enrollee_type],
+          ["hmo_provider", formData.hmo_provider],
+          ["hmo_plan", formData.hmo_plan],
+          ["hmo_number", formData.hmo_number],
+          ["policy_start_date", formData.policy_start_date],
+          ["policy_expiry_date", formData.policy_expiry_date],
+        );
+      }
 
       for (const [field, rawValue] of optionalFields) {
         const nextValue = asOptional(rawValue);
@@ -185,12 +219,17 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
       onCreated?.();
       onClose();
       setFormData(emptyForm);
+      setCoverageType("");
+      setFormError("");
     } catch (error) {
       console.error("Failed to create patient:", error);
       if (isAxiosError(error)) {
         const backendMessage = extractApiErrorMessage(error.response?.data);
-        toast.error(backendMessage ?? "Failed to create patient");
+        const message = backendMessage ?? "Failed to create patient";
+        setFormError(message);
+        toast.error(message);
       } else {
+        setFormError("Failed to create patient");
         toast.error("Failed to create patient");
       }
     } finally {
@@ -213,7 +252,12 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
         onClose={onClose}
         className="w-full max-w-4xl"
       >
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {formError && (
+            <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {formError}
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
@@ -231,13 +275,18 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
               placeholder="Last Name"
               className="border rounded-md px-3 py-2 w-full"
             />
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 w-full"
-            />
+            <label className="space-y-1 text-sm text-gray-600">
+              <span>Date of Birth</span>
+              <input
+                required
+                type="date"
+                name="dob"
+                max={getTodayDateInputValue()}
+                value={formData.dob}
+                onChange={handleChange}
+                className="w-full rounded-md border px-3 py-2 text-gray-900"
+              />
+            </label>
             <select
               name="gender"
               value={formData.gender}
@@ -347,58 +396,76 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
             className="border rounded-md px-3 py-2 w-full"
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="enrollee_type"
-              value={formData.enrollee_type}
-              onChange={handleChange}
-              placeholder="Enrollee Type"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <input
-              type="text"
-              name="hmo_provider"
-              value={formData.hmo_provider}
-              onChange={handleChange}
-              placeholder="HMO Provider"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <input
-              type="text"
-              name="hmo_plan"
-              value={formData.hmo_plan}
-              onChange={handleChange}
-              placeholder="HMO Plan"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <input
-              type="text"
-              name="hmo_number"
-              value={formData.hmo_number}
-              onChange={handleChange}
-              placeholder="HMO Number"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <input
-              type="date"
-              name="policy_start_date"
-              value={formData.policy_start_date}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <input
-              type="date"
-              name="policy_expiry_date"
-              value={formData.policy_expiry_date}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 w-full"
-            />
-          </div>
+          <fieldset className="space-y-4 border-t border-gray-100 pt-4">
+            <legend className="text-sm font-semibold text-gray-900">Payment coverage</legend>
+            <p className="text-sm text-gray-500">
+              Choose HMO/Insurance to add policy details, or Self-pay to continue without them.
+            </p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {(["hmo", "self_pay"] as const).map((option) => (
+                <label
+                  key={option}
+                  className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}
+                >
+                  <input
+                    type="radio"
+                    name="coverage_type"
+                    value={option}
+                    checked={coverageType === option}
+                    onChange={() => {
+                      setCoverageType(option);
+                      setFormError("");
+                      if (option === "self_pay") {
+                        setFormData((current) => ({
+                          ...current,
+                          enrollee_type: "",
+                          hmo_provider: "",
+                          hmo_plan: "",
+                          hmo_number: "",
+                          policy_start_date: "",
+                          policy_expiry_date: "",
+                        }));
+                      }
+                    }}
+                    required
+                  />
+                  {option === "hmo" ? "HMO / Insurance" : "Self-pay"}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          {coverageType === "hmo" && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <label className="space-y-1 text-sm font-medium text-gray-700">
+                <span>Enrollee Type (Optional)</span>
+                <input type="text" name="enrollee_type" value={formData.enrollee_type} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
+              </label>
+              <label className="space-y-1 text-sm font-medium text-gray-700">
+                <span>HMO Provider</span>
+                <input required type="text" name="hmo_provider" value={formData.hmo_provider} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
+              </label>
+              <label className="space-y-1 text-sm font-medium text-gray-700">
+                <span>HMO Plan</span>
+                <input required type="text" name="hmo_plan" value={formData.hmo_plan} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
+              </label>
+              <label className="space-y-1 text-sm font-medium text-gray-700">
+                <span>HMO Number</span>
+                <input required type="text" name="hmo_number" value={formData.hmo_number} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
+              </label>
+              <label className="space-y-1 text-sm font-medium text-gray-700">
+                <span>Policy Start Date (Optional)</span>
+                <input type="date" name="policy_start_date" value={formData.policy_start_date} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
+              </label>
+              <label className="space-y-1 text-sm font-medium text-gray-700">
+                <span>Policy Expiry Date (Optional)</span>
+                <input type="date" name="policy_expiry_date" value={formData.policy_expiry_date} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
+              </label>
+            </div>
+          )}
 
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             disabled={submitting}
             className="bg-[#1A2380] text-white px-4 py-2 rounded-md mt-4 disabled:opacity-50"
           >

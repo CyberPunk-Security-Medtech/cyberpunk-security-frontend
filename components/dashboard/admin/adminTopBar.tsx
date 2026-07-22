@@ -13,21 +13,22 @@ export default function Topbar({ onAddPatientClick }: TopbarProps) {
   const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
   const displayName = fullName || user?.email?.split("@")?.[0] || "Administrator";
   return (
-    <header className="px-8 py-4 border-b bg-white flex items-center justify-between">
+    <header className="flex flex-col gap-4 border-b bg-white px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
       <div>
-        <h1 className="text-xl font-semibold">Dashboard Overview</h1>
+        <h1 className="dashboard-page-title">Dashboard Overview</h1>
         <p className="text-sm text-slate-500">Welcome back, {displayName}.</p>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
         
-        <button className="flex items-center gap-1 border rounded-full px-3 py-1.5 text-xs">
+        <button className="dashboard-button min-h-10 border px-4 text-sm">
           Today <ChevronDown className="w-3 h-3" />
         </button>
 
         <Button
           type="button"
-          className="bg-[#E1E7EF] w-[100px] h-[43px] rounded-full flex items-center justify-center gap-2"
+          size="default"
+          className="bg-[#E1E7EF] rounded-full"
         >
           <Download className="w-4 h-4" />
           Export
@@ -36,7 +37,9 @@ export default function Topbar({ onAddPatientClick }: TopbarProps) {
         <Button
           type="button"
           onSubmitHandler={onAddPatientClick}
-          className="bg-[#1A2380] w-[133px] h-[43px] text-white rounded-full flex items-center justify-center gap-2"
+          size="default"
+          variant="primary"
+          className="rounded-full"
         >
           <Plus className="w-4 h-4" />
           Add Patient

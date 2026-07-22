@@ -79,11 +79,11 @@ export default function LabTestTab() {
   return (
     <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-lg font-semibold text-brand-navy">Lab Test</h3>
+        <h3 className="text-lg font-semibold text-[#003C36]">Lab Test</h3>
         <button
           disabled={!isSelectedConsultationActive || !selectedConsultationId}
           onClick={() => setOpen(true)}
-          className="rounded-md bg-brand-navy px-4 py-2.5 text-sm font-medium text-white hover:bg-[#141a66] disabled:opacity-50"
+          className="rounded-md bg-[#006B5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
         >
           + Order Lab Test
         </button>
@@ -102,7 +102,7 @@ export default function LabTestTab() {
         {filteredTests.map((t: any) => (
           <div key={t.id} className="flex flex-col gap-3 rounded-xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="break-words font-medium text-brand-navy">{t.test_name}</p>
+              <p className="break-words font-medium text-[#003C36]">{t.test_name}</p>
               <p className="break-words text-xs text-gray-500">{t.test_category || "Uncategorized"}</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -116,7 +116,12 @@ export default function LabTestTab() {
           </div>
         ))}
       </div>
-      <Modal title="Order New Test" isOpen={open} onClose={() => setOpen(false)}>
+      <Modal
+        title="Order New Test"
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        headerClassName="bg-[#003C36]"
+      >
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <FieldLabel>Test Name</FieldLabel>
@@ -163,7 +168,7 @@ export default function LabTestTab() {
             </button>
             <button
               disabled={submitting || !orgId || !selectedConsultationId}
-              className="rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              className="rounded-full bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
               type="submit"
             >
               {submitting ? "Submitting..." : "Submit Test Request"}

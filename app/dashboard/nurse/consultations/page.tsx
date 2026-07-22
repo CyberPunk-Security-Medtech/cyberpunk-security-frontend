@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { consultationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { StatusBadge } from "@components/StatusBadge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type ConsultationStatus = "Pending" | "In Progress" | "Completed" | "Cancelled";
 
@@ -51,7 +52,6 @@ export default function ConsultationsPage() {
   const [query, setQuery] = useState("");
   const [rows, setRows] = useState<ConsultationRow[]>([]);
   const [activeTab, setActiveTab] = useState<"All" | ConsultationStatus>("All");
-  const [actionLoadingById, setActionLoadingById] = useState<Record<string, boolean>>({});
 
   const loadConsultations = async () => {
     if (!orgId) return;
@@ -132,48 +132,15 @@ export default function ConsultationsPage() {
     return base;
   }, [rows]);
 
-  const withRowLoading = async (id: string, fn: () => Promise<void>) => {
-    setActionLoadingById((prev) => ({ ...prev, [id]: true }));
-    try {
-      await fn();
-    } finally {
-      setActionLoadingById((prev) => ({ ...prev, [id]: false }));
-    }
-  };
-
-  const handleStart = async (row: ConsultationRow) => {
-    if (!orgId) return;
-    await withRowLoading(row.id, async () => {
-      await consultationService.attendConsultation(orgId, row.id);
-      await loadConsultations();
-      router.push(
-        `/dashboard/doctor/consultations/${row.id}?patient_id=${row.patient_id}`
-      );
-    });
-  };
-
-  // const handleComplete = async (row: ConsultationRow) => {
-  //   if (!orgId) return;
-  //   await withRowLoading(row.id, async () => {
-  //     await consultationService.completeConsultation(orgId, row.id, { status: "Completed" });
-  //     await loadConsultations();
-  //   });
-  // };
-
-  const renderActionButtons = (row: ConsultationRow, rowLoading: boolean) => {
+  const renderActionButtons = (row: ConsultationRow) => {
     const detailHref = `/dashboard/nurse/consultations/${row.id}?patient_id=${row.patient_id}`;
 
     if (row.status === "Pending") {
       return (
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-          <button
-            type="button"
-            onClick={() => void handleStart(row)}
-            disabled={rowLoading}
-            className="w-full rounded-md bg-[#1A2380] px-3 py-1.5 text-white hover:bg-[#111B66] disabled:opacity-50 sm:w-auto"
-          >
-            {rowLoading ? "Starting..." : "Start"}
-          </button>
+          <span className="w-full rounded-md bg-green-50 px-3 py-1.5 text-center text-green-700 sm:w-auto">
+            Routed to Department
+          </span>
           <button
             type="button"
             onClick={() => router.push(detailHref)}
@@ -188,21 +155,16 @@ export default function ConsultationsPage() {
     if (row.status === "In Progress") {
       return (
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          <span className="w-full rounded-md bg-blue-50 px-3 py-1.5 text-center text-blue-700 sm:w-auto">
+            With Doctor
+          </span>
           <button
             type="button"
             onClick={() => router.push(detailHref)}
             className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
           >
-            Continue
+            Details
           </button>
-          {/* <button
-            type="button"
-            onClick={() => void handleComplete(row)}
-            disabled={rowLoading}
-            className="w-full rounded-md bg-[#00B8A8] px-3 py-1.5 text-white hover:bg-[#00A393] disabled:opacity-50 sm:w-auto"
-          >
-            {rowLoading ? "Saving..." : "Complete"}
-          </button> */}
         </div>
       );
     }
@@ -221,7 +183,7 @@ export default function ConsultationsPage() {
   return (
     <div className="min-w-0 space-y-6 py-2 sm:py-4">
       <div className="space-y-1">
-        <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">Consultation Queue</h2>
+        <h2 className="text-xl font-semibold text-[#003C36] sm:text-2xl">Consultation Queue</h2>
         <p className="text-sm text-gray-500">
           Track pending, active and completed consultations across your patients.
         </p>
@@ -238,7 +200,7 @@ export default function ConsultationsPage() {
                 onClick={() => setActiveTab(tab)}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
                   isActive
-                    ? "bg-[#1A2380] text-white"
+                    ? "bg-[#006B5F] text-white"
                     : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
@@ -258,11 +220,11 @@ export default function ConsultationsPage() {
       </div>
 
       <div className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="hidden overflow-x-auto xl:block">
+        <ResponsiveTableRegion label="Nurse consultations">
           <table className="w-full min-w-[980px] border-collapse text-left text-sm">
             <thead className="border-b bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Patient</th>
+                <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient</th>
                 <th className="px-4 py-3 font-medium">Department</th>
                 <th className="px-4 py-3 font-medium">Reason</th>
                 <th className="px-4 py-3 font-medium">Priority</th>
@@ -290,11 +252,10 @@ export default function ConsultationsPage() {
 
               {!loading &&
                 filteredRows.map((row) => {
-                  const rowLoading = !!actionLoadingById[row.id];
                   return (
                     <tr key={row.id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-[#1A2380]">{row.patient_name}</div>
+                      <td className="bg-white px-4 py-3">
+                        <div className="font-medium text-[#003C36]">{row.patient_name}</div>
                         <div className="break-all text-xs text-gray-500">{row.patient_id}</div>
                       </td>
                       <td className="px-4 py-3">{row.department_name}</td>
@@ -306,15 +267,15 @@ export default function ConsultationsPage() {
                         <StatusBadge status={toBadgeStatus(row.status)} />
                       </td>
                       <td className="px-4 py-3 text-gray-500">{formatDate(row.updated_at)}</td>
-                      <td className="px-4 py-3 text-right">{renderActionButtons(row, rowLoading)}</td>
+                      <td className="px-4 py-3 text-right">{renderActionButtons(row)}</td>
                     </tr>
                   );
                 })}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTableRegion>
 
-        <div className="space-y-3 p-3 sm:p-4 xl:hidden">
+        <div className="hidden">
           {loading && (
             <div className="rounded-lg border p-4 text-sm text-gray-500">
               Loading consultations...
@@ -329,12 +290,11 @@ export default function ConsultationsPage() {
 
           {!loading &&
             filteredRows.map((row) => {
-              const rowLoading = !!actionLoadingById[row.id];
               return (
                 <div key={row.id} className="overflow-hidden rounded-lg border border-gray-200 p-4">
                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="break-words font-medium text-[#1A2380]">{row.patient_name}</p>
+                      <p className="break-words font-medium text-[#003C36]">{row.patient_name}</p>
                       <p className="break-all text-xs text-gray-500">{row.patient_id}</p>
                     </div>
                     <StatusBadge status={toBadgeStatus(row.status)} />
@@ -356,7 +316,7 @@ export default function ConsultationsPage() {
                   </div>
 
                   <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {renderActionButtons(row, rowLoading)}
+                    {renderActionButtons(row)}
                   </div>
                 </div>
               );

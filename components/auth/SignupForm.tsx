@@ -157,16 +157,18 @@ export default function SignupForm() {
 
   return (
     <form
-  onSubmit={handleSubmit}
-  className="space-y-3 sm:space-y-5 scale-[0.95] sm:scale-100 origin-top"
->
+      onSubmit={handleSubmit}
+      className="space-y-3 sm:space-y-5"
+    >
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="signup-email" className="mb-1 block text-sm font-medium text-gray-700">
           Email Address
         </label>
         <input
+          id="signup-email"
           type="email"
           name="email"
+          autoComplete="email"
           placeholder="Enter Email Address"
           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.email}
@@ -176,12 +178,14 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="signup-first-name" className="mb-1 block text-sm font-medium text-gray-700">
           First Name
         </label>
         <input
+          id="signup-first-name"
           type="text"
           name="firstName"
+          autoComplete="given-name"
           placeholder="First Name"
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.firstName}
@@ -191,12 +195,14 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="signup-last-name" className="mb-1 block text-sm font-medium text-gray-700">
           Last Name
         </label>
         <input
+          id="signup-last-name"
           type="text"
           name="lastName"
+          autoComplete="family-name"
           placeholder="Last Name"
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.lastName}
@@ -206,12 +212,14 @@ export default function SignupForm() {
       </div>
 
       <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="signup-password" className="mb-1 block text-sm font-medium text-gray-700">
           Password
         </label>
         <input
+          id="signup-password"
           type={showPassword ? "text" : "password"}
           name="password"
+          autoComplete="new-password"
           placeholder="Enter Password"
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           value={formData.password}
@@ -222,13 +230,15 @@ export default function SignupForm() {
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-4 top-9 text-gray-500"
+          className="absolute right-1 top-7 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+          aria-pressed={showPassword}
         >
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
 
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"
@@ -251,7 +261,7 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-900 text-white py-1.5 rounded-full font-semibold hover:bg-blue-800 transition disabled:opacity-60 disabled:cursor-not-allowed"
+        className="min-h-11 w-full rounded-full bg-blue-900 py-1.5 font-semibold text-white transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-800 focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Creating..." : "Create account"}
       </button>

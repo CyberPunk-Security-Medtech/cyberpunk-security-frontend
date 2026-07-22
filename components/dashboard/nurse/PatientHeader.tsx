@@ -21,25 +21,13 @@ export default function PatientHeader() {
     patientLoading,
     consultations,
     consultationLoading,
-    consultationStatus,
-    isConsultationActive,
     selectedConsultation,
     patientId,
     hasConsultation,
-    canStartConsultation,
     refreshConsultations,
-    startConsultation,
   } = useConsultation();
 
   const vitals = parseVitals(selectedConsultation?.vitals ?? consultations[0]?.vitals);
-
-  const handleStart = async () => {
-    try {
-      await startConsultation();
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const fullName = `${patient?.first_name ?? ""} ${patient?.last_name ?? ""}`.trim() || "Patient";
   const initials =
@@ -50,41 +38,25 @@ export default function PatientHeader() {
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <button
           onClick={() => history.back()}
-          className="text-sm w-fit bg-[#ECEEFD] font-medium rounded-full text-brand-navy hover:underline px-4 py-1"
+          className="text-sm w-fit bg-[#ECFDF8] font-medium rounded-full text-[#003C36] hover:underline px-4 py-1"
         >
           Back to Patients List
         </button>
 
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          {isConsultationActive ? (
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              In Consultation
+          {hasConsultation ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+              <span className="h-2 w-2 rounded-full bg-green-500" />
+              Routed to Department
             </span>
           ) : (
             <Button
               type="button"
-              onSubmitHandler={
-                hasConsultation
-                  ? handleStart
-                  : () => setIsCreateModalOpen(true)
-              }
-              disabled={
-                consultationLoading ||
-                consultationStatus === "starting" ||
-                (hasConsultation && !canStartConsultation)
-              }
-              className="w-full rounded-md bg-[#1A2380] px-4 py-2 text-white transition hover:bg-[#00B8A8] disabled:opacity-50 sm:w-auto sm:px-6"
+              onSubmitHandler={() => setIsCreateModalOpen(true)}
+              disabled={consultationLoading}
+              className="w-full rounded-md bg-[#006B5F] px-4 py-2 text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50 sm:w-auto sm:px-6"
             >
-              {consultationStatus === "starting"
-                ? "Starting..."
-                : consultationLoading
-                ? "Loading..."
-                : !hasConsultation
-                ? "Create Consultation"
-                : canStartConsultation
-                ? "Start Consultation"
-                : "No Consultation Ready"}
+              {consultationLoading ? "Loading..." : "Create Consultation"}
             </Button>
           )}
         </div>
@@ -95,7 +67,7 @@ export default function PatientHeader() {
           {initials}
         </div>
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-semibold text-brand-navy">
+          <h3 className="truncate text-lg font-semibold text-[#003C36]">
             {patientLoading ? "Loading patient..." : fullName}
           </h3>
           <p className="text-sm">
@@ -108,7 +80,7 @@ export default function PatientHeader() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {vitals.map((v) => (
           <div key={v.label} className="border rounded-lg p-4 text-center">
-            <p className="break-words font-semibold text-brand-navy">{v.value}</p>
+            <p className="break-words font-semibold text-[#003C36]">{v.value}</p>
             <p className="text-sm text-gray-500">{v.label}</p>
             <div className="mt-2"><StatusBadge status={v.status} /></div>
           </div>

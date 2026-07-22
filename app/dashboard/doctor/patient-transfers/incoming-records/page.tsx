@@ -21,6 +21,7 @@ import {
   type DataShareGrant,
   type Referral,
 } from "@services/api";
+import { resolvePatientAge } from "@utils/patientAge";
 
 type FilterType = "All" | IncomingRecordStatus;
 
@@ -78,25 +79,6 @@ const formatPatientName = (patient: unknown, fallback: string) => {
   const lastName = getStringField(patient, "last_name");
   const fullName = `${firstName} ${lastName}`.trim();
   return fullName || getStringField(patient, "name") || fallback;
-};
-
-const calculateAge = (dob?: string) => {
-  if (!dob) return "N/A";
-  const birthDate = new Date(dob);
-  if (Number.isNaN(birthDate.getTime())) return "N/A";
-
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age -= 1;
-  }
-
-  return age;
 };
 
 const scopeLabels: Record<string, string> = {
@@ -328,9 +310,10 @@ const mapReferralToRecord = (
         ? "Granted controlled access"
         : "Controlled access",
     status: statusMap[referral.status] ?? "Pending",
-    age:
-      getNumberField(options?.patient, "age") ??
-      calculateAge(getStringField(options?.patient, "dob")),
+    age: resolvePatientAge(
+      getNumberField(options?.patient, "age"),
+      getStringField(options?.patient, "dob"),
+    ),
     gender: getStringField(options?.patient, "gender") || "N/A",
     bloodGroup: getStringField(options?.patient, "blood_group") || "N/A",
     genotype: getStringField(options?.patient, "genotype") || "N/A",

@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { consultationService, patientService } from "@services/api";
-import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
 
 type ConsultationStatus = "idle" | "starting" | "active";
@@ -22,7 +21,6 @@ type ConsultationContextType = {
   selectedConsultation: any | null;
   hasConsultation: boolean;
   hasOpenConsultation: boolean;
-  canStartConsultation: boolean;
   setSelectedConsultationId: (consultationId: string | null) => void;
   refreshPatient: () => Promise<void>;
   refreshConsultations: () => Promise<void>;
@@ -32,7 +30,6 @@ type ConsultationContextType = {
     priority?: "Routine" | "Urgent" | "Emergency";
     vitals?: string | null;
   }) => Promise<string | null>;
-  startConsultation: () => Promise<void>;
 };
 
 const ConsultationContext = createContext<ConsultationContextType | undefined>(undefined);
@@ -123,18 +120,16 @@ export function ConsultationProvider({
 
   const selectedConsultation =
     consultations.find((consultation) => consultation.id === selectedConsultationId) ?? null;
-  const selectedStatus = String(selectedConsultation?.status ?? "").toLowerCase();
   const actionConsultation =
     consultations.find((consultation) => consultation.id === currentConsultationId) ?? null;
   const actionStatus = String(actionConsultation?.status ?? "").toLowerCase();
-  const isConsultationActive = actionStatus === "in progress";
-  const isSelectedConsultationActive = selectedStatus === "in progress";
+  const isConsultationActive = false;
+  const isSelectedConsultationActive = false;
   const hasConsultation = !!currentConsultationId;
   const hasOpenConsultation = consultations.some((consultation) => {
     const status = String(consultation?.status ?? "").toLowerCase();
     return status === "pending" || status === "in progress";
   });
-  const canStartConsultation = actionStatus === "pending";
 
   const createConsultation = async (payload: {
     department_id: string;
@@ -160,40 +155,6 @@ export function ConsultationProvider({
     }
   };
 
-  const startConsultation = async () => {
-    const targetConsultationId =
-      selectedStatus === "pending"
-        ? selectedConsultationId
-        : actionStatus === "pending"
-        ? currentConsultationId
-        : null;
-
-    if (!orgId || !targetConsultationId) return;
-    setConsultationStatus("starting");
-    try {
-      await consultationService.attendConsultation(orgId, targetConsultationId);
-      setConsultationStatus("active");
-      await refreshConsultations();
-    } catch (error) {
-      if (isAxiosError(error)) {
-        const method = error.config?.method?.toUpperCase() ?? "UNKNOWN";
-        const url = error.config?.url ?? "UNKNOWN_URL";
-        const status = error.response?.status;
-        const responseData = error.response?.data;
-        console.error("Failed to attend consultation", {
-          message: error.message,
-          method,
-          url,
-          status,
-          responseData,
-        });
-      } else {
-        console.error("Failed to attend consultation", error);
-      }
-      setConsultationStatus("idle");
-    }
-  };
-
   const value = useMemo(
     () => ({
       patientId,
@@ -210,12 +171,10 @@ export function ConsultationProvider({
       selectedConsultation,
       hasConsultation,
       hasOpenConsultation,
-      canStartConsultation,
       setSelectedConsultationId,
       refreshPatient,
       refreshConsultations,
       createConsultation,
-      startConsultation,
     }),
     [
       patientId,
@@ -232,7 +191,6 @@ export function ConsultationProvider({
       selectedConsultation,
       hasConsultation,
       hasOpenConsultation,
-      canStartConsultation,
       setSelectedConsultationId,
     ]
   );

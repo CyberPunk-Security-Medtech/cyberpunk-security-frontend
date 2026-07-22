@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Sidebar from "@components/dashboard/admin/Sidebar";
-import Header from "@components/Header";
 import { useAuth } from "@context/AuthContext";
 import { organizationService } from "@services/api";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type Department = {
   id: string;
@@ -80,15 +79,9 @@ export default function DepartmentManagementPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900">
-      <Sidebar />
-
-      <main className="flex-1 flex flex-col">
-        <Header />
-
-        <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6">
           <section>
-            <h1 className="text-2xl font-semibold">Department Management</h1>
+            <h1 className="dashboard-page-title">Department Management</h1>
             <p className="mt-1 text-sm text-slate-600">
               Create and review departments for the selected organization.
             </p>
@@ -125,11 +118,11 @@ export default function DepartmentManagementPage() {
                 <div className="border-b px-5 py-3">
                   <h2 className="text-base font-semibold">Departments</h2>
                 </div>
-                <div className="overflow-x-auto">
+                <ResponsiveTableRegion label="Departments">
                   <table className="w-full min-w-[720px] text-sm">
                     <thead className="bg-slate-50 text-left text-slate-600">
                       <tr>
-                        <th className="px-5 py-3 font-medium">Name</th>
+                        <th scope="col" className="min-w-[180px] bg-slate-50 px-5 py-3 font-medium">Name</th>
                         <th className="px-5 py-3 font-medium">Department ID</th>
                         <th className="px-5 py-3 font-medium">Created At</th>
                       </tr>
@@ -150,7 +143,7 @@ export default function DepartmentManagementPage() {
                       ) : (
                         departments.map((department) => (
                           <tr key={department.id} className="border-t">
-                            <td className="px-5 py-4">{department.name}</td>
+                            <td className="bg-white px-5 py-4">{department.name}</td>
                             <td className="px-5 py-4 font-mono text-xs">{department.id}</td>
                             <td className="px-5 py-4">{formatDateTime(department.created_at)}</td>
                           </tr>
@@ -158,12 +151,10 @@ export default function DepartmentManagementPage() {
                       )}
                     </tbody>
                   </table>
-                </div>
+                </ResponsiveTableRegion>
               </section>
             </>
           )}
-        </div>
-      </main>
     </div>
   );
 }

@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { invitationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 interface Invitation {
   id: string;
@@ -17,7 +19,6 @@ interface Invitation {
 export default function StaffTable() {
   const { activeWorkspace } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeWorkspace?.id) return;
@@ -41,7 +42,6 @@ const handleRevoke = async (invId: string) => {
     );
 
     toast.success("Invitation revoked successfully");
-    setOpenMenu(null);
   } catch (error) {
     let message = "Failed to revoke invitation";
 
@@ -70,7 +70,6 @@ const handleResend = async (inv: Invitation) => {
     );
 
     toast.success(`Invitation resent to ${inv.email}`);
-    setOpenMenu(null);
   } catch (error) {
     let message = "Unable to resend invitation";
 
@@ -86,20 +85,21 @@ const handleResend = async (inv: Invitation) => {
 };
 
   return (
-    <table className="w-full text-sm">
+    <ResponsiveTableRegion label="Staff invitations">
+    <table className="w-full min-w-[760px] text-sm">
       <thead>
         <tr className="bg-slate-50 text-xs font-medium text-slate-600">
-          <th className="px-4 py-3 text-left w-[40%]">Email</th>
-          <th className="px-4 py-3 text-left w-[20%]">Role</th>
-          <th className="px-4 py-3 text-right w-[20%]">Status</th>
-          <th className="px-4 py-3 text-right w-[20%]">Actions</th>
+          <th scope="col" className="w-[40%] min-w-[280px] bg-slate-50 px-4 py-3 text-left">Email</th>
+          <th scope="col" className="w-[20%] min-w-[140px] px-4 py-3 text-left">Role</th>
+          <th scope="col" className="w-[20%] min-w-[130px] px-4 py-3 text-right">Status</th>
+          <th scope="col" className="w-[20%] min-w-[150px] px-4 py-3 text-right">Actions</th>
         </tr>
       </thead>
 
       <tbody>
         {invitations.map((inv, i) => (
-          <tr key={inv.email} className={i % 2 ? "bg-slate-50/50" : ""}>
-            <td className="px-4 py-3">{inv.email}</td>
+          <tr key={inv.email} className={i % 2 ? "bg-slate-50/50" : "bg-white"}>
+            <td className="bg-inherit px-4 py-3">{inv.email}</td>
             <td className="px-4 py-3 capitalize">{inv.role}</td>
 
             <td className="px-4 py-3 text-right">
@@ -116,40 +116,39 @@ const handleResend = async (inv: Invitation) => {
             </td>
 
             {/* ACTIONS */}
-            <td className="px-4 py-3 text-right relative">
-              <button
-                onClick={() =>
-                  setOpenMenu(
-                    openMenu === inv.email ? null : inv.email
-                  )
-                }
-                className="px-4 py-1 border rounded-full text-xs hover:bg-slate-50"
-              >
-                Actions
-              </button>
-
-              {openMenu === inv.email && (
-                <div className="absolute right-4 mt-2 w-40 bg-white border rounded-lg shadow-lg z-20">
-                 <button
-  disabled={inv.status === "accepted"}
-  onClick={() => handleResend(inv)}
-  className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
->
-  Resend Invite
-</button>
-
-                  <button
-                    onClick={() => handleRevoke(inv.id)}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                  >
-                    Revoke Invite
-                  </button>
-                </div>
-              )}
+            <td className="px-4 py-3 text-right">
+              <Menu>
+                <MenuButton className="min-h-10 rounded-full border px-4 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">
+                  Actions
+                </MenuButton>
+                <MenuItems
+                  anchor="bottom end"
+                  className="z-50 mt-2 w-40 rounded-lg border bg-white p-1 shadow-lg focus:outline-none"
+                >
+                  <MenuItem>
+                    <button
+                      disabled={inv.status === "accepted"}
+                      onClick={() => handleResend(inv)}
+                      className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-50 focus:bg-slate-50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Resend Invite
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      onClick={() => handleRevoke(inv.id)}
+                      className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none"
+                    >
+                      Revoke Invite
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
+    </ResponsiveTableRegion>
   );
 }

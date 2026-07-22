@@ -217,7 +217,7 @@
 //     <div className="space-y-6 py-2 sm:py-4">
 //       <div className="space-y-1">
 //         <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">
-//           Good morning, Sci. {buildDisplayName(user)}!
+//           {greeting}, Sci. {buildDisplayName(user)}!
 //         </h2>
 //         <p className="text-sm text-gray-500">
 //           Welcome back. Review pending and active test orders from your queue.
@@ -431,11 +431,13 @@ import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@components/StatusBadge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { useAuth } from "@context/AuthContext";
 import {
   consultationService,
   labService,
 } from "@services/api";
+import { getTimeGreeting } from "@utils/greeting";
 import {
   LabOrder,
   combineUniqueOrders,
@@ -470,6 +472,7 @@ export default function LabScientistDashboardClient() {
   const router = useRouter();
   const { user, activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
+  const greeting = getTimeGreeting();
 
   const [orders, setOrders] = useState<LabOrder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -637,7 +640,7 @@ export default function LabScientistDashboardClient() {
     <div className="space-y-6 py-2 sm:py-4">
       <div className="space-y-1">
         <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">
-          Good morning, Sci. {buildDisplayName(user)}!
+          {greeting}, Sci. {buildDisplayName(user)}!
         </h2>
         <p className="text-sm text-gray-500">
           Welcome back. Review pending and active test orders from your queue.
@@ -691,11 +694,11 @@ export default function LabScientistDashboardClient() {
 
         {!loading && orders.length > 0 && (
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="hidden overflow-x-auto lg:block">
+            <ResponsiveTableRegion label="Lab orders awaiting action">
               <table className="w-full min-w-[980px] border-collapse text-left text-sm">
                 <thead className="border-b bg-gray-50 text-gray-600">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Patient</th>
+                    <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient</th>
                     <th className="px-4 py-3 font-medium">Test Type</th>
                     <th className="px-4 py-3 font-medium">Ordering Doctor</th>
                     <th className="px-4 py-3 font-medium">Time Ordered</th>
@@ -711,7 +714,7 @@ export default function LabScientistDashboardClient() {
                       className="cursor-pointer border-b hover:bg-gray-50"
                       onClick={() => openOrder(order.id)}
                     >
-                      <td className="px-4 py-3">
+                      <td className="bg-white px-4 py-3">
                         <div className="font-medium text-[#1A2380]">
                           {order.patientName || "Unknown Patient"}
                         </div>
@@ -776,9 +779,9 @@ export default function LabScientistDashboardClient() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ResponsiveTableRegion>
 
-            <div className="space-y-3 p-3 lg:hidden">
+            <div className="hidden">
               {orders.map((order) => (
                 <div
                   key={order.id}

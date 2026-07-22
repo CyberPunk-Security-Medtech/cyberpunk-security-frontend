@@ -18,6 +18,7 @@ export default function MedicalHistoryTab() {
     isSelectedConsultationActive,
     selectedConsultationId,
     selectedConsultation,
+    refreshConsultations,
   } = useConsultation();
 
   const [note, setNote] = useState("");
@@ -51,10 +52,12 @@ export default function MedicalHistoryTab() {
     setSavingNote(true);
     try {
       await consultationService.completeConsultation(orgId, selectedConsultationId, {
+        status: "Completed",
         clinical_notes: note.trim(),
       });
+      await refreshConsultations();
       setNote("");
-      toast.success("Note saved");
+      toast.success("Consultation completed");
     } catch (error) {
       console.error("Failed to save note", error);
       toast.error("Failed to save note");

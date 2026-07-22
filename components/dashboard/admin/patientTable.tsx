@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@context/AuthContext";
-import { patientService } from "@services/api";
+import { patientService, type PatientListRecord } from "@services/api";
+import { resolvePatientAge } from "@utils/patientAge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type AdminPatient = {
   id: string;
@@ -12,17 +14,6 @@ type AdminPatient = {
   hospital: string;
   status: "active" | "follow-up";
   date: string;
-};
-
-const calculateAge = (dob?: string | null): number => {
-  if (!dob) return 0;
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return 0;
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age -= 1;
-  return age;
 };
 
 const formatDate = (value?: string | null): string => {
@@ -52,11 +43,11 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
         const result = await patientService.getPatients(orgId);
         if (ignore) return;
 
-        const normalized: AdminPatient[] = (result ?? []).map((p: any) => ({
+        const normalized: AdminPatient[] = ((result ?? []) as PatientListRecord[]).map((p) => ({
           id: p.id,
           initials: `${p.first_name?.[0] ?? ""}${p.last_name?.[0] ?? ""}`.toUpperCase() || "NA",
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
-          ageGender: `${calculateAge(p.dob)} / ${p.gender ?? "-"}`,
+          ageGender: `${resolvePatientAge(p.age, p.dob ?? p.date_of_birth)} / ${p.gender ?? "-"}`,
           hospital: activeWorkspace?.name ?? "Hospital",
           status: p.symptoms ? "follow-up" : "active",
           date: formatDate(p.updated_at),
@@ -77,38 +68,38 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
   }, [activeWorkspace?.id, activeWorkspace?.name, refreshVersion]);
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-6 text-sm">
-          <button className="font-semibold text-[#051466] border-b-2 border-[#051466] pb-1">
+    <section className="rounded-2xl border bg-white p-4 shadow-sm sm:p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex gap-5 text-sm sm:gap-6">
+          <button className="min-h-10 border-b-2 border-[#051466] pb-1 font-semibold text-[#051466] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">
             Patient Records
           </button>
-          <button className="text-slate-400 pb-1">Appointments</button>
+          <button className="min-h-10 pb-1 text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">Appointments</button>
         </div>
 
-        <button className="text-xs border rounded-full px-3 py-1 flex items-center gap-1 hover:bg-slate-50">
+        <button className="dashboard-button min-h-10 border px-4 text-sm hover:bg-slate-50">
           Advanced Filters
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <ResponsiveTableRegion label="Admin patient records">
+        <table className="w-full min-w-[1120px] text-sm">
           <thead>
             <tr className="text-left text-xs text-slate-400 border-b">
-              <th className="py-2">Patient Name</th>
-              <th className="py-2">ID</th>
-              <th className="py-2">Age/Gender</th>
-              <th className="py-2">Hospital</th>
-              <th className="py-2">Status</th>
-              <th className="py-2">Date</th>
-              <th className="py-2 text-right">Actions</th>
+              <th scope="col" className="min-w-[210px] border-b bg-white px-4 py-3">Patient Name</th>
+              <th scope="col" className="min-w-[290px] px-4 py-3">ID</th>
+              <th scope="col" className="min-w-[120px] px-4 py-3">Age/Gender</th>
+              <th scope="col" className="min-w-[170px] px-4 py-3">Hospital</th>
+              <th scope="col" className="min-w-[120px] px-4 py-3">Status</th>
+              <th scope="col" className="min-w-[110px] px-4 py-3">Date</th>
+              <th scope="col" className="min-w-[150px] px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {loading && (
               <tr>
-                <td className="py-6 text-center text-slate-500" colSpan={7}>
+                <td className="px-4 py-6 text-center text-slate-500" colSpan={7}>
                   Loading patients...
                 </td>
               </tr>
@@ -116,27 +107,27 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
 
             {!loading && patients.length === 0 && (
               <tr>
-                <td className="py-6 text-center text-slate-500" colSpan={7}>
+                <td className="px-4 py-6 text-center text-slate-500" colSpan={7}>
                   No patients found.
                 </td>
               </tr>
             )}
 
             {patients.map((p, i) => (
-              <tr key={p.id} className={i % 2 ? "bg-slate-50/50 border-b" : "border-b"}>
-                <td className="py-3 flex items-center gap-3">
+              <tr key={p.id} className={`group border-b ${i % 2 ? "bg-slate-50/50" : "bg-white"}`}>
+                <td className="flex items-center gap-3 bg-inherit px-4 py-3">
                   <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs font-semibold">
                     {p.initials}
                   </div>
                   <span>{p.name}</span>
                 </td>
-                <td>{p.id}</td>
-                <td>{p.ageGender}</td>
-                <td>{p.hospital}</td>
-                <td>
+                <td className="whitespace-nowrap px-4 py-3">{p.id}</td>
+                <td className="whitespace-nowrap px-4 py-3">{p.ageGender}</td>
+                <td className="px-4 py-3">{p.hospital}</td>
+                <td className="whitespace-nowrap px-4 py-3">
                   <span
                     className={
-                      "rounded-full px-3 py-1 text-[11px] capitalize " +
+                      "rounded-full px-3 py-1 text-xs capitalize " +
                       (p.status === "active"
                         ? "bg-emerald-50 text-emerald-700"
                         : "bg-amber-50 text-amber-700")
@@ -145,17 +136,17 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
                     {p.status}
                   </span>
                 </td>
-                <td>{p.date}</td>
-                <td className="text-right space-x-2 text-xs">
-                  <button className="hover:text-slate-700">View</button>
-                  <button className="hover:text-slate-700">Edit</button>
-                  <button className="hover:text-slate-700">...</button>
+                <td className="whitespace-nowrap px-4 py-3 tabular-nums">{p.date}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right text-xs">
+                  <button className="min-h-10 px-2 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">View</button>
+                  <button className="min-h-10 px-2 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">Edit</button>
+                  <button aria-label={`More actions for ${p.name}`} className="min-h-10 min-w-10 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">...</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </ResponsiveTableRegion>
     </section>
   );
 }

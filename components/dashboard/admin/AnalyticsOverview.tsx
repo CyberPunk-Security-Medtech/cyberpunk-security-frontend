@@ -8,17 +8,17 @@ export default function AnalyticsOverview() {
         <div>
           <p className="text-slate-500 text-xs">Patient Transfers</p>
           <p className="text-xl font-semibold">+18%</p>
-          <p className="text-[11px] text-slate-500">+42 vs last month</p>
+          <p className="text-xs text-slate-500">+42 vs last month</p>
         </div>
         <div>
           <p className="text-slate-500 text-xs">Compliance Rate</p>
           <p className="text-xl font-semibold">99%</p>
-          <p className="text-[11px] text-slate-500">Avg compliance</p>
+          <p className="text-xs text-slate-500">Avg compliance</p>
         </div>
         <div>
           <p className="text-slate-500 text-xs">Patient Satisfaction</p>
           <p className="text-xl font-semibold">4.8 / 5</p>
-          <p className="text-[11px] text-slate-500">Based on reviews</p>
+          <p className="text-xs text-slate-500">Based on reviews</p>
         </div>
       </div>
     </section>

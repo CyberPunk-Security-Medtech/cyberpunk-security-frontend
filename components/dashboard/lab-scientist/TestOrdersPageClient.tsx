@@ -537,6 +537,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LayoutGrid, List, Search } from "lucide-react";
 import { StatusBadge } from "@components/StatusBadge";
+import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { useAuth } from "@context/AuthContext";
 import {
   consultationService,
@@ -915,11 +916,11 @@ export default function TestOrdersPageClient() {
         )}
 
         {!loading && filteredOrders.length > 0 && viewMode === "table" && (
-          <div className="overflow-x-auto">
+          <ResponsiveTableRegion label="Lab test orders">
             <table className="w-full min-w-[980px] border-collapse text-left text-sm">
               <thead className="border-b bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Order ID</th>
+                  <th scope="col" className="min-w-[220px] bg-gray-50 px-4 py-3 font-medium">Order ID</th>
                   <th className="px-4 py-3 font-medium">Patient Name</th>
                   <th className="px-4 py-3 font-medium">Test Type</th>
                   <th className="px-4 py-3 font-medium">Ordering Doctor</th>
@@ -935,7 +936,7 @@ export default function TestOrdersPageClient() {
                     className="cursor-pointer border-b hover:bg-gray-50"
                     onClick={() => openOrder(order.id)}
                   >
-                    <td className="px-4 py-3">{order.id}</td>
+                    <td className="bg-white px-4 py-3">{order.id}</td>
                     <td className="px-4 py-3">
                       {order.patientName || "Unknown Patient"}
                     </td>
@@ -969,7 +970,7 @@ export default function TestOrdersPageClient() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ResponsiveTableRegion>
         )}
 
       </section>

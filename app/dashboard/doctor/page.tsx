@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import OverviewCards from "@components/dashboard/doctor/OverviewCards";
 import TodayAppointments from "@components/dashboard/doctor/TodaysAppointment";
 import { authService } from "@services/api";
+import { getTimeGreeting } from "@utils/greeting";
 
 const formatDoctorName = (user: any): string => {
   const firstName = (user?.first_name ?? "").toString().trim();
@@ -17,6 +18,7 @@ const formatDoctorName = (user: any): string => {
 
 export default function Dashboard() {
   const [doctorName, setDoctorName] = useState("Doctor");
+  const greeting = getTimeGreeting();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -35,10 +37,10 @@ export default function Dashboard() {
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-[#1A2380] mb-1">
-        Good morning, Dr. {doctorName}!
-      </h2>
-      <p className="text-gray-500 mb-8">Welcome back to PrivaCure dashboard</p>
+      <h1 className="dashboard-page-title mb-1 text-[#1A2380]">
+        {greeting}, Dr. {doctorName}!
+      </h1>
+      <p className="mb-6 text-sm leading-5 text-gray-500 sm:mb-8">Welcome back to PrivaCure dashboard</p>
 
       <OverviewCards />
       <TodayAppointments />

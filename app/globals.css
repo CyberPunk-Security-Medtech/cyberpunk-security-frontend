@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .dashboard-page-title {
+    @apply text-xl font-semibold leading-tight sm:text-2xl;
+  }
+
+  .dashboard-section-title {
+    @apply text-lg font-semibold leading-snug sm:text-xl;
+  }
+
+  .dashboard-body-text,
+  .dashboard-data-text {
+    @apply text-sm leading-5;
+  }
+
+  .dashboard-caption {
+    @apply text-xs leading-4;
+  }
+
+  .dashboard-kpi {
+    @apply text-2xl font-semibold leading-none sm:text-3xl;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dashboard-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent,#1A2380)] focus-visible:ring-offset-2;
+  }
+
+}
+
+.dashboard-table-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #e2e8f0;
+}
+
+.dashboard-table-scroll::-webkit-scrollbar {
+  height: 7px;
+}
+
+.dashboard-table-scroll::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 9999px;
+}
+
+.dashboard-table-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 9999px;
+}
+
 
 .sidebar::-webkit-scrollbar {
   display: none;

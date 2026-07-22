@@ -52,7 +52,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="font-sans h-screen flex overflow-hidden">
+    <div className="flex h-[100dvh] min-w-0 overflow-hidden font-sans [--dashboard-accent:#1A2380] [--dashboard-accent-hover:#11185F]">
       {/* Sidebar */}
       <Sidebar
         sidebarMinimize={sidebarMinimize}
@@ -61,15 +61,21 @@ export default function DashboardLayout({
         setSidebarOpen={setSidebarOpen}
         menuItems={doctorMenu}
         user={doctorProfile}
+        navigationTheme={{
+          accentColor: "#818CF8",
+          activeBackgroundColor: "#1A2380",
+          hoverBackgroundColor: "#11185F",
+        }}
       />
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1 bg-[#F9FAFB]">
+      <div className="flex min-w-0 flex-1 flex-col bg-[#F9FAFB]">
         <Header
           setSidebarOpen={setSidebarOpen}
+          sidebarOpen={sidebarOpen}
           desktopPaddingClassName="md:px-12"
         />
-        <main className="flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
+        <main className="min-w-0 flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
       </div>
     </div>
   );

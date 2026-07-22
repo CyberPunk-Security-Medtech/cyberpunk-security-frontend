@@ -1,6 +1,9 @@
+"use client";
+
 import { X } from "lucide-react";
 import { ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
 
 interface ModalProps {
   title: string;
@@ -19,6 +22,8 @@ export default function Modal({
   className,
   header,
 }: ModalProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -45,10 +50,12 @@ export default function Modal({
               </button>
             </div>
 
-            {/* Body */}
-            <div className="p-6 overflow-y-auto">{children}</div>
-          </motion.div>
-        </motion.div>
+              <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+                {children}
+              </div>
+            </DialogPanel>
+          </div>
+        </Dialog>
       )}
     </AnimatePresence>
   );
