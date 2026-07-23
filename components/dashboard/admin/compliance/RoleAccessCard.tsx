@@ -1,33 +1,100 @@
-export function RoleAccessCard() {
-  type RoleAccessEntry = [role: string, users: string, permissions: string[]];
+"use client";
 
-  const roles: RoleAccessEntry[] = [
-    ["Admin", "2 active users", ["Full Access", "User Management", "Audit Logs"]],
-    ["Senior Physician", "8 active users", ["Reports", "Patient Records", "Lab Results"]],
-  ];
+import { useMemo, useState } from "react";
+import ComplianceSearchField from "./ComplianceSearchField";
+
+type RoleAccess = {
+  role: string;
+  users: string;
+  permissions: string[];
+};
+
+const roles: RoleAccess[] = [
+  {
+    role: "Admin",
+    users: "2 active users",
+    permissions: ["Full Access", "User Management", "Audit Logs"],
+  },
+  {
+    role: "Doctor",
+    users: "8 active users",
+    permissions: ["Reports", "Patient Records", "Lab Results"],
+  },
+  {
+    role: "Nurse",
+    users: "6 active users",
+    permissions: ["Patient Records", "Consultations", "Triage"],
+  },
+];
+
+export function RoleAccessCard() {
+  const [query, setQuery] = useState("");
+  const filteredRoles = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return roles;
+    return roles.filter(
+      ({ role, permissions }) =>
+        role.toLowerCase().includes(normalizedQuery) ||
+        permissions.some((permission) =>
+          permission.toLowerCase().includes(normalizedQuery),
+        ),
+    );
+  }, [query]);
 
   return (
-    <div className="mt-6 space-y-6 rounded-xl border bg-white p-4 sm:p-5">
-      {roles.map(([role, users, permissions], i) => (
-        <div key={i} className="border-b last:border-none pb-5">
-          <p className="font-semibold">{role}</p>
-          <p className="text-xs text-slate-500">{users}</p>
+    <section aria-labelledby="access-control-title">
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 id="access-control-title" className="text-base font-medium text-slate-900">
+          Access control
+        </h2>
+        <ComplianceSearchField
+          label="Search role management"
+          placeholder="Search Role Management..."
+          value={query}
+          onChange={setQuery}
+        />
+      </div>
 
-          <div className="flex gap-2 flex-wrap mt-3">
-            {permissions.map((p) => (
-              <span key={p} className="px-3 py-1 rounded-full bg-slate-100 text-xs">
-                {p}
-              </span>
-            ))}
-          </div>
+      <div className="space-y-3">
+        {filteredRoles.map(({ role, users, permissions }) => (
+          <article
+            key={role}
+            className="rounded border border-slate-200 bg-white p-4 sm:p-5"
+          >
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-medium text-slate-900">{role}</h3>
+                <p className="mt-1 text-xs text-slate-500">{users}</p>
+              </div>
+              <button
+                type="button"
+                disabled
+                title="Permission editing is not connected yet"
+                className="dashboard-button min-h-10 w-full bg-[#EEEFFF] px-5 text-[#21178C] disabled:opacity-100 sm:w-auto"
+              >
+                Edit Permissions
+              </button>
+            </div>
 
-          <div className="mt-4 flex justify-end">
-            <button className="px-4 py-2 rounded-full text-sm bg-[#EFEFFF] text-[#0808B5] hover:bg-[#e3e3ff]">
-              Edit Permissions
-            </button>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {permissions.map((permission) => (
+                <span
+                  key={permission}
+                  className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-700"
+                >
+                  {permission}
+                </span>
+              ))}
+            </div>
+          </article>
+        ))}
+
+        {filteredRoles.length === 0 && (
+          <div className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-500">
+            No roles match your search.
           </div>
-        </div>
-      ))}
-    </div>
+        )}
+      </div>
+    </section>
   );
 }
