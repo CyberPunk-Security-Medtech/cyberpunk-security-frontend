@@ -13,6 +13,7 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronLeft,
+  CreditCard,
 } from "lucide-react";
 import Image from "next/image";
 import { authService } from "@services/api";
@@ -144,6 +145,7 @@ export default function Sidebar({
     },
     { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin/hmo-management" },
     { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin/compliance" },
+    { label: "Billing & Payment", icon: CreditCard, href: "/dashboard/admin/billing-payment" },
     { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin/reports" },
     { label: "Settings", icon: Settings, href: "/dashboard/admin/settings" },
     { label: "Help", icon: HelpCircle, href: "/dashboard/admin/help" },
