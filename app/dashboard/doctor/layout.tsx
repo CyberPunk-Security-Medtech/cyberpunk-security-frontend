@@ -11,7 +11,7 @@ const doctorMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/doctor" },
   { name: "Patients Records", icon: Users, href: "/dashboard/doctor/patient-records" },
   { name: "Consultations", icon: ClipboardList, href: "/dashboard/doctor/consultations" },
-  { name: "Ai Assistant", icon: Sparkles, href: "/assistant"},
+  { name: "Ai Assistant", icon: Sparkles, href: "/dashboard/doctor/ai-assistant"},
   {
     name: "Patient Transfers",
     icon: ArrowLeftRight,

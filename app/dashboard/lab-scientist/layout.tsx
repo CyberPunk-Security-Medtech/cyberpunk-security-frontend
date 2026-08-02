@@ -22,7 +22,7 @@ const labScientistMenu: MenuItem[] = [
   {
     name: "Ai Assistant",
     icon: Sparkles,
-    href: "/assistant",
+    href: "/dashboard/lab-scientist/ai-assistant",
   },
 ];
 

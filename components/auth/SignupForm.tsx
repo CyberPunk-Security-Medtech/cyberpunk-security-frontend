@@ -76,6 +76,7 @@ import Link from "next/link";
 import { authService } from "@services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@utils/apiError";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -91,27 +92,7 @@ export default function SignupForm() {
   });
 
   const [loading, setLoading] = useState(false);
-
-  const getErrorMessage = (err: any) => {
-    const data = err?.response?.data;
-
-    if (typeof data === "string") return data;
-
-    if (data?.detail) return data.detail;
-    if(data?.password) return data.password;
-    if (data?.message) return data.message;
-    if (data?.error) return data.error;
-
-    if (Array.isArray(data?.detail)) {
-      return data.detail[0]?.msg || "Validation error";
-    }
-
-    if (Array.isArray(data?.errors)) {
-      return data.errors[0]?.message || data.errors[0] || "Validation error";
-    }
-
-    return err?.message || "Signup failed. Try again.";
-  };
+  const [formError, setFormError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -124,6 +105,15 @@ export default function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError("");
+    if (!formData.email.trim() || !formData.firstName.trim() || !formData.lastName.trim() || !formData.password) {
+      setFormError("Complete all required fields to create an account.");
+      return;
+    }
+    if (formData.password.length < 8 || !/\d/.test(formData.password)) {
+      setFormError("Password must be at least 8 characters and include a number.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -148,8 +138,9 @@ export default function SignupForm() {
 
       router.push(`/auth/signup/verify?email=${formData.email}`);
     } catch (err: any) {
-      console.log("FULL SIGNUP ERROR:", err);
-      toast.error(getErrorMessage(err));
+      const message = getApiErrorMessage(err, "Signup failed. Please try again.");
+      setFormError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -160,6 +151,7 @@ export default function SignupForm() {
       onSubmit={handleSubmit}
       className="space-y-3 sm:space-y-5"
     >
+      {formError && <p id="signup-error" role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
       <div>
         <label htmlFor="signup-email" className="mb-1 block text-sm font-medium text-gray-700">
           Email Address
@@ -172,7 +164,9 @@ export default function SignupForm() {
           placeholder="Enter Email Address"
           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.email}
-          onChange={handleChange}
+          onChange={(event) => { handleChange(event); setFormError(""); }}
+          aria-invalid={Boolean(formError)}
+          aria-describedby={formError ? "signup-error" : undefined}
           required
         />
       </div>
@@ -189,7 +183,7 @@ export default function SignupForm() {
           placeholder="First Name"
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.firstName}
-          onChange={handleChange}
+          onChange={(event) => { handleChange(event); setFormError(""); }}
           required
         />
       </div>
@@ -206,7 +200,7 @@ export default function SignupForm() {
           placeholder="Last Name"
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.lastName}
-          onChange={handleChange}
+          onChange={(event) => { handleChange(event); setFormError(""); }}
           required
         />
       </div>
@@ -223,7 +217,7 @@ export default function SignupForm() {
           placeholder="Enter Password"
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           value={formData.password}
-          onChange={handleChange}
+          onChange={(event) => { handleChange(event); setFormError(""); }}
           required
         />
 

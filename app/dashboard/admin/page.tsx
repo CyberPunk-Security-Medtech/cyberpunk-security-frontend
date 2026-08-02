@@ -1,12 +1,8 @@
 'use client'
 
-import AnalyticsOverview from "@components/dashboard/admin/AnalyticsOverview";
 import AddPatientModal from "@components/dashboard/doctor/AddPatientModal";
 import PatientTable from "@components/dashboard/admin/patientTable";
-import RecentActivity from "@components/dashboard/admin/recentActivity";
-import StatCardsRow from "@components/dashboard/admin/statRowCards";
-import TotalTransfers from "@components/dashboard/admin/totalTransfers";
-import Performance from "@components/dashboard/admin/performance";
+import LiveOperationalOverview from "@components/dashboard/admin/LiveOperationalOverview";
 import Topbar from "@components/dashboard/admin/adminTopBar";
 import { useAuth } from "@context/AuthContext";
 import { useState } from "react";
@@ -38,13 +34,7 @@ export default function AdminDashboard() {
           }
         />
         <div className="space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-          <AnalyticsOverview />
-          <StatCardsRow />
-          <div className="grid lg:grid-cols-[1.4fr,1.4fr,1fr] gap-4">
-            <RecentActivity />
-            <Performance />
-            <TotalTransfers />
-          </div>
+          <LiveOperationalOverview refreshVersion={patientTableRefreshVersion} />
           <PatientTable refreshVersion={patientTableRefreshVersion} />
         </div>
     </>

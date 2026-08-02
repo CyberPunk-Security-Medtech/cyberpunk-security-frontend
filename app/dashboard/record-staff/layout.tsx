@@ -21,7 +21,7 @@ const recordStaffMenu: MenuItem[] = [
   {
     name: "Ai Assistant",
     icon: Sparkles,
-    href: "/assistant",
+    href: "/dashboard/record-staff/ai-assistant",
   },
 ];
 

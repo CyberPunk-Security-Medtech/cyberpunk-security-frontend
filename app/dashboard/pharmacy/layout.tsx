@@ -13,7 +13,7 @@ const pharmacyMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/pharmacy" },
   { name: "Inventory", icon: Package2, href: "/dashboard/pharmacy/inventory" },
   { name: "Reports", icon: BarChart3, href: "/dashboard/pharmacy/reports" },
-  { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
+  { name: "Ai Assistant", icon: Sparkles, href: "/dashboard/pharmacy/ai-assistant" },
 ];
 
 export default function PharmacyDashboardLayout({

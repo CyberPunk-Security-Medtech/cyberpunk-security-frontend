@@ -6,6 +6,7 @@ import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { getApiErrorMessage } from "@utils/apiError";
 
 
 export default function LoginForm() {
@@ -19,6 +20,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [formError, setFormError] = useState("");
 
 
  useEffect(() => {
@@ -50,22 +52,13 @@ if(redirect){
   router,
 ]);
 
-const getErrorMessage = (err: any) => {
-  return (
-    err?.response?.data?.detail ||
-    err?.response?.data?.message ||
-    err?.response?.data?.error ||
-    err?.data?.detail ||
-    err?.data?.message ||
-    err?.message ||
-    "Something went wrong. Please try again."
-  );
-};
-
-
-
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+  setFormError("");
+  if (!email.trim() || !password) {
+    setFormError("Enter your email address and password to continue.");
+    return;
+  }
   setLoading(true);
 
   try {
@@ -75,7 +68,9 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     toast.success("Login successful!");
   } catch (err: any) {
-    toast.error(getErrorMessage(err));
+    const message = getApiErrorMessage(err, "Unable to sign in. Please try again.");
+    setFormError(message);
+    toast.error(message);
   } finally {
     setLoading(false);
   }
@@ -83,6 +78,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {formError && <p id="login-error" role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
       <label htmlFor="login-email" className="sr-only">
         Email address
       </label>
@@ -92,7 +88,9 @@ const handleSubmit = async (e: React.FormEvent) => {
         name="email"
         autoComplete="email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => { setEmail(e.target.value); setFormError(""); }}
+        aria-invalid={Boolean(formError)}
+        aria-describedby={formError ? "login-error" : undefined}
         className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
         placeholder="Email Address"
         required
@@ -108,7 +106,8 @@ const handleSubmit = async (e: React.FormEvent) => {
           name="password"
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => { setPassword(e.target.value); setFormError(""); }}
+          aria-invalid={Boolean(formError)}
           className="min-h-11 w-full rounded-full border px-4 py-2 pr-12 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           placeholder="Password"
           required

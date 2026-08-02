@@ -11,6 +11,7 @@ import {
   BarChart2,
   Settings,
   HelpCircle,
+  Sparkles,
   ChevronDown,
   ChevronLeft,
 } from "lucide-react";
@@ -145,6 +146,7 @@ export default function Sidebar({
     { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin/hmo-management" },
     { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin/compliance" },
     { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin/reports" },
+    { label: "AI Assistant", icon: Sparkles, href: "/dashboard/admin/ai-assistant" },
     { label: "Settings", icon: Settings, href: "/dashboard/admin/settings" },
     { label: "Help", icon: HelpCircle, href: "/dashboard/admin/help" },
   ];

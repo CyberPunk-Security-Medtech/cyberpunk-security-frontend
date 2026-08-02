@@ -74,7 +74,7 @@ const nurseMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/nurse" },
   { name: "Patients Records", icon: Users, href: "/dashboard/nurse/patient-records" },
   { name: "Consultations", icon: ClipboardList, href: "/dashboard/nurse/consultations" },
-  { name: "Ai Assistant", icon: Sparkles, href: "/assistant" },
+  { name: "Ai Assistant", icon: Sparkles, href: "/dashboard/nurse/ai-assistant" },
 ];
 
 const formatDisplayName = (user: { first_name?: string; last_name?: string; email?: string } | null) => {

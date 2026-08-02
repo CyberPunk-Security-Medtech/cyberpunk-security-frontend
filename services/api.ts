@@ -4,9 +4,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  // headers: {
+  //   "Content-Type": "application/json",
+  // },
   withCredentials: true,
 });
 
@@ -1068,29 +1068,30 @@ export const labService = {
     return unwrap(res.data);
   },
 
-  // async uploadLabReportAttachment(orgId: string, labTestId: string, file: File) {
-  //   const form = new FormData();
-  //   form.append("file", file);
-  //   const res = await api.post(
-  //     `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
-  //     form,
-  //   );
-  //   return unwrap(res.data);
-  // },
+  async uploadLabReportAttachment(orgId: string, labTestId: string, file: File) {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await api.post(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
+      form,
+    );
+    return unwrap(res.data);
+  },
 
-  // async listLabReportAttachments(orgId: string, labTestId: string) {
-  //   const res = await api.get(
-  //     `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
-  //   );
-  //   return unwrap(res.data);
-  // },
+  
+  async listLabReportAttachments(orgId: string, labTestId: string) {
+    const res = await api.get(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
+    );
+    return unwrap(res.data);
+  },
 
-  // async deleteLabReportAttachment(orgId: string, labTestId: string, attachmentId: string) {
-  //   const res = await api.delete(
-  //     `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments/${attachmentId}`,
-  //   );
-  //   return unwrap(res.data);
-  // },
+  async deleteLabReportAttachment(orgId: string, labTestId: string, attachmentId: string) {
+    const res = await api.delete(
+      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments/${attachmentId}`,
+    );
+    return unwrap(res.data);
+  },
 };
 
 export const inventoryService = {

@@ -271,7 +271,11 @@ export interface RawConsultation {
   doctor_id?: string | null;
   patient?: RawPatient;
   patient_name?: string;
+  patient_age?: string;
+  patient_gender?: string;
   patient_first_name?: string;
+  gender?: string;
+  age?: string;
   patient_last_name?: string;
   doctor?: RawDoctor;
   assigned_doctor?: RawDoctor;
