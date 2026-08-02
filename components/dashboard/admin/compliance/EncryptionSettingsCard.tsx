@@ -15,23 +15,30 @@ export default function EncryptionSettingsCard() {
       title: "Transport Layer Security",
       desc: "TLS 1.3 for all communication",
     },
+    {
+      id: "patient-records-backup",
+      title: "Patient Records Encryption",
+      desc: "AES-256 field-level encryption",
+    },
   ];
 
   return (
-    <div className="flex-1 rounded-xl border bg-white p-4 sm:p-6">
-      <h3 className="font-semibold text-lg mb-4">Encryption Settings</h3>
+    <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="encryption-settings-title">
+      <h2 id="encryption-settings-title" className="text-lg font-medium text-slate-900">
+        Encryption Settings
+      </h2>
 
       {encryptionItems.map((item) => (
-        <div key={item.id} className="flex items-start justify-between gap-3 border-b py-3 last:border-none sm:items-center">
+        <div key={item.id} className="flex items-start justify-between gap-4 py-3.5 sm:items-center">
           <div>
             <p className="text-sm font-medium">{item.title}</p>
-            <p className="text-xs text-slate-500">{item.desc}</p>
+            <p className="mt-1 text-xs text-slate-500">{item.desc}</p>
           </div>
-          <span className="px-3 py-1 text-xs font-medium text-emerald-600 border border-emerald-400 rounded-full">
+          <span className="min-w-16 rounded-full border border-teal-400 px-3 py-0.5 text-center text-xs font-medium text-[#00796F]">
             Active
           </span>
         </div>
       ))}
-    </div>
+    </section>
   );
 }

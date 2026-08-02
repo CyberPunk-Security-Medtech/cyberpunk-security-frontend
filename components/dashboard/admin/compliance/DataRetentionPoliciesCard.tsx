@@ -1,48 +1,41 @@
-'use client'
-
 import ToggleSwitch from "./ToggleSwitch";
-import { useState } from "react";
-
-type PolicyType = "patient" | "audit" | "consent";
-
-interface PolicyState {
-  patient: boolean;
-  audit: boolean;
-  consent: boolean;
-}
 
 export default function DataRetentionPoliciesCard() {
-  const [policy, setPolicy] = useState<PolicyState>({
-    patient: true,
-    audit: false,
-    consent: false,
-  });
-
-  const policies: { title: string; desc: string; key: PolicyType }[] = [
-    { title: "Patient Records", desc: "7 years post-treatment", key: "patient" },
-    { title: "Audit Logs", desc: "3 years retention", key: "audit" },
-    { title: "Consent Records", desc: "Permanent retention", key: "consent" },
+  const policies = [
+    {
+      title: "Patient Records",
+      description: "6 years post-treatment",
+      enabled: true,
+    },
+    {
+      title: "Consent Records",
+      description: "Permanent retention",
+      enabled: false,
+    },
   ];
 
   return (
-    <div className="w-full rounded-xl border bg-white p-4 sm:p-6 xl:max-w-[380px]">
-      <h3 className="font-semibold text-lg mb-4">Data Retention Policies</h3>
+    <section className="w-full rounded-xl border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="retention-policies-title">
+      <h2 id="retention-policies-title" className="text-lg font-medium text-slate-900">
+        Data Retention Policies
+      </h2>
 
-      {policies.map(({ title, desc, key }) => (
+      {policies.map(({ title, description, enabled }) => (
         <div
           key={title}
-          className="flex justify-between items-center py-3 border-b last:border-none"
+          className="flex items-center justify-between gap-4 py-4"
         >
           <div>
             <p className="text-sm font-medium">{title}</p>
-            <p className="text-xs text-slate-500">{desc}</p>
+            <p className="mt-1 text-xs text-slate-500">{description}</p>
           </div>
           <ToggleSwitch
-            checked={policy[key]}
-            onChange={() => setPolicy((prev) => ({ ...prev, [key]: !prev[key] }))}
+            checked={enabled}
+            label={`${title} retention preview`}
           />
         </div>
       ))}
-    </div>
+      <p className="sr-only">Retention switches are a visual preview and are not saved to the server.</p>
+    </section>
   );
 }

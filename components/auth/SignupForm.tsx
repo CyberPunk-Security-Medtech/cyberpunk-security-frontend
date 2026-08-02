@@ -106,14 +106,6 @@ export default function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
-    if (!formData.email.trim() || !formData.firstName.trim() || !formData.lastName.trim() || !formData.password) {
-      setFormError("Complete all required fields to create an account.");
-      return;
-    }
-    if (formData.password.length < 8 || !/\d/.test(formData.password)) {
-      setFormError("Password must be at least 8 characters and include a number.");
-      return;
-    }
 
     try {
       setLoading(true);
@@ -167,7 +159,6 @@ export default function SignupForm() {
           onChange={(event) => { handleChange(event); setFormError(""); }}
           aria-invalid={Boolean(formError)}
           aria-describedby={formError ? "signup-error" : undefined}
-          required
         />
       </div>
 
@@ -184,7 +175,6 @@ export default function SignupForm() {
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.firstName}
           onChange={(event) => { handleChange(event); setFormError(""); }}
-          required
         />
       </div>
 
@@ -201,7 +191,6 @@ export default function SignupForm() {
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.lastName}
           onChange={(event) => { handleChange(event); setFormError(""); }}
-          required
         />
       </div>
 
@@ -218,7 +207,6 @@ export default function SignupForm() {
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           value={formData.password}
           onChange={(event) => { handleChange(event); setFormError(""); }}
-          required
         />
 
         <button
