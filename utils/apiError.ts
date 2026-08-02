@@ -23,9 +23,5 @@ export const getApiErrorMessage = (error: unknown, fallback: string): string => 
   const data = response?.data;
   const message = asMessage(data?.detail) ?? asMessage(data?.message) ?? asMessage(data?.error) ?? asMessage(data?.errors) ?? asMessage((error as { message?: unknown })?.message);
   if (message) return message;
-  if (response?.status === 401) return "Invalid email or password.";
-  if (response?.status === 409) return "An account with this email already exists.";
-  if (response?.status === 429) return "Too many attempts. Please wait a moment and try again.";
-  if (typeof response?.status === "number" && response.status >= 500) return "The service is temporarily unavailable. Please try again.";
   return fallback;
 };

@@ -55,10 +55,6 @@ if(redirect){
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setFormError("");
-  if (!email.trim() || !password) {
-    setFormError("Enter your email address and password to continue.");
-    return;
-  }
   setLoading(true);
 
   try {
@@ -93,7 +89,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         aria-describedby={formError ? "login-error" : undefined}
         className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
         placeholder="Email Address"
-        required
       />
 
       <div className="relative">
@@ -110,7 +105,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           aria-invalid={Boolean(formError)}
           className="min-h-11 w-full rounded-full border px-4 py-2 pr-12 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           placeholder="Password"
-          required
         />
         <button
           type="button"
