@@ -31,6 +31,36 @@ export type PasswordChangePayload = {
   new_password: string;
 };
 
+export type TwoFactorMethod = "totp" | "email";
+
+export type TwoFactorStatus = {
+  enabled: boolean;
+  method: TwoFactorMethod | null;
+  totp_confirmed: boolean;
+  backup_codes_remaining: number;
+  trusted_device_count: number;
+};
+
+export type TwoFactorSetupPayload = {
+  password: string;
+  method: TwoFactorMethod;
+};
+
+export type TwoFactorSetupResult = {
+  method: TwoFactorMethod;
+  secret?: string | null;
+  otpauth_uri?: string | null;
+};
+
+export type TwoFactorBackupCodes = {
+  codes: string[];
+};
+
+export type TwoFactorChallenge = {
+  action: "TWO_FACTOR_REQUIRED";
+  method: TwoFactorMethod;
+};
+
 const unwrap = <T>(payload: T | WrappedData<T>): T => {
   if (payload && typeof payload === "object" && "data" in (payload as object)) {
     return (payload as WrappedData<T>).data;
@@ -104,12 +134,64 @@ export const authService = {
     const response = await api.post("/api/v1/users/change-password", payload);
     return unwrap(response.data);
   },
+  getTwoFactorStatus: async (): Promise<TwoFactorStatus> => {
+    const response = await api.get("/api/v1/auth/2fa/status");
+    return unwrap(response.data);
+  },
+  setupTwoFactor: async (
+    payload: TwoFactorSetupPayload,
+  ): Promise<TwoFactorSetupResult> => {
+    const response = await api.post("/api/v1/auth/2fa/setup", payload);
+    return unwrap(response.data);
+  },
+  confirmTwoFactor: async (code: string): Promise<TwoFactorBackupCodes> => {
+    const response = await api.post("/api/v1/auth/2fa/confirm", { code });
+    return unwrap(response.data);
+  },
+  verifyTwoFactor: async (code: string): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/verify", {
+      code,
+      remember_device: false,
+    });
+  },
+  recoverTwoFactor: async (backupCode: string): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/recovery", {
+      backup_code: backupCode,
+      remember_device: false,
+    });
+  },
+  resendTwoFactorCode: async (): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/resend-code");
+  },
+  disableTwoFactor: async (payload: {
+    password: string;
+    code: string;
+  }): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/disable", payload);
+  },
+  regenerateTwoFactorBackupCodes: async (
+    password: string,
+  ): Promise<TwoFactorBackupCodes> => {
+    const response = await api.post(
+      "/api/v1/auth/2fa/backup-codes/regenerate",
+      { password },
+    );
+    return unwrap(response.data);
+  },
 };
 
 export interface CreateOrganizationPayload {
   name: string;
-  image_url?: string | null;
 }
+
+export type OrganizationRead = {
+  id: string;
+  name: string;
+  slug: string;
+  image_url?: string | null;
+  accepts_referrals?: boolean;
+  created_at: string;
+};
 
 export type OrganizationDirectoryEntry = {
   id: string;
@@ -148,11 +230,13 @@ export type Membership = {
 export type OrganizationMember = Membership;
 
 export const organizationService = {
-  createOrganization: async (payload: CreateOrganizationPayload) => {
+  createOrganization: async (
+    payload: CreateOrganizationPayload,
+  ): Promise<OrganizationRead> => {
     const response = await api.post("/api/v1/organizations", payload, {
       withCredentials: true,
     });
-    return response.data;
+    return unwrap(response.data);
   },
 
   getOrganizations: async () => {
@@ -160,7 +244,7 @@ export const organizationService = {
     return response.data;
   },
 
-  getOrganization: async (org_id: string) => {
+  getOrganization: async (org_id: string): Promise<OrganizationRead> => {
     const response = await api.get(`/api/v1/organizations/${org_id}`);
     return unwrap(response.data);
   },
@@ -177,7 +261,7 @@ export const organizationService = {
   updateOrganization: async (
     org_id: string,
     payload: { name?: string | null; accepts_referrals?: boolean | null },
-  ) => {
+  ): Promise<OrganizationRead> => {
     const response = await api.patch(`/api/v1/organizations/${org_id}`, payload);
     return unwrap(response.data);
   },
@@ -209,21 +293,94 @@ export const organizationService = {
 };
 
 export const uploadService = {
-  uploadImage: async (org_id: string, file: File) => {
+  uploadImage: async (
+    org_id: string,
+    file: File,
+  ): Promise<OrganizationRead> => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await api.post(
+    const response = await api.postForm(
       `/api/v1/organizations/${org_id}/image`,
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      },
     );
 
-    return response.data;
+    return unwrap(response.data);
+  },
+};
+
+export type VerificationDocumentType =
+  | "business_registration"
+  | "medical_license"
+  | "accreditation"
+  | "tax_certificate"
+  | "proof_of_address"
+  | "other";
+
+export type VerificationStatus =
+  | "unverified"
+  | "pending"
+  | "verified"
+  | "rejected";
+
+export type VerificationDocument = {
+  id: string;
+  document_type: VerificationDocumentType;
+  file_url: string;
+  file_name?: string | null;
+  content_type?: string | null;
+  created_at: string;
+};
+
+export type VerificationDetails = {
+  verification_status: VerificationStatus;
+  verification_submitted_at?: string | null;
+  verified_at?: string | null;
+  verification_rejection_reason?: string | null;
+  verification_documents?: VerificationDocument[];
+};
+
+export const verificationService = {
+  getStatus: async (orgId: string): Promise<VerificationDetails> => {
+    const response = await api.get(
+      `/api/v1/organizations/${orgId}/verification`,
+    );
+    return unwrap(response.data);
+  },
+
+  listDocuments: async (
+    orgId: string,
+  ): Promise<VerificationDocument[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${orgId}/verification/documents`,
+    );
+    return unwrap(response.data);
+  },
+
+  uploadDocument: async (
+    orgId: string,
+    documentType: VerificationDocumentType,
+    file: File,
+  ): Promise<VerificationDocument> => {
+    const formData = new FormData();
+    formData.append("document_type", documentType);
+    formData.append("file", file);
+
+    const response = await api.postForm(
+      `/api/v1/organizations/${orgId}/verification/documents`,
+      formData,
+    );
+    return unwrap(response.data);
+  },
+
+  deleteDocument: async (orgId: string, documentId: string): Promise<void> => {
+    await api.delete(
+      `/api/v1/organizations/${orgId}/verification/documents/${documentId}`,
+    );
+  },
+
+  submit: async (orgId: string): Promise<void> => {
+    await api.post(`/api/v1/organizations/${orgId}/verification/submit`);
   },
 };
 
