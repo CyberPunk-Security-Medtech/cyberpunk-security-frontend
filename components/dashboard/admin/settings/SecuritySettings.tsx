@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { authService } from "@services/api";
 import SettingsSection from "./SettingsSection";
+import TwoFactorSettings from "./two-factor/TwoFactorSettings";
 
 type PasswordForm = {
   currentPassword: string;
@@ -140,23 +141,7 @@ export default function SecuritySettings() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Two-factor authentication
         </h3>
-        <div className="mt-2 flex flex-col gap-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-800">Email verification</p>
-            <p className="mt-1 text-xs leading-5 text-slate-500">One-time code sent to your email</p>
-            <p id="two-factor-unavailable" className="mt-1 text-xs leading-5 text-slate-500">
-              Two-factor setup is not available yet.
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled
-            aria-describedby="two-factor-unavailable"
-            className="dashboard-button min-h-11 rounded-full border border-[#00B8A8] px-8 text-sm font-medium text-[#008F83] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10"
-          >
-            Enable
-          </button>
-        </div>
+        <TwoFactorSettings />
       </div>
     </SettingsSection>
   );
