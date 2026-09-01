@@ -7,6 +7,9 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import Pagination from "@components/dashboard/admin/staff-management/Pagination";
+
+const PAGE_SIZE = 10;
 
 interface Invitation {
   id: string;
@@ -19,13 +22,17 @@ interface Invitation {
 export default function StaffTable() {
   const { activeWorkspace } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     if (!activeWorkspace?.id) return;
 
     invitationService
       .getOrganizationInvitations(activeWorkspace.id)
-      .then(setInvitations)
+      .then((rows) => {
+        setInvitations(rows);
+        setPage(1);
+      })
       .catch(console.error);
   }, [activeWorkspace?.id]);
 const handleRevoke = async (invId: string) => {
@@ -84,6 +91,13 @@ const handleResend = async (inv: Invitation) => {
   }
 };
 
+  const totalPages = Math.max(1, Math.ceil(invitations.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pagedInvitations = invitations.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
   return (
     <ResponsiveTableRegion label="Staff invitations">
     <table className="w-full min-w-[760px] text-sm">
@@ -97,7 +111,7 @@ const handleResend = async (inv: Invitation) => {
       </thead>
 
       <tbody>
-        {invitations.map((inv, i) => (
+        {pagedInvitations.map((inv, i) => (
           <tr key={inv.email} className={i % 2 ? "bg-slate-50/50" : "bg-white"}>
             <td className="bg-inherit px-4 py-3">{inv.email}</td>
             <td className="px-4 py-3 capitalize">{inv.role}</td>
@@ -149,6 +163,18 @@ const handleResend = async (inv: Invitation) => {
         ))}
       </tbody>
     </table>
+
+    {invitations.length === 0 && (
+      <p className="px-4 py-8 text-center text-sm text-slate-500">
+        No staff invitations yet.
+      </p>
+    )}
+
+    {totalPages > 1 && (
+      <div className="border-t px-4 py-3">
+        <Pagination page={safePage} totalPages={totalPages} onPageChange={setPage} />
+      </div>
+    )}
     </ResponsiveTableRegion>
   );
 }

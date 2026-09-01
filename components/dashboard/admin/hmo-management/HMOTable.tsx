@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import Pagination from "@components/dashboard/admin/staff-management/Pagination";
 import { useRouter } from "next/navigation";
+
+const PAGE_SIZE = 10;
 
 const statusStyles: Record<string, string> = {
   Approved: "bg-green-100 text-green-700",
@@ -16,6 +20,11 @@ const hmos = [
 
 export default function HMOTable() {
   const router = useRouter();
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(hmos.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pagedHmos = hmos.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   return (
     <ResponsiveTableRegion label="HMO providers">
@@ -32,7 +41,7 @@ export default function HMOTable() {
         </thead>
 
         <tbody>
-          {hmos.map((hmo, index) => (
+          {pagedHmos.map((hmo, index) => (
             <tr
               key={`${hmo.name}-${index}`}
               onClick={() => router.push("/dashboard/admin/hmo-management/view-hmo")}
@@ -60,6 +69,18 @@ export default function HMOTable() {
           ))}
         </tbody>
       </table>
+
+      {hmos.length === 0 && (
+        <p className="px-4 py-8 text-center text-sm text-slate-500">
+          No HMOs registered yet.
+        </p>
+      )}
+
+      {totalPages > 1 && (
+        <div className="border-t px-4 py-3">
+          <Pagination page={safePage} totalPages={totalPages} onPageChange={setPage} />
+        </div>
+      )}
     </ResponsiveTableRegion>
   );
 }

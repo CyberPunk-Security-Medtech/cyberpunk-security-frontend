@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 import IncomingRecordDetails from "@components/patient-transfers/incomingRecords/IncomingRecordDetails";
 import IncomingRecordsList from "@components/patient-transfers/incomingRecords/IncomingRecordsList";
 import {
@@ -363,7 +364,6 @@ export default function IncomingRecordsPage({
   const [recordToReject, setRecordToReject] = useState<IncomingRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
-  const [error, setError] = useState("");
 
   const orgId = activeWorkspace?.id;
 
@@ -373,9 +373,6 @@ export default function IncomingRecordsPage({
 
       if (options?.showPageLoader ?? true) {
         setLoading(true);
-      }
-      if (options?.showErrors ?? true) {
-        setError("");
       }
 
       try {
@@ -462,7 +459,7 @@ export default function IncomingRecordsPage({
         return enrichedRecords;
       } catch (loadError) {
         if (options?.showErrors ?? true) {
-          setError(getErrorMessage(loadError));
+          toast.error(getErrorMessage(loadError));
         }
         return [];
       } finally {
@@ -529,7 +526,6 @@ export default function IncomingRecordsPage({
   const handleAccept = async (id: string) => {
     if (!orgId) return;
     setActionLoadingId(id);
-    setError("");
     const record = records.find((item) => item.id === id);
 
     try {
@@ -542,7 +538,7 @@ export default function IncomingRecordsPage({
       const refreshedRecord = refreshedRecords.find((record) => record.id === id);
       if (refreshedRecord) setSelectedRecord(refreshedRecord);
     } catch (acceptError) {
-      setError(getErrorMessage(acceptError));
+      toast.error(getErrorMessage(acceptError));
     } finally {
       setActionLoadingId(null);
     }
@@ -551,7 +547,6 @@ export default function IncomingRecordsPage({
   const handleRejectSubmit = async () => {
     if (!orgId || !recordToReject) return;
     setActionLoadingId(recordToReject.id);
-    setError("");
 
     try {
       const updatedReferral = await referralService.declineReferral(
@@ -561,7 +556,7 @@ export default function IncomingRecordsPage({
       updateReferral(updatedReferral);
       setRecordToReject(null);
     } catch (declineError) {
-      setError(getErrorMessage(declineError));
+      toast.error(getErrorMessage(declineError));
     } finally {
       setActionLoadingId(null);
     }
@@ -591,12 +586,6 @@ export default function IncomingRecordsPage({
           : "-mx-4 -my-4 min-h-full bg-[#F4FAFA] md:-mx-12"
       }
     >
-      {error && (
-        <div className="mx-6 mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 md:mx-12">
-          {error}
-        </div>
-      )}
-
       {loading ? (
         <div className="px-6 py-16 text-center text-sm text-gray-500 md:px-12">
           Loading incoming referrals...

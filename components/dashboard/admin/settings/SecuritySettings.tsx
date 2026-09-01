@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { authService } from "@services/api";
 import SettingsSection from "./SettingsSection";
+import TwoFactorSettings from "./two-factor/TwoFactorSettings";
 
 type PasswordForm = {
   currentPassword: string;
@@ -20,14 +21,10 @@ const emptyForm: PasswordForm = {
 
 export default function SecuritySettings() {
   const [form, setForm] = useState<PasswordForm>(emptyForm);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const updateField = (field: keyof PasswordForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
-    setError("");
-    setSuccess("");
   };
 
   const validate = () => {
@@ -52,20 +49,17 @@ export default function SecuritySettings() {
 
     const validationError = validate();
     if (validationError) {
-      setError(validationError);
+      toast.error(validationError);
       return;
     }
 
     setSubmitting(true);
-    setError("");
-    setSuccess("");
     try {
       await authService.changePassword({
         old_password: form.currentPassword,
         new_password: form.newPassword,
       });
       setForm(emptyForm);
-      setSuccess("Your password has been updated successfully.");
       toast.success("Password updated successfully");
     } catch (requestError) {
       const message = axios.isAxiosError(requestError)
@@ -73,7 +67,6 @@ export default function SecuritySettings() {
           requestError.response?.data?.message ||
           "Unable to update your password."
         : "Unable to update your password.";
-      setError(String(message));
       toast.error(String(message));
     } finally {
       setSubmitting(false);
@@ -109,8 +102,7 @@ export default function SecuritySettings() {
                 autoComplete={field.autoComplete}
                 value={form[field.key]}
                 onChange={(event) => updateField(field.key, event.target.value)}
-                aria-invalid={Boolean(error)}
-                aria-describedby="password-feedback password-requirements"
+                aria-describedby="password-requirements"
                 className="h-10 w-full rounded-lg border border-slate-300 bg-slate-100 px-3 text-sm text-slate-800 outline-none focus:border-[#051466] focus-visible:ring-2 focus-visible:ring-[#051466]"
               />
             </div>
@@ -120,10 +112,6 @@ export default function SecuritySettings() {
         <p id="password-requirements" className="sr-only">
           The new password must be at least 8 characters, contain a number, differ from the current password, and match the confirmation.
         </p>
-        <div id="password-feedback" aria-live="polite" className="min-h-6">
-          {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-          {success && <p className="text-sm text-emerald-700">{success}</p>}
-        </div>
 
         <div className="mt-3 flex justify-stretch sm:justify-end">
           <button
@@ -140,23 +128,7 @@ export default function SecuritySettings() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Two-factor authentication
         </h3>
-        <div className="mt-2 flex flex-col gap-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-800">Email verification</p>
-            <p className="mt-1 text-xs leading-5 text-slate-500">One-time code sent to your email</p>
-            <p id="two-factor-unavailable" className="mt-1 text-xs leading-5 text-slate-500">
-              Two-factor setup is not available yet.
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled
-            aria-describedby="two-factor-unavailable"
-            className="dashboard-button min-h-11 rounded-full border border-[#00B8A8] px-8 text-sm font-medium text-[#008F83] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10"
-          >
-            Enable
-          </button>
-        </div>
+        <TwoFactorSettings />
       </div>
     </SettingsSection>
   );
