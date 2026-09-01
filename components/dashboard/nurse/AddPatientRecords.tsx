@@ -120,13 +120,11 @@ export default function AddNewPatientRecordModal({
    const [formData, setFormData] = useState<FormState>(emptyForm);
    const [coverageType, setCoverageType] = useState<CoverageType | "">("");
    const [submitting, setSubmitting] = useState(false);
-   const [formError, setFormError] = useState("");
- 
+
    // handle input changes
    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
      const { name, value } = e.target;
      setFormData(prev => ({ ...prev, [name]: value }));
-     setFormError("");
     };
 
    const handleSubmit = async () => {
@@ -138,25 +136,22 @@ export default function AddNewPatientRecordModal({
       !formData.email ||
       !formData.phone
     ) {
-      setFormError("Please complete all required personal information fields.");
       toast.error("Please complete all required fields.");
       return;
     }
 
    if (!["Male", "Female", "Other"].includes(formData.gender)) {
-        setFormError("Please select a valid gender.");
         toast.error("Please select a valid gender.");
         return;
       }
 
       if (!isValidPatientDateOfBirth(formData.dob)) {
-        setFormError("Enter a valid date of birth that is not in the future.");
         toast.error("Enter a valid date of birth that is not in the future.");
         return;
       }
 
       if (!coverageType) {
-        setFormError("Select HMO/Insurance or Self-pay before submitting.");
+        toast.error("Select HMO/Insurance or Self-pay before submitting.");
         return;
       }
 
@@ -168,7 +163,7 @@ export default function AddNewPatientRecordModal({
           hmo_number: formData.hmoNumber,
         })
       ) {
-        setFormError("HMO provider, plan, and enrollee number are required for HMO patients.");
+        toast.error("HMO provider, plan, and enrollee number are required for HMO patients.");
         return;
       }
   
@@ -235,16 +230,13 @@ export default function AddNewPatientRecordModal({
         onClose();
         setFormData(emptyForm);
         setCoverageType("");
-        setFormError("");
       } catch (error) {
         console.error("Failed to create patient:", error);
         if (isAxiosError(error)) {
           const backendMessage = extractApiErrorMessage(error.response?.data);
           const message = backendMessage ?? "Failed to create patient";
-          setFormError(message);
           toast.error(message);
         } else {
-          setFormError("Failed to create patient");
           toast.error("Failed to create patient");
         }
       } finally {
@@ -262,11 +254,6 @@ export default function AddNewPatientRecordModal({
       headerClassName="bg-[#003C36]"
     >
       <div className="w-full space-y-6 py-2 font-sans md:space-y-8 md:py-4">
-          {formError && (
-            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {formError}
-            </div>
-          )}
           <section className="rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6">
 
             {/* STEP 1 */}
@@ -483,7 +470,6 @@ export default function AddNewPatientRecordModal({
                         checked={coverageType === option}
                         onChange={() => {
                           setCoverageType(option);
-                          setFormError("");
                           if (option === "self_pay") {
                             setFormData((current) => ({
                               ...current,
