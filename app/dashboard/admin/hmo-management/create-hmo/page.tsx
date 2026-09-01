@@ -6,8 +6,6 @@ import HMOHeader from "@components/dashboard/admin/hmo-management/HMOHeader";
 import HMOActions from "@components/dashboard/admin/hmo-management/HMOActions";
 import HMOTable from "@components/dashboard/admin/hmo-management/HMOTable";
 
-import Pagination from "@components/dashboard/admin/staff-management/Pagination";
-
 import CreateHMOPage from "@components/dashboard/admin/hmo-management/CreateHMOPage";
 
 
@@ -43,13 +41,6 @@ export default function HMOManagementPage() {
           <div className="bg-white rounded-xl border overflow-hidden">
 
             <HMOTable />
-
-
-            <div className="border-t px-4 py-3">
-
-              <Pagination />
-
-            </div>
 
           </div>
 
