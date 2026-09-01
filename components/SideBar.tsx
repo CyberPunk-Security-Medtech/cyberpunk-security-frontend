@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { MenuItem, UserProfile } from "@/types/index";
 import { authService } from "@services/api";
+import OrganizationLogo from "@components/shared/OrganizationLogo";
 
 interface SidebarProps {
   sidebarMinimize: boolean;
@@ -195,12 +196,7 @@ export default function SideBar({
           <div className="px-6 mb-10 relative flex items-center justify-center min-h-[40px]">
             <div className="flex justify-center flex-1">
               {!sidebarMinimize && (
-                <Image
-                  src="/sidebar_logo.svg"
-                  alt="PrivaCure"
-                  width={110}
-                  height={70}
-                />
+                <OrganizationLogo />
               )}
             </div>
 

@@ -1,54 +1,51 @@
 "use client";
 
-import { motion } from "framer-motion";
-import Image from "next/image";
+import { CheckCircle2 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 
+type SuccessScreenProps = {
+  onContinue: () => void;
+};
 
-export default function SuccessScreen({ onDashboard, onAddStaff }: any) {
+export default function SuccessScreen({
+  onContinue,
+}: SuccessScreenProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+    <motion.section
+      initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="flex flex-col items-center text-center space-y-6"
+      className="flex flex-col items-center space-y-6 text-center"
+      aria-labelledby="verification-submitted-title"
     >
-    
+      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
+        <CheckCircle2
+          className="h-11 w-11 text-emerald-600"
+          aria-hidden="true"
+        />
+      </span>
 
-      {/* Confetti emoji */}
-      <motion.div
-        initial={{ y: -10 }}
-        animate={{ y: [0, -10, 0] }}
-        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-        className="text-6xl"
-      >
-        🎉
-      </motion.div>
-
-      {/* Text */}
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900">
-          Hospital Registered Successfully!
-        </h2>
-        <p className="text-gray-500 mt-2 text-sm">
-          You can now create staff accounts and start managing patient records securely.
+        <h1
+          id="verification-submitted-title"
+          className="text-xl font-semibold text-gray-950 sm:text-2xl"
+        >
+          Verification submitted
+        </h1>
+        <p className="mt-2 text-sm leading-6 text-gray-600">
+          Your hospital documents have been submitted for review. We will
+          update your verification status after the review is complete.
         </p>
       </div>
 
-      {/* Buttons */}
-      <div className="flex flex-col w-full max-w-sm gap-3">
-        <button
-          onClick={onDashboard}
-          className="bg-[#1A2380] text-white py-3 rounded-full font-medium hover:bg-[#151C6B] transition"
-        >
-          Go to Dashboard
-        </button>
-        <button
-          onClick={onAddStaff}
-          className="border border-[#1A2380] text-[#1A2380] py-3 rounded-full font-medium hover:bg-[#F8FAFB] transition"
-        >
-          Add Staff Accounts
-        </button>
-      </div>
-    </motion.div>
+      <button
+        type="button"
+        onClick={onContinue}
+        className="min-h-11 w-full max-w-sm rounded-full bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none"
+      >
+        Continue to workspaces
+      </button>
+    </motion.section>
   );
 }
