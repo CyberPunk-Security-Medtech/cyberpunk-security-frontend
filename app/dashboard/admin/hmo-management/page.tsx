@@ -4,7 +4,6 @@ import HMOActions from "@components/dashboard/admin/hmo-management/HMOActions";
 import HMOHeader from "@components/dashboard/admin/hmo-management/HMOHeader";
 import HMOSetupModal from "@components/dashboard/admin/hmo-management/HMOSetupModal";
 import HMOTable from "@components/dashboard/admin/hmo-management/HMOTable";
-import Pagination from "@components/dashboard/admin/staff-management/Pagination";
 import { useState } from "react";
 
 export default function HMOManagementPage() {
@@ -23,9 +22,6 @@ export default function HMOManagementPage() {
 
          <div className="bg-white rounded-xl border overflow-hidden">
                     <HMOTable />
-                    <div className="border-t px-4 py-3">
-                      <Pagination />
-                    </div>
         </div>
     </div>
   );

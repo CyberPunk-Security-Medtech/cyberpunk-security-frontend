@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import {
   patientService,
   type PatientListRecord,
@@ -41,7 +42,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
   const { activeWorkspace } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const patientCacheRef = useRef<{ orgId: string; records: PatientListRecord[] } | null>(null);
 
   useEffect(() => {
@@ -50,7 +50,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
 
     const fetchPatients = async () => {
       setLoading(true);
-      setError("");
 
       try {
         if (!activeWorkspace?.id) {
@@ -101,7 +100,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
         console.error("Failed to fetch patients:", requestError);
         if (!cancelled) {
           setPatients([]);
-          setError("Unable to load patient records. Please try again.");
+          toast.error("Unable to load patient records. Please try again.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -120,7 +119,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
   }, [activeWorkspace?.id, searchQuery]);
 
   if (loading) return <p className="p-4 text-gray-500">Loading patients...</p>;
-  if (error) return <p role="alert" className="p-4 text-red-700">{error}</p>;
   if (!loading && patients.length === 0) {
     return (
       <p className="p-4 text-gray-500">
