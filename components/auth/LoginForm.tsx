@@ -1,19 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getApiErrorMessage } from "@utils/apiError";
+import type {
+  TwoFactorChallenge as TwoFactorChallengeResponse,
+  TwoFactorMethod,
+} from "@services/api";
+import TwoFactorChallenge from "./TwoFactorChallenge";
 
+const getTwoFactorMethod = (error: unknown): TwoFactorMethod | null => {
+  if (!axios.isAxiosError(error) || error.response?.status !== 401) return null;
+
+  const detail = error.response.data?.detail as
+    | Partial<TwoFactorChallengeResponse>
+    | undefined;
+  if (detail?.action !== "TWO_FACTOR_REQUIRED") return null;
+
+  return detail.method === "totp" || detail.method === "email" ? detail.method : null;
+};
 
 export default function LoginForm() {
-  const { login,user, workspaces, workspaceLoading, authLoading, hydrated } = useAuth();
+  const {
+    login,
+    completeTwoFactorLogin,
+    user,
+    workspaces,
+    workspaceLoading,
+    authLoading,
+    hydrated,
+  } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") 
+  const redirect = searchParams.get("redirect");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,60 +45,99 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [formError, setFormError] = useState("");
+  const [challengeMethod, setChallengeMethod] =
+    useState<TwoFactorMethod | null>(null);
 
+  useEffect(() => {
+    if (!hydrated || authLoading || workspaceLoading || !hasSubmitted || !user) {
+      return;
+    }
 
- useEffect(() => {
-  if (!hydrated) return;
-  if (authLoading || workspaceLoading) return;
+    if (redirect) {
+      router.replace(redirect);
+      return;
+    }
 
-  if(!hasSubmitted) return;
+    router.replace(
+      workspaces.length === 0
+        ? "/onboarding/hospital-info"
+        : "/auth/workspace-select",
+    );
+  }, [
+    hydrated,
+    authLoading,
+    workspaceLoading,
+    user,
+    workspaces,
+    hasSubmitted,
+    redirect,
+    router,
+  ]);
 
-  if (!user) return;
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setFormError("");
 
-if(redirect){
-  router.replace(redirect);
-  return;
-}
+    if (!email.trim() || !password) {
+      const message = "Please enter your email address and password.";
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
 
-  if (workspaces.length === 0) {
-    router.replace("/onboarding/hospital-info");
-  } else {
-    router.replace("/auth/workspace-select");
-  }
-}, [
-  hydrated,
-  authLoading,
-  workspaceLoading,
-  user,
-  workspaces,
-  hasSubmitted,
-  redirect,
-  router,
-]);
+    setLoading(true);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setFormError("");
-  setLoading(true);
+    try {
+      await login(email, password);
+      setHasSubmitted(true);
+      toast.success("Login successful!");
+    } catch (error: unknown) {
+      const requiredMethod = getTwoFactorMethod(error);
+      if (requiredMethod) {
+        setChallengeMethod(requiredMethod);
+        return;
+      }
+      const message = getApiErrorMessage(
+        error,
+        "Unable to sign in. Please try again.",
+      );
+      setFormError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  try {
-    await login(email, password);
-
+  const handleTwoFactorVerified = async () => {
+    await completeTwoFactorLogin();
     setHasSubmitted(true);
-
     toast.success("Login successful!");
-  } catch (err: any) {
-    const message = getApiErrorMessage(err, "Unable to sign in. Please try again.");
-    setFormError(message);
-    toast.error(message);
-  } finally {
-    setLoading(false);
+  };
+
+  if (challengeMethod) {
+    return (
+      <TwoFactorChallenge
+        method={challengeMethod}
+        onVerified={handleTwoFactorVerified}
+        onCancel={() => {
+          setChallengeMethod(null);
+          setPassword("");
+        }}
+      />
+    );
   }
-};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {formError && <p id="login-error" role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
+      {formError ? (
+        <p
+          id="login-error"
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+        >
+          {formError}
+        </p>
+      ) : null}
       <label htmlFor="login-email" className="sr-only">
         Email address
       </label>
@@ -84,7 +147,10 @@ const handleSubmit = async (e: React.FormEvent) => {
         name="email"
         autoComplete="email"
         value={email}
-        onChange={(e) => { setEmail(e.target.value); setFormError(""); }}
+        onChange={(event) => {
+          setEmail(event.target.value);
+          setFormError("");
+        }}
         aria-invalid={Boolean(formError)}
         aria-describedby={formError ? "login-error" : undefined}
         className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
@@ -101,7 +167,10 @@ const handleSubmit = async (e: React.FormEvent) => {
           name="password"
           autoComplete="current-password"
           value={password}
-          onChange={(e) => { setPassword(e.target.value); setFormError(""); }}
+          onChange={(event) => {
+            setPassword(event.target.value);
+            setFormError("");
+          }}
           aria-invalid={Boolean(formError)}
           className="min-h-11 w-full rounded-full border px-4 py-2 pr-12 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           placeholder="Password"

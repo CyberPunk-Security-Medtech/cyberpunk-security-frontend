@@ -1,48 +1,70 @@
-import React from "react";
+import { Check } from "lucide-react";
 
-interface StepIndicatorProps {
+type StepIndicatorProps = {
   currentStep: number;
-}
-
-const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
-  const steps = [
-    "Hospital\nInformation",
-    "Compliance &\nAuthorization",
-  ];
-
-  return (
-    <div className="relative w-full max-w-[672px] mx-auto">
-      {/* Circle container */}
-      <div className="relative flex items-center justify-between">
-        {/* Connector line */}
-        <div className="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 h-[2px] bg-gray-300 z-0" />
-
-        {/* Circles */}
-        {steps.map((step, index) => (
-          <div key={index} className="flex flex-col items-center z-10">
-            <div
-              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center bg-white ${
-                currentStep > index ? "border-[#1A2380]" : "border-gray-300"
-              }`}
-            >
-              {currentStep > index && (
-                <div className="w-2.5 h-2.5 rounded-full bg-[#1A2380]" />
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Step labels */}
-      <div className="flex justify-between mt-2 text-center">
-        {steps.map((step, index) => (
-          <p key={index} className="text-xs text-gray-600 whitespace-pre-line">
-            {step}
-          </p>
-        ))}
-      </div>
-    </div>
-  );
 };
 
-export default StepIndicator;
+const steps = [
+  "Hospital Information",
+  "Verify Hospital",
+  "Compliance & Authorization",
+] as const;
+
+export default function StepIndicator({
+  currentStep,
+}: StepIndicatorProps) {
+  return (
+    <nav aria-label="Hospital onboarding progress" className="mx-auto w-full">
+      <ol className="grid grid-cols-3">
+        {steps.map((label, index) => {
+          const stepNumber = index + 1;
+          const isCompleted = stepNumber < currentStep;
+          const isCurrent = stepNumber === currentStep;
+          const isActive = isCompleted || isCurrent;
+
+          return (
+            <li
+              key={label}
+              className="relative flex min-w-0 flex-col items-center px-1 text-center"
+              aria-current={isCurrent ? "step" : undefined}
+            >
+              {index > 0 ? (
+                <span
+                  aria-hidden="true"
+                  className={`absolute right-1/2 top-3 h-px w-full ${
+                    stepNumber <= currentStep
+                      ? "bg-[#1A2380]"
+                      : "bg-gray-200"
+                  }`}
+                />
+              ) : null}
+
+              <span
+                aria-hidden="true"
+                className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 bg-white ${
+                  isActive ? "border-[#1A2380]" : "border-gray-200"
+                }`}
+              >
+                {isCompleted ? (
+                  <Check className="h-3.5 w-3.5 text-[#1A2380]" strokeWidth={3} />
+                ) : isCurrent ? (
+                  <span className="h-2 w-2 rounded-full bg-[#1A2380]" />
+                ) : null}
+              </span>
+
+              <span
+                className={`mt-2 max-w-28 text-[11px] leading-4 sm:text-xs ${
+                  isCurrent
+                    ? "font-medium text-[#1A2380]"
+                    : "text-gray-500"
+                }`}
+              >
+                {label}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
