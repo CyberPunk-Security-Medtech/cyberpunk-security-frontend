@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 import {
   AlertCircle,
   CalendarClock,
@@ -98,7 +99,6 @@ export default function SharingPermissionsPage({
   const [grantToRevoke, setGrantToRevoke] = useState<DataShareGrant | null>(null);
   const [loading, setLoading] = useState(true);
   const [revoking, setRevoking] = useState(false);
-  const [error, setError] = useState("");
 
   const orgId = activeWorkspace?.id;
 
@@ -133,7 +133,6 @@ export default function SharingPermissionsPage({
   const loadGrants = async () => {
     if (!orgId) return;
     setLoading(true);
-    setError("");
 
     try {
       const [grantRows, directoryRows] = await Promise.all([
@@ -151,7 +150,7 @@ export default function SharingPermissionsPage({
           : current,
       );
     } catch (loadError) {
-      setError(getErrorMessage(loadError));
+      toast.error(getErrorMessage(loadError));
     } finally {
       setLoading(false);
     }
@@ -166,7 +165,6 @@ export default function SharingPermissionsPage({
   const revokeGrant = async () => {
     if (!orgId || !grantToRevoke) return;
     setRevoking(true);
-    setError("");
 
     try {
       const updatedGrant = await dataSharingService.revokeShareGrant(
@@ -183,7 +181,7 @@ export default function SharingPermissionsPage({
       );
       setGrantToRevoke(null);
     } catch (revokeError) {
-      setError(getErrorMessage(revokeError));
+      toast.error(getErrorMessage(revokeError));
       await loadGrants();
     } finally {
       setRevoking(false);
@@ -226,12 +224,6 @@ export default function SharingPermissionsPage({
           </p>
         </div>
       </header>
-
-      {error && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
-        </div>
-      )}
 
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <SummaryCard title="All Permissions" value={counts.all} icon="all" />
