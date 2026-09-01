@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LoaderCircle, Search, X } from "lucide-react";
+import { toast } from "react-toastify";
 import { useEffect, useId, useRef, useState } from "react";
 import { useAuth } from "@context/AuthContext";
 import {
@@ -32,7 +33,6 @@ export default function GlobalPatientSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PatientSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
 
   const normalizedQuery = query.trim();
@@ -41,7 +41,6 @@ export default function GlobalPatientSearch() {
     setOpen(false);
     setQuery("");
     setResults([]);
-    setError("");
   }, [pathname, activeWorkspace?.id]);
 
   useEffect(() => {
@@ -61,12 +60,10 @@ export default function GlobalPatientSearch() {
     if (!activeWorkspace?.id || normalizedQuery.length < 2) {
       setResults([]);
       setLoading(false);
-      setError("");
       return;
     }
 
     setLoading(true);
-    setError("");
 
     const timer = window.setTimeout(async () => {
       try {
@@ -80,7 +77,7 @@ export default function GlobalPatientSearch() {
       } catch {
         if (requestVersion === requestVersionRef.current) {
           setResults([]);
-          setError("Patient search is unavailable. Please try again.");
+          toast.error("Patient search is unavailable. Please try again.");
         }
       } finally {
         if (requestVersion === requestVersionRef.current) {
@@ -96,7 +93,6 @@ export default function GlobalPatientSearch() {
     requestVersionRef.current += 1;
     setQuery("");
     setResults([]);
-    setError("");
     setLoading(false);
     setOpen(false);
   };
@@ -146,11 +142,9 @@ export default function GlobalPatientSearch() {
       <p className="sr-only" aria-live="polite">
         {loading
           ? "Searching patients"
-          : error
-            ? error
-            : normalizedQuery.length >= 2 && activeWorkspace?.id
-              ? `${results.length} ${results.length === 1 ? "patient" : "patients"} found`
-              : ""}
+          : normalizedQuery.length >= 2 && activeWorkspace?.id
+            ? `${results.length} ${results.length === 1 ? "patient" : "patients"} found`
+            : ""}
       </p>
 
       {showPanel && (
@@ -172,10 +166,6 @@ export default function GlobalPatientSearch() {
             <p role="status" className="flex items-center gap-2 px-4 py-4 text-sm text-slate-600">
               <LoaderCircle size={17} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
               Searching patients...
-            </p>
-          ) : error ? (
-            <p role="alert" className="px-4 py-4 text-sm text-red-700">
-              {error}
             </p>
           ) : results.length === 0 ? (
             <p role="status" className="px-4 py-4 text-sm text-slate-600">

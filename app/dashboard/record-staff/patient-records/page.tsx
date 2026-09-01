@@ -97,7 +97,6 @@ export default function RecordStaffPatientRecordsPage() {
   const [loadingPatients, setLoadingPatients] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState("");
 
   const fetchPatients = useCallback(async () => {
     if (!activeWorkspace?.id) {
@@ -108,13 +107,12 @@ export default function RecordStaffPatientRecordsPage() {
 
     try {
       setLoadingPatients(true);
-      setError("");
       const data = await patientService.getPatients(activeWorkspace.id);
       const patientList = Array.isArray(data) ? data : [];
       setPatients(patientList.map(mapRecordStaffPatient));
     } catch (fetchError) {
       console.error("Failed to load record staff patients", fetchError);
-      setError("Unable to load patient records. Please try again.");
+      toast.error("Unable to load patient records. Please try again.");
       setPatients([]);
     } finally {
       setLoadingPatients(false);
@@ -131,13 +129,11 @@ export default function RecordStaffPatientRecordsPage() {
     value: string | null,
   ) => {
     setForm((current) => ({ ...current, [field]: value }));
-    setError("");
   };
 
   const resetForm = () => {
     setForm(initialForm);
     setCoverageType("");
-    setError("");
   };
 
   const closeModal = () => {
@@ -155,23 +151,22 @@ export default function RecordStaffPatientRecordsPage() {
     }
 
     if (!coverageType) {
-      setError("Select HMO/Insurance or Self-pay before creating the patient record.");
+      toast.error("Select HMO/Insurance or Self-pay before creating the patient record.");
       return;
     }
 
     if (!isValidPatientDateOfBirth(form.dob)) {
-      setError("Enter a valid date of birth that is not in the future.");
+      toast.error("Enter a valid date of birth that is not in the future.");
       return;
     }
 
     if (coverageType === "hmo" && !hasRequiredHmoDetails(form)) {
-      setError("HMO provider, plan, and enrollee number are required for HMO patients.");
+      toast.error("HMO provider, plan, and enrollee number are required for HMO patients.");
       return;
     }
 
     try {
       setSubmitting(true);
-      setError("");
       const payload = coverageType === "self_pay" ? omitHmoDetails(form) : form;
       await patientService.createPatient(activeWorkspace.id, payload);
       toast.success("Patient record created successfully");
@@ -183,7 +178,6 @@ export default function RecordStaffPatientRecordsPage() {
         submitError,
         "Failed to create patient record",
       );
-      setError(message);
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -208,12 +202,6 @@ export default function RecordStaffPatientRecordsPage() {
           Add New Patient Record
         </button>
       </section>
-
-      {!isModalOpen && error && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-          {error}
-        </div>
-      )}
 
       <section className="overflow-hidden rounded-xl bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-4">
@@ -308,12 +296,6 @@ export default function RecordStaffPatientRecordsPage() {
         className="w-full max-w-6xl"
         headerClassName="bg-[#003C36]"
       >
-        {error && (
-          <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-8">
           <section className="border-b border-slate-100 pb-8">
             <p className="text-sm font-semibold text-[#003C36]">Step 1 of 3</p>
@@ -483,7 +465,6 @@ export default function RecordStaffPatientRecordsPage() {
                       checked={coverageType === option}
                       onChange={() => {
                         setCoverageType(option);
-                        setError("");
                         if (option === "self_pay") {
                           setForm((current) => omitHmoDetails(current));
                         }
