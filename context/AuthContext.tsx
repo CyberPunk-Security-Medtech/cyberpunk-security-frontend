@@ -921,6 +921,7 @@ interface AuthContextType {
   workspaceLoading: boolean;
   refreshWorkspaces: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  completeTwoFactorLogin: () => Promise<void>;
   workspace: Workspace | null;
   setWorkspace: (ws: Workspace) => void;
   logout: () => void;
@@ -1020,22 +1021,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /* ================= ACTIONS ================= */
 
+  const establishSession = async () => {
+    const meRes = await authService.getMe();
+    const me = meRes?.data ?? meRes;
+
+    setUser(me);
+    localStorage.setItem("user", JSON.stringify(me));
+
+    setWorkspaces([]);
+    localStorage.removeItem("workspaces");
+
+    await loadWorkspaces();
+  };
+
   const login = async (email: string, password: string) => {
     setAuthLoading(true);
-    setWorkspaceLoading(true)
+    setWorkspaceLoading(true);
 
     try {
       await authService.login({ email, password });
-      const meRes = await authService.getMe();
-      const me = meRes?.data ?? meRes;
+      await establishSession();
+    } finally {
+      setWorkspaceLoading(false);
+      setAuthLoading(false);
+    }
+  };
 
-      setUser(me);
-      localStorage.setItem("user", JSON.stringify(me));
-
-      setWorkspaces([]);
-      localStorage.removeItem("workspaces")
-
-      await loadWorkspaces();
+  const completeTwoFactorLogin = async () => {
+    setAuthLoading(true);
+    setWorkspaceLoading(true);
+    try {
+      await establishSession();
     } finally {
       setWorkspaceLoading(false);
       setAuthLoading(false);
@@ -1065,6 +1081,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         workspaceLoading,
         refreshWorkspaces: loadWorkspaces,
         login,
+        completeTwoFactorLogin,
         workspace,
         setWorkspace,
         logout,
