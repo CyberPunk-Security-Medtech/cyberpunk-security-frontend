@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 import {
   Search,
   Bell,
-  MoreHorizontal,
-  Eye,
   Send,
   ShieldCheck,
   X,
@@ -15,7 +14,6 @@ import {
 
 export default function PatientTransferDashboard() {
   const [openModal, setOpenModal] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const patients = [
     {
@@ -179,34 +177,11 @@ export default function PatientTransferDashboard() {
           onClose={() => setOpenModal(false)}
           onSubmit={() => {
             setOpenModal(false);
-            setSuccess(true);
+            toast.success(
+              "Transfer request has been submitted successfully.",
+            );
           }}
         />
-      )}
-
-      {success && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-xl">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#dff8f5] text-[#19c7b6]">
-              <CheckCircle2 size={48} />
-            </div>
-
-            <h2 className="mb-2 text-xl font-bold text-gray-900">
-              Patient Transfer Successful
-            </h2>
-
-            <p className="mb-6 text-sm text-gray-500">
-              Transfer request has been submitted successfully.
-            </p>
-
-            <button
-              onClick={() => setSuccess(false)}
-              className="w-full rounded-xl bg-[#24128f] py-3 text-sm font-semibold text-white"
-            >
-              Continue
-            </button>
-          </div>
-        </div>
       )}
     </main>
   );
