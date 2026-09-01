@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
+import { toast } from "react-toastify";
 import { hasOnboardingConsentForScopes } from "@components/patient-transfers/consentStorage";
 import {
   organizationService,
@@ -129,8 +130,6 @@ export default function PatientTransferDashboard({
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   const orgId = activeWorkspace?.id;
@@ -169,7 +168,6 @@ export default function PatientTransferDashboard({
 
     const loadTransferData = async () => {
       setLoading(true);
-      setError("");
 
       try {
         const [patientRows, directoryRows, referralRows] = await Promise.all([
@@ -201,7 +199,7 @@ export default function PatientTransferDashboard({
         setOrganizations(directoryRows.filter((org) => org.id !== orgId));
         setReferrals(referralRows);
       } catch (loadError) {
-        setError(getErrorMessage(loadError));
+        toast.error(getErrorMessage(loadError));
       } finally {
         setLoading(false);
       }
@@ -216,8 +214,6 @@ export default function PatientTransferDashboard({
       patientId: patient?.id ?? "",
       patientEmail: patient?.email ?? "",
     });
-    setError("");
-    setSuccessMessage("");
     setOpenModal(true);
   };
 
@@ -265,12 +261,11 @@ export default function PatientTransferDashboard({
   const submitTransfer = async () => {
     const validationMessage = validateForm();
     if (validationMessage) {
-      setError(validationMessage);
+      toast.error(validationMessage);
       return;
     }
 
     setSubmitting(true);
-    setError("");
 
     try {
       const referral = await referralService.createReferral(orgId!, {
@@ -291,7 +286,7 @@ export default function PatientTransferDashboard({
 
       setReferrals((current) => [referral, ...current]);
       setOpenModal(false);
-      setSuccessMessage(
+      toast.success(
         hasPriorConsent
           ? "Referral sent using the patient's onboarding consent."
           : form.consentMethod === "email_link"
@@ -299,7 +294,7 @@ export default function PatientTransferDashboard({
           : "Referral sent. In-person consent was attested and record access can become active immediately.",
       );
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      toast.error(getErrorMessage(submitError));
     } finally {
       setSubmitting(false);
     }
@@ -333,18 +328,6 @@ export default function PatientTransferDashboard({
           </p>
         </div>
       </div>
-
-      {error && !openModal && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
-      {successMessage && (
-        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
-          {successMessage}
-        </div>
-      )}
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         <StatCard title="Outgoing Referrals" value={String(referrals.length)} />
@@ -450,7 +433,6 @@ export default function PatientTransferDashboard({
           organizations={organizations}
           form={form}
           selectedPatient={selectedPatient}
-          error={error}
           submitting={submitting}
           hasPriorConsent={hasPriorConsent}
           onClose={() => setOpenModal(false)}
@@ -477,7 +459,6 @@ function TransferRequestModal({
   organizations,
   form,
   selectedPatient,
-  error,
   submitting,
   hasPriorConsent,
   onClose,
@@ -489,7 +470,6 @@ function TransferRequestModal({
   organizations: OrganizationDirectoryEntry[];
   form: TransferForm;
   selectedPatient: TransferPatient | null;
-  error: string;
   submitting: boolean;
   hasPriorConsent: boolean;
   onClose: () => void;
@@ -521,12 +501,6 @@ function TransferRequestModal({
             <X size={22} />
           </button>
         </div>
-
-        {error && (
-          <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
 
         <div className="space-y-6">
           <section className="rounded-2xl border border-gray-100 p-4">
