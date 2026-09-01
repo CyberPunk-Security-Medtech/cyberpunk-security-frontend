@@ -1,116 +1,122 @@
 "use client";
 
-import { motion } from "framer-motion";
-import React, { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
 
-interface ComplianceSetupProps {
+type ComplianceSetupProps = {
   onBack: () => void;
-  onFinish: (data: any) => Promise<void>;
-}
+  onFinish: () => Promise<void>;
+};
 
+export default function ComplianceAuthorization({
+  onBack,
+  onFinish,
+}: ComplianceSetupProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export default function ComplianceAuthorization({ onBack, onFinish }: ComplianceSetupProps) {
-  const [checked1, setChecked1] = useState(false);
-  const [checked2, setChecked2] = useState(false);
-   const [loading, setLoading] = useState(false);
-
-
-  const container = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.15 } },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
+  const canSubmit = isAuthorized && hasAcceptedTerms && !isSubmitting;
 
   const handleRegister = async () => {
-    if (!checked1 || !checked2) return;
-    setLoading(true);
+    if (!canSubmit) return;
+
+    setIsSubmitting(true);
+    setError(null);
+
     try {
-      await onFinish({ docs: [] }); // ✅ calls parent onFinish
-    } catch (err) {
-      console.error("Finish error:", err);
+      await onFinish();
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Unable to submit the hospital for verification. Please try again.",
+      );
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
+  const entrance = shouldReduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
+    : {
+        initial: { opacity: 0, y: 16 },
+        animate: { opacity: 1, y: 0 },
+      };
 
   return (
-    <motion.div
-      className="w-full max-w-md mx-auto flex flex-col gap-6"
-      variants={container}
-      initial="hidden"
-      animate="visible"
+    <motion.section
+      {...entrance}
+      className="mx-auto flex w-full max-w-md flex-col gap-5"
+      aria-labelledby="compliance-title"
     >
-      {/* Header */}
-      <motion.h2
-        variants={item}
-        className="text-center text-2xl font-semibold text-[#1A2380]"
-      >
-        Compliance & Authorization
-      </motion.h2>
+      <header className="text-center">
+        <h1
+          id="compliance-title"
+          className="text-xl font-semibold text-[#1A2380] sm:text-2xl"
+        >
+          Compliance &amp; Authorization
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Confirm your authority to register this hospital
+        </p>
+      </header>
 
-      {/* Light teal info box */}
-      <motion.div
-        variants={item}
-        className="bg-[#E6F7F7] text-gray-700 text-sm p-4 rounded-lg border border-[#C9E9E9] leading-relaxed"
-      >
+      <div className="rounded-xl border border-[#C9E9E9] bg-[#E6F7F7] p-4 text-sm leading-6 text-gray-700">
         By proceeding, you confirm that your hospital complies with all
-        applicable health data protection regulations and that you’re authorized
-        to register this institution on PrivaCure.
-      </motion.div>
+        applicable health data protection regulations and that you are
+        authorized to register this institution on PrivaCure.
+      </div>
 
-      {/* Checkbox 1 */}
-      <motion.label
-        variants={item}
-        className="flex items-start gap-3 border border-gray-300 rounded-lg p-3 cursor-pointer"
-      >
+      <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border border-gray-300 p-3 text-sm text-gray-800 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none">
         <input
           type="checkbox"
-          checked={checked1}
-          onChange={() => setChecked1(!checked1)}
-          className="mt-1 w-5 h-5 accent-[#1A2380]"
+          checked={isAuthorized}
+          onChange={(event) => setIsAuthorized(event.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0 accent-[#1A2380]"
         />
-        <span className="text-sm text-gray-800">
-      I confirm that I am authorized to register this hospital.
-        </span>
-      </motion.label>
+        <span>I confirm that I am authorized to register this hospital.</span>
+      </label>
 
-      {/* Checkbox 2 */}
-      <motion.label
-        variants={item}
-        className="flex items-start gap-3 border border-gray-300 rounded-lg p-3 cursor-pointer"
-      >
+      <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border border-gray-300 p-3 text-sm text-gray-800 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none">
         <input
           type="checkbox"
-          checked={checked2}
-          onChange={() => setChecked2(!checked2)}
-          className="mt-1 w-5 h-5 accent-[#1A2380]"
+          checked={hasAcceptedTerms}
+          onChange={(event) => setHasAcceptedTerms(event.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0 accent-[#1A2380]"
         />
-        <span className="text-sm text-gray-800">
-         I agree to the Privacy Policy and NDPR, HIPAA, GDPR compliance terms.
-          
+        <span>
+          I agree to the Privacy Policy and NDPR, HIPAA, and GDPR compliance
+          terms.
         </span>
-      </motion.label>
-      
- {/* Register Button */}
-      <motion.button
-        variants={item}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={handleRegister} // ✅ Added this
-        disabled={!checked1 || !checked2 || loading}
-        className={`mt-2 w-full py-3 rounded-lg text-white font-medium transition-colors ${
-          checked1 && checked2
-            ? "bg-[#1A2380] hover:bg-[#151C6B]"
-            : "bg-[#AAB0D6] cursor-not-allowed"
-        }`}
-      >
-        {loading ? "Registering..." : "Register Hospital"}
-      </motion.button>
-    </motion.div>
+      </label>
+
+      {error ? (
+        <p className="text-sm text-red-700" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={() => void handleRegister()}
+          disabled={!canSubmit}
+          className="min-h-11 w-full rounded-full bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:bg-[#AAB0D6]"
+        >
+          {isSubmitting ? "Submitting for review…" : "Register Hospital"}
+        </button>
+        <button
+          type="button"
+          onClick={onBack}
+          disabled={isSubmitting}
+          className="min-h-11 w-full rounded-full px-6 py-2 text-sm font-medium text-[#1A2380] transition hover:bg-[#1A2380]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Back to verification
+        </button>
+      </div>
+    </motion.section>
   );
 }
