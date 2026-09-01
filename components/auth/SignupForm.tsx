@@ -78,10 +78,42 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getApiErrorMessage } from "@utils/apiError";
 
+// Mirrors the backend password policy: minimum 12 characters, and it must
+// not appear in public breach databases (the breach check runs server-side
+// and is reported back as a regular signup error).
+const PASSWORD_RULES: Array<{ label: string; test: (value: string) => boolean }> = [
+  { label: "At least 12 characters", test: (value) => value.length >= 12 },
+];
+
+const getPasswordValidationErrors = (value: string) =>
+  PASSWORD_RULES.filter((rule) => !rule.test(value)).map((rule) => rule.label);
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const validateSignupForm = (form: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}): string => {
+  if (!form.firstName.trim()) return "First name is required.";
+  if (!form.lastName.trim()) return "Last name is required.";
+  if (!form.email.trim()) return "Email address is required.";
+  if (!EMAIL_PATTERN.test(form.email.trim())) {
+    return "Email address must be a valid email address.";
+  }
+  const passwordErrors = getPasswordValidationErrors(form.password);
+  if (passwordErrors.length > 0) {
+    return `Password must contain ${passwordErrors.join(", ").toLowerCase()}.`;
+  }
+  return "";
+};
+
 export default function SignupForm() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -93,6 +125,9 @@ export default function SignupForm() {
 
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
+  const passwordErrors = passwordTouched
+    ? getPasswordValidationErrors(formData.password)
+    : [];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -106,6 +141,14 @@ export default function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+    setPasswordTouched(true);
+
+    const validationMessage = validateSignupForm(formData);
+    if (validationMessage) {
+      setFormError(validationMessage);
+      toast.error(validationMessage);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -207,6 +250,9 @@ export default function SignupForm() {
           className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           value={formData.password}
           onChange={(event) => { handleChange(event); setFormError(""); }}
+          onBlur={() => setPasswordTouched(true)}
+          aria-invalid={Boolean(formError) || passwordErrors.length > 0}
+          aria-describedby={passwordErrors.length > 0 ? "signup-password-rules" : undefined}
         />
 
         <button
@@ -219,6 +265,25 @@ export default function SignupForm() {
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
+
+      {passwordTouched && passwordErrors.length > 0 ? (
+        <ul id="signup-password-rules" className="-mt-2 space-y-1 text-xs text-gray-500">
+          {PASSWORD_RULES.map((rule) => {
+            const satisfied = !passwordErrors.includes(rule.label);
+            return (
+              <li
+                key={rule.label}
+                className={`flex items-center gap-1.5 ${
+                  satisfied ? "text-emerald-600" : "text-gray-500"
+                }`}
+              >
+                <span aria-hidden="true">{satisfied ? "✓" : "•"}</span>
+                {rule.label}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <label className="flex items-center space-x-2">

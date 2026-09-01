@@ -16,8 +16,8 @@ import {
   ChevronLeft,
   CreditCard,
 } from "lucide-react";
-import Image from "next/image";
 import { authService } from "@services/api";
+import OrganizationLogo from "@components/shared/OrganizationLogo";
 import { useAuth } from "@context/AuthContext";
 
 
@@ -198,7 +198,7 @@ export default function Sidebar({
       >
       {/* Logo Area */}
       <div className="flex items-center justify-between border-b border-white/10 px-6 py-6">
-        <Image src="/sidebar_logo.svg" alt="PrivaCure" width={110} height={70} />
+        <OrganizationLogo />
         <button
           ref={closeButtonRef}
           type="button"
