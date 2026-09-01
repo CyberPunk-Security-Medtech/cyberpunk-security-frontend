@@ -1,4 +1,7 @@
-import axios from "axios";
+import axios, {
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -9,6 +12,62 @@ export const api = axios.create({
   // },
   withCredentials: true,
 });
+
+/* ================= 401 AUTO-REFRESH ================= */
+
+let refreshPromise: Promise<unknown> | null = null;
+
+const isAuthEndpoint = (url?: string) =>
+  typeof url === "string" && url.includes("/api/v1/auth/");
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error?.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
+    const status = (error as AxiosError)?.response?.status;
+
+    // Only attempt a refresh for expired access tokens on non-auth endpoints.
+    // Auth endpoints (login, 2FA, refresh...) legitimately return 401 and
+    // retrying them would mask the real error (e.g. the 2FA challenge).
+    if (
+      status !== 401 ||
+      !original ||
+      original._retry ||
+      isAuthEndpoint(original.url)
+    ) {
+      return Promise.reject(error);
+    }
+
+    original._retry = true;
+
+    try {
+      // Share a single in-flight refresh across parallel 401s.
+      refreshPromise =
+        refreshPromise ??
+        api.post("/api/v1/auth/refresh").finally(() => {
+          refreshPromise = null;
+        });
+      await refreshPromise;
+      return api(original);
+    } catch {
+      // Refresh failed — the session is gone. Clear cached auth state and
+      // send the user back to login.
+      localStorage.removeItem("user");
+      localStorage.removeItem("workspaces");
+      localStorage.removeItem("activeWorkspace");
+      if (
+        typeof window !== "undefined" &&
+        !window.location.pathname.startsWith("/auth") &&
+        !window.location.pathname.startsWith("/onboarding")
+      ) {
+        window.location.assign("/auth/login");
+      }
+      return Promise.reject(error);
+    }
+  },
+);
 
 export type InviteDetailsResponse = {
   email: string;
@@ -31,6 +90,36 @@ export type PasswordChangePayload = {
   new_password: string;
 };
 
+export type TwoFactorMethod = "totp" | "email";
+
+export type TwoFactorStatus = {
+  enabled: boolean;
+  method: TwoFactorMethod | null;
+  totp_confirmed: boolean;
+  backup_codes_remaining: number;
+  trusted_device_count: number;
+};
+
+export type TwoFactorSetupPayload = {
+  password: string;
+  method: TwoFactorMethod;
+};
+
+export type TwoFactorSetupResult = {
+  method: TwoFactorMethod;
+  secret?: string | null;
+  otpauth_uri?: string | null;
+};
+
+export type TwoFactorBackupCodes = {
+  codes: string[];
+};
+
+export type TwoFactorChallenge = {
+  action: "TWO_FACTOR_REQUIRED";
+  method: TwoFactorMethod;
+};
+
 const unwrap = <T>(payload: T | WrappedData<T>): T => {
   if (payload && typeof payload === "object" && "data" in (payload as object)) {
     return (payload as WrappedData<T>).data;
@@ -43,6 +132,12 @@ const isNotFoundError = (error: unknown): boolean => {
     ?.status;
   return status === 404;
 };
+
+const AI_API_BASE_URL =
+  process.env.NEXT_PUBLIC_AI_API_BASE_URL ?? "http://13.51.109.85";
+
+// Separate axios instance for the dedicated AI service
+export const aiApi = axios.create({ baseURL: AI_API_BASE_URL });
 
 // Auth endpoints
 export const authService = {
@@ -104,12 +199,64 @@ export const authService = {
     const response = await api.post("/api/v1/users/change-password", payload);
     return unwrap(response.data);
   },
+  getTwoFactorStatus: async (): Promise<TwoFactorStatus> => {
+    const response = await api.get("/api/v1/auth/2fa/status");
+    return unwrap(response.data);
+  },
+  setupTwoFactor: async (
+    payload: TwoFactorSetupPayload,
+  ): Promise<TwoFactorSetupResult> => {
+    const response = await api.post("/api/v1/auth/2fa/setup", payload);
+    return unwrap(response.data);
+  },
+  confirmTwoFactor: async (code: string): Promise<TwoFactorBackupCodes> => {
+    const response = await api.post("/api/v1/auth/2fa/confirm", { code });
+    return unwrap(response.data);
+  },
+  verifyTwoFactor: async (code: string): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/verify", {
+      code,
+      remember_device: false,
+    });
+  },
+  recoverTwoFactor: async (backupCode: string): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/recovery", {
+      backup_code: backupCode,
+      remember_device: false,
+    });
+  },
+  resendTwoFactorCode: async (): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/resend-code");
+  },
+  disableTwoFactor: async (payload: {
+    password: string;
+    code: string;
+  }): Promise<void> => {
+    await api.post("/api/v1/auth/2fa/disable", payload);
+  },
+  regenerateTwoFactorBackupCodes: async (
+    password: string,
+  ): Promise<TwoFactorBackupCodes> => {
+    const response = await api.post(
+      "/api/v1/auth/2fa/backup-codes/regenerate",
+      { password },
+    );
+    return unwrap(response.data);
+  },
 };
 
 export interface CreateOrganizationPayload {
   name: string;
-  image_url?: string | null;
 }
+
+export type OrganizationRead = {
+  id: string;
+  name: string;
+  slug: string;
+  image_url?: string | null;
+  accepts_referrals?: boolean;
+  created_at: string;
+};
 
 export type OrganizationDirectoryEntry = {
   id: string;
@@ -148,11 +295,13 @@ export type Membership = {
 export type OrganizationMember = Membership;
 
 export const organizationService = {
-  createOrganization: async (payload: CreateOrganizationPayload) => {
+  createOrganization: async (
+    payload: CreateOrganizationPayload,
+  ): Promise<OrganizationRead> => {
     const response = await api.post("/api/v1/organizations", payload, {
       withCredentials: true,
     });
-    return response.data;
+    return unwrap(response.data);
   },
 
   getOrganizations: async () => {
@@ -160,7 +309,7 @@ export const organizationService = {
     return response.data;
   },
 
-  getOrganization: async (org_id: string) => {
+  getOrganization: async (org_id: string): Promise<OrganizationRead> => {
     const response = await api.get(`/api/v1/organizations/${org_id}`);
     return unwrap(response.data);
   },
@@ -177,7 +326,7 @@ export const organizationService = {
   updateOrganization: async (
     org_id: string,
     payload: { name?: string | null; accepts_referrals?: boolean | null },
-  ) => {
+  ): Promise<OrganizationRead> => {
     const response = await api.patch(`/api/v1/organizations/${org_id}`, payload);
     return unwrap(response.data);
   },
@@ -209,21 +358,94 @@ export const organizationService = {
 };
 
 export const uploadService = {
-  uploadImage: async (org_id: string, file: File) => {
+  uploadImage: async (
+    org_id: string,
+    file: File,
+  ): Promise<OrganizationRead> => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await api.post(
+    const response = await api.postForm(
       `/api/v1/organizations/${org_id}/image`,
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      },
     );
 
-    return response.data;
+    return unwrap(response.data);
+  },
+};
+
+export type VerificationDocumentType =
+  | "business_registration"
+  | "medical_license"
+  | "accreditation"
+  | "tax_certificate"
+  | "proof_of_address"
+  | "other";
+
+export type VerificationStatus =
+  | "unverified"
+  | "pending"
+  | "verified"
+  | "rejected";
+
+export type VerificationDocument = {
+  id: string;
+  document_type: VerificationDocumentType;
+  file_url: string;
+  file_name?: string | null;
+  content_type?: string | null;
+  created_at: string;
+};
+
+export type VerificationDetails = {
+  verification_status: VerificationStatus;
+  verification_submitted_at?: string | null;
+  verified_at?: string | null;
+  verification_rejection_reason?: string | null;
+  verification_documents?: VerificationDocument[];
+};
+
+export const verificationService = {
+  getStatus: async (orgId: string): Promise<VerificationDetails> => {
+    const response = await api.get(
+      `/api/v1/organizations/${orgId}/verification`,
+    );
+    return unwrap(response.data);
+  },
+
+  listDocuments: async (
+    orgId: string,
+  ): Promise<VerificationDocument[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${orgId}/verification/documents`,
+    );
+    return unwrap(response.data);
+  },
+
+  uploadDocument: async (
+    orgId: string,
+    documentType: VerificationDocumentType,
+    file: File,
+  ): Promise<VerificationDocument> => {
+    const formData = new FormData();
+    formData.append("document_type", documentType);
+    formData.append("file", file);
+
+    const response = await api.postForm(
+      `/api/v1/organizations/${orgId}/verification/documents`,
+      formData,
+    );
+    return unwrap(response.data);
+  },
+
+  deleteDocument: async (orgId: string, documentId: string): Promise<void> => {
+    await api.delete(
+      `/api/v1/organizations/${orgId}/verification/documents/${documentId}`,
+    );
+  },
+
+  submit: async (orgId: string): Promise<void> => {
+    await api.post(`/api/v1/organizations/${orgId}/verification/submit`);
   },
 };
 
@@ -1214,4 +1436,96 @@ export const PatientService = {
   getDepartments: async (org_id: string) => ({
     data: await organizationService.getDepartments(org_id),
   }),
+};
+
+/* ================= AI SERVICE ================= */
+
+export type AiModel = "gemini" | "mistral" | "deepseek";
+
+export type AiUsageInfo = {
+  tokens_used: number;
+  tokens_remaining: number;
+  daily_limit: number;
+  limit_reached: boolean;
+  resets_in: string;
+  resets_at_utc: string;
+};
+
+export type AiChatItem = {
+  id: string;
+  session_id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AiChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+};
+
+export type AiChatResponse = {
+  reply: string;
+  model_used: string;
+  session_id: string;
+  usage: AiUsageInfo;
+  temporary: boolean;
+};
+
+export const aiService = {
+  chat: async (payload: {
+    user_id: string;
+    message: string;
+    session_id?: string | null;
+    model?: AiModel | null;
+    temporary?: boolean;
+  }): Promise<AiChatResponse> => {
+    const response = await aiApi.post("/ai/chat", payload);
+    return response.data;
+  },
+
+  resetSession: async (user_id: string, session_id: string) => {
+    const response = await aiApi.post("/ai/session/reset", {
+      user_id,
+      session_id,
+    });
+    return response.data;
+  },
+
+  getUsage: async (user_id: string): Promise<AiUsageInfo> => {
+    const response = await aiApi.get(`/ai/usage/${user_id}`);
+    return response.data.usage;
+  },
+
+  listChats: async (user_id: string): Promise<AiChatItem[]> => {
+    const response = await aiApi.get(`/ai/chats/${user_id}`);
+    return response.data.chats;
+  },
+
+  getMessages: async (
+    session_id: string,
+    user_id: string,
+  ): Promise<AiChatMessage[]> => {
+    const response = await aiApi.get(`/ai/chats/${session_id}/messages`, {
+      params: { user_id },
+    });
+    return response.data.messages;
+  },
+
+  renameChat: async (
+    session_id: string,
+    user_id: string,
+    title: string,
+  ): Promise<void> => {
+    await aiApi.patch(`/ai/chats/${session_id}`, { user_id, title });
+  },
+
+  deleteChat: async (session_id: string, user_id: string): Promise<void> => {
+    await aiApi.delete(`/ai/chats/${session_id}`, {
+      params: { user_id },
+    });
+  },
 };

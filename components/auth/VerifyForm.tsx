@@ -5,6 +5,7 @@ import { useRouter, useSearchParams} from "next/navigation";
 import { toast } from "react-toastify";
 import OTPInput from "@components/OTPInput";
 import { authService } from "@services/api";
+import { getApiErrorMessage } from "@utils/apiError";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import auth_logo from "@public/auth_logo.svg";
@@ -71,7 +72,7 @@ export default function VerifyForm() {
 
       router.replace("/auth/signup/verify/successPage");
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Verification failed");
+      toast.error(getApiErrorMessage(err, "Verification failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -85,7 +86,7 @@ export default function VerifyForm() {
       await authService.resendOtp(email);
       toast.success("Verification code resent!");
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to resend code");
+      toast.error(getApiErrorMessage(err, "Failed to resend code. Please try again."));
     }
   };
 
