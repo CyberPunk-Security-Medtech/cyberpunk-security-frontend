@@ -48,7 +48,6 @@ export default function AddNewPatientRecord() {
   const [form, setForm] = useState<PatientCreatePayload>(initialForm);
   const [coverageType, setCoverageType] = useState<CoverageType | "">("");
   const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     if (!hydrated) return;
@@ -59,7 +58,6 @@ export default function AddNewPatientRecord() {
 
   const update = (key: keyof PatientCreatePayload, value: string | null) => {
     setForm((prev) => ({ ...prev, [key]: value as never }));
-    setFormError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,17 +69,17 @@ export default function AddNewPatientRecord() {
     }
 
     if (!coverageType) {
-      setFormError("Select HMO/Insurance or Self-pay before submitting.");
+      toast.error("Select HMO/Insurance or Self-pay before submitting.");
       return;
     }
 
     if (!isValidPatientDateOfBirth(form.dob)) {
-      setFormError("Enter a valid date of birth that is not in the future.");
+      toast.error("Enter a valid date of birth that is not in the future.");
       return;
     }
 
     if (coverageType === "hmo" && !hasRequiredHmoDetails(form)) {
-      setFormError("HMO provider, plan, and enrollee number are required for HMO patients.");
+      toast.error("HMO provider, plan, and enrollee number are required for HMO patients.");
       return;
     }
 
@@ -96,7 +94,6 @@ export default function AddNewPatientRecord() {
         error?.response?.data?.detail ||
         error?.response?.data?.message ||
         "Failed to create patient";
-      setFormError(message);
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -123,11 +120,6 @@ export default function AddNewPatientRecord() {
         onSubmit={handleSubmit}
         className="rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6"
       >
-        {formError && (
-          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {formError}
-          </div>
-        )}
         <section className="space-y-4">
           <h3 className="text-sm md:text-base font-semibold text-gray-900">
             Personal Information
@@ -272,7 +264,6 @@ export default function AddNewPatientRecord() {
                     checked={coverageType === option}
                     onChange={() => {
                       setCoverageType(option);
-                      setFormError("");
                       if (option === "self_pay") setForm((current) => omitHmoDetails(current));
                     }}
                   />
