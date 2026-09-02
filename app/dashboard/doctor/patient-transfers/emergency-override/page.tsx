@@ -63,7 +63,11 @@ export default function EmergencyTransferPage() {
   return (
     <div className="-mx-4 -my-4 min-h-full bg-[#F3FAFA] md:-mx-12">
       {toast && (
-        <div className="fixed right-6 top-24 z-[100] rounded-lg bg-[#F0F1FF] px-7 py-6 font-semibold text-[#211783] shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed right-6 top-24 z-toast rounded-lg bg-[#F0F1FF] px-7 py-6 font-semibold text-[#211783] shadow-lg"
+        >
           <button
             onClick={() => setToast(null)}
             className="absolute right-3 top-2 text-[#211783]"

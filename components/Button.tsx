@@ -92,6 +92,7 @@ function Button({
   return (
     <button
       className={`
+        inline-flex min-w-max shrink-0 items-center justify-center gap-2 whitespace-nowrap
         rounded-md font-medium transition
         disabled:cursor-not-allowed disabled:opacity-50
         ${variantStyles[variant]}

@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, Search, Download, Plus, Bell } from "lucide-react";
+import { Plus } from "lucide-react";
 import Button from "@components/Button"
 import { useAuth } from "@context/AuthContext";
 
@@ -20,20 +20,6 @@ export default function Topbar({ onAddPatientClick }: TopbarProps) {
       </div>
 
       <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
-        
-        <button className="dashboard-button min-h-10 border px-4 text-sm">
-          Today <ChevronDown className="w-3 h-3" />
-        </button>
-
-        <Button
-          type="button"
-          size="lg"
-          className="bg-[#E1E7EF] rounded-full"
-        >
-          <Download className="w-4 h-4" />
-          Export
-        </Button>
-
         <Button
           type="button"
           onSubmitHandler={onAddPatientClick}

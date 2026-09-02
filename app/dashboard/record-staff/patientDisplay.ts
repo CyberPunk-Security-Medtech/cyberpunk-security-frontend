@@ -1,5 +1,6 @@
 export type RecordStaffPatientRow = {
   id: string;
+  patientCode: string;
   initials: string;
   name: string;
   dateOfBirth: string;
@@ -12,6 +13,7 @@ export type RecordStaffPatientRow = {
 
 type ApiPatient = {
   id?: string;
+  patient_code?: string | null;
   first_name?: string;
   last_name?: string;
   dob?: string;
@@ -47,6 +49,7 @@ export const mapRecordStaffPatient = (
 
   return {
     id: patient.id ?? "",
+    patientCode: patient.patient_code?.trim() || patient.id || "Not recorded",
     initials: `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase(),
     name,
     dateOfBirth: formatPatientDate(patient.dob ?? patient.date_of_birth),

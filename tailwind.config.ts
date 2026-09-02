@@ -71,6 +71,13 @@ export default {
         22: "5.5rem",
         100: "25rem",
       },
+      zIndex: {
+        base: "var(--z-base)",
+        header: "var(--z-header)",
+        dropdown: "var(--z-dropdown)",
+        modal: "var(--z-modal)",
+        toast: "var(--z-toast)",
+      },
     },
   },
   plugins: [],
