@@ -20,6 +20,10 @@ let refreshPromise: Promise<unknown> | null = null;
 const isAuthEndpoint = (url?: string) =>
   typeof url === "string" && url.includes("/api/v1/auth/");
 
+const isInvitationRoute = () =>
+  typeof window !== "undefined" &&
+  window.location.pathname.startsWith("/invitations");
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -35,7 +39,8 @@ api.interceptors.response.use(
       status !== 401 ||
       !original ||
       original._retry ||
-      isAuthEndpoint(original.url)
+      isAuthEndpoint(original.url) ||
+      isInvitationRoute()
     ) {
       return Promise.reject(error);
     }

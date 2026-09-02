@@ -83,7 +83,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
               <th scope="col" className="min-w-[120px] px-4 py-3">Age/Gender</th>
               <th scope="col" className="min-w-[170px] px-4 py-3">Hospital</th>
               <th scope="col" className="min-w-[120px] px-4 py-3">Status</th>
-              <th scope="col" className="min-w-[110px] px-4 py-3">Date</th>
+              <th scope="col" className="min-w-[150px] px-4 py-3">Date of birth</th>
               <th scope="col" className="min-w-[150px] px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
