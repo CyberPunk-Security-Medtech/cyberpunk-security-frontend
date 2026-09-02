@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
+import DialogPortal from "@components/DialogPortal";
 import {
   dataSharingService,
   organizationService,
@@ -423,8 +424,12 @@ function PermissionDetailsModal({
   const canRevoke = isSourceOrg && !terminalStatuses.has(grant.status);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-6">
-      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+    <DialogPortal
+      title="Permission Details"
+      isOpen
+      onClose={onClose}
+      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+    >
         <div className="flex items-start justify-between border-b border-gray-100 px-6 py-5">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Permission Details</h2>
@@ -432,8 +437,13 @@ function PermissionDetailsModal({
               Grant ID: {grant.id}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-black">
-            <X size={22} />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Permission Details"
+            className="rounded text-gray-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+          >
+            <X size={22} aria-hidden="true" />
           </button>
         </div>
 
@@ -474,6 +484,7 @@ function PermissionDetailsModal({
             </p>
           )}
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
           >
@@ -481,6 +492,7 @@ function PermissionDetailsModal({
           </button>
           {canRevoke && (
             <button
+              type="button"
               onClick={onRevoke}
               className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             >
@@ -488,8 +500,7 @@ function PermissionDetailsModal({
             </button>
           )}
         </div>
-      </div>
-    </div>
+    </DialogPortal>
   );
 }
 
@@ -516,8 +527,13 @@ function RevokeConfirmModal({
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+    <DialogPortal
+      title="Revoke access?"
+      isOpen
+      onClose={onClose}
+      panelClassName="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+      dismissible={!revoking}
+    >
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
           <AlertCircle size={24} />
         </div>
@@ -530,6 +546,7 @@ function RevokeConfirmModal({
 
         <div className="mt-6 flex justify-end gap-3">
           <button
+            type="button"
             onClick={onClose}
             disabled={revoking}
             className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
@@ -537,6 +554,7 @@ function RevokeConfirmModal({
             Cancel
           </button>
           <button
+            type="button"
             onClick={onConfirm}
             disabled={revoking}
             className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:bg-red-300"
@@ -545,7 +563,6 @@ function RevokeConfirmModal({
             Revoke Access
           </button>
         </div>
-      </div>
-    </div>
+    </DialogPortal>
   );
 }

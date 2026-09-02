@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import { Eye, Plus, RotateCcw, Save } from "lucide-react";
@@ -216,7 +216,7 @@ export default function RecordStaffPatientRecordsPage() {
             <thead className="bg-[#F5F7FA] text-xs uppercase tracking-wide text-slate-600">
               <tr>
                 <th scope="col" className="min-w-[190px] bg-[#F5F7FA] px-5 py-3 font-semibold">Patient</th>
-                <th className="px-5 py-3 font-semibold">Patient ID</th>
+                <th className="px-5 py-3 font-semibold">Patient Code</th>
                 <th className="px-5 py-3 font-semibold">Gender</th>
                 <th className="px-5 py-3 font-semibold">Department</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
@@ -255,7 +255,7 @@ export default function RecordStaffPatientRecordsPage() {
                       </div>
                     </td>
                     <td className="break-all px-5 py-4 font-mono text-xs text-slate-500">
-                      {patient.id}
+                      {patient.patientCode}
                     </td>
                     <td className="px-5 py-4 text-slate-700">{patient.gender}</td>
                     <td className="px-5 py-4 text-slate-700">{patient.ward}</td>

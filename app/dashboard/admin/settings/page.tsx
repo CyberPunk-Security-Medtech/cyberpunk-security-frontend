@@ -9,7 +9,6 @@ import {
 } from "@services/api";
 import AdminMembersSettings from "@components/dashboard/admin/settings/AdminMembersSettings";
 import DangerZoneSettings from "@components/dashboard/admin/settings/DangerZoneSettings";
-import NotificationSettings from "@components/dashboard/admin/settings/NotificationSettings";
 import ProfileSettings from "@components/dashboard/admin/settings/ProfileSettings";
 import SecuritySettings from "@components/dashboard/admin/settings/SecuritySettings";
 
@@ -95,7 +94,6 @@ export default function AdminSettingsPage() {
           {...profile}
           membershipUnavailable={membershipUnavailable}
         />
-        <NotificationSettings />
         <SecuritySettings />
         <AdminMembersSettings
           members={members}

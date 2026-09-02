@@ -14,6 +14,7 @@ import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 interface Patient {
   id: string;
+  patientCode: string;
   initials: string;
   name: string;
   age: number | string;
@@ -80,6 +81,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
 
         const mappedPatients = data.map((p) => ({
           id: p.id,
+          patientCode: p.patient_code?.trim() || p.id,
           initials: `${p.first_name?.[0] ?? ""}${p.last_name?.[0] ?? ""}`.toUpperCase(),
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
           age: resolvePatientAge(p.age, p.dob ?? p.date_of_birth),
@@ -134,7 +136,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
           <thead className="border-b bg-gray-50 text-gray-600">
             <tr>
               <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient Name</th>
-              <th className="px-4 py-3 font-medium">Patient ID</th>
+              <th className="px-4 py-3 font-medium">Patient Code</th>
               <th className="px-4 py-3 font-medium">Age</th>
               <th className="px-4 py-3 font-medium">Gender</th>
               <th className="px-4 py-3 font-medium">Condition</th>
@@ -157,7 +159,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
                     <span className="break-words">{patient.name}</span>
                   </div>
                 </td>
-                <td className="break-all px-4 py-3">{patient.id}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{patient.patientCode}</td>
                 <td className="px-4 py-3">{patient.age}</td>
                 <td className="px-4 py-3">{patient.gender}</td>
                 <td className="px-4 py-3">
@@ -194,7 +196,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
                 </div>
                 <div className="min-w-0">
                   <p className="break-words text-sm font-semibold text-[#003C36]">{patient.name}</p>
-                  <p className="break-all text-xs text-gray-500">{patient.id}</p>
+                  <p className="break-all text-xs text-gray-500">{patient.patientCode}</p>
                 </div>
               </div>
               <span

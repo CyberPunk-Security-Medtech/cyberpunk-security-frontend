@@ -31,7 +31,7 @@ export default function TwoFactorDialog({
   const canDismiss = dismissible && !busy;
 
   return (
-    <Dialog open={open} onClose={canDismiss ? onClose : () => undefined} className="relative z-[70]">
+    <Dialog open={open} onClose={canDismiss ? onClose : () => undefined} className="relative z-modal">
       <DialogBackdrop className="fixed inset-0 bg-slate-950/55 backdrop-blur-[1px]" />
       <div className="fixed inset-0 overflow-y-auto p-4 sm:p-6">
         <div className="flex min-h-full items-center justify-center">

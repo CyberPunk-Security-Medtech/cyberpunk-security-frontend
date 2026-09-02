@@ -5,7 +5,7 @@
 
 ## Executive summary
 
-This work improves PrivaCure in eleven important areas:
+This work improves PrivaCure in nine important areas:
 
 1. Record Staff invitations now send the correct staff role. This work was completed in pull request #25.
 2. The Admin sidebar now shows only the page the user is currently viewing and stays steady during navigation.
@@ -16,8 +16,6 @@ This work improves PrivaCure in eleven important areas:
 7. Every dashboard now uses a safer responsive shell for phones, tablets, compact desktops, and large screens.
 8. Wide dashboard tables now scroll inside their own cards and keep clear spacing between columns.
 9. The Doctor sidebar now uses the Doctor indigo colors for selected and hovered pages.
-10. The Admin Compliance page now has a clearer dashboard, four organized views, and mobile-friendly tables.
-11. Billing & Payment now appears in the Admin menu as a safe coming-soon preview.
 
 These changes make the system easier to understand, reduce data mistakes, and give staff a more consistent experience.
 
@@ -35,8 +33,6 @@ These changes make the system easier to understand, reduce data mistakes, and gi
 | Phones and tablets | Some sidebars disappeared at tablet widths, the Admin page could become wider than the screen, and actions could be pushed outside the page. | All role areas use the same desktop breakpoint. Mobile sidebars open as contained drawers, content stays inside the screen, and actions wrap when needed. |
 | Dashboard tables | On smaller screens, some headings joined together and some columns such as Status and Actions could not be reached. | Wide tables scroll inside their cards. The complete table moves together, matching the Patient Transfer table, while the page itself stays fixed. |
 | Doctor sidebar colors | The Doctor sidebar could show a green or teal selected state that belonged to another dashboard. | Selected and hovered Doctor pages use the Doctor indigo color family. |
-| Admin Compliance | Compliance information was incomplete and the mobile tab layout was difficult to use. | The page now matches the approved layout, with Overview, Audit Logs, Consent Management, and Role Management views. |
-| Billing & Payment | The Admin menu had no Billing & Payment destination. | A responsive preview page is available directly below Compliance and is clearly covered by a “Coming soon” notice. |
 
 ## How patient age now works
 
@@ -159,16 +155,6 @@ The Doctor and Nurse Patient Records search fields now use the same endpoint and
 
 Medicine, consultation, test-order, transfer, and audit-log searches were not connected to this patient endpoint because they search different information. They continue using their existing local behavior until matching backend endpoints are available.
 
-## Admin Compliance and Billing
-
-The Compliance page now gives administrators a clearer view of access control, encryption, retention rules, audit activity, consent activity, and role permissions. The four views are organized as accessible tabs and their search fields work on the information currently displayed.
-
-Wide compliance tables move from side to side inside their own area on small screens. The full page stays inside the screen, and the cards stack cleanly on phones and tablets.
-
-Actions such as exporting a report, running a full audit, editing role permissions, and changing retention rules remain disabled because the server does not yet provide safe endpoints for them. This prevents the interface from pretending that a setting was saved.
-
-Billing & Payment now appears directly below Compliance in the Admin sidebar. The page shows the approved bill-summary and Paystack preview underneath a clear, non-dismissible coming-soon layer. No payment can be started and no payment-success message is shown while the feature is unavailable.
-
 ## Dashboards and people helped
 
 - **Admin:** clearer sidebar navigation and consistent patient age.
@@ -179,21 +165,6 @@ Billing & Payment now appears directly below Compliance in the Admin sidebar. Th
 - **Patients:** uninsured patients can be registered without incorrect HMO data.
 
 ## Validation completed
-
-The Admin Compliance and Billing work received these additional checks on 23 July 2026:
-
-- TypeScript check: **Passed**.
-- Next.js production build: **Passed**. All 58 pages were generated, including the new Billing & Payment route.
-- Git whitespace/error check (`git diff --check`): **Passed**.
-- Chrome DevTools checks at `320 × 568`, `390 × 844`, `800 × 900`, and `1440 × 900`: **Passed** with no page-level horizontal overflow.
-- Compliance tab keyboard navigation: **Passed** for Left Arrow, Right Arrow, Home, and End behavior.
-- Audit and Consent table behavior: **Passed** for contained horizontal scrolling and keyboard-focusable scroll regions.
-- Compliance search behavior: **Passed** for matching records and empty results.
-- Header and page alignment: **Passed** with `16px` phone gutters and `32px` tablet/desktop gutters.
-- Billing coming-soon layer: **Passed** for full content blocking, one readable status message, no payment interaction, and no second page scrollbar.
-- Lighthouse mobile Compliance and desktop Billing snapshots: **100/100 Accessibility** and **100/100 Best Practices**.
-
-The DevTools browser was not signed in to a live Admin workspace. One expected `401` request to the existing `/api/v1/users/me` endpoint was recorded; it was caused by the anonymous test session and not by the new pages.
 
 The Admin Settings page received the following additional checks on 21 July 2026:
 

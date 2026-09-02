@@ -2,6 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import { useState } from "react";
+import DialogPortal from "@components/DialogPortal";
 import { CheckboxRow, RecordOption, SelectableBox } from "./FormControls";
 import { EMRType, Patient, TransferMode } from "@components/patient-transfers/patientOverview/PatientTransferTypes"
 
@@ -34,13 +35,23 @@ export default function SendRecordsModal({
     (isNearbyTransfer || (isSpecificTransfer && destinationHospital.trim().length > 0));
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 py-6">
-      <div className="max-h-[95vh] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl">
+    <DialogPortal
+      title="Send Records"
+      isOpen
+      onClose={onClose}
+      backdropClassName="bg-black/50"
+      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl"
+    >
         <div className="flex items-center justify-between border-b border-gray-200 px-10 py-7">
           <h2 className="text-3xl font-medium text-black">Send Records</h2>
 
-          <button onClick={onClose} className="text-gray-600 hover:text-black">
-            <X size={28} />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Send Records"
+            className="rounded text-gray-600 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+          >
+            <X size={28} aria-hidden="true" />
           </button>
         </div>
 
@@ -163,6 +174,7 @@ export default function SendRecordsModal({
 
           <div className="grid gap-6 pt-4 md:grid-cols-2">
             <button
+              type="button"
               onClick={onClose}
               className="rounded-lg border-2 border-gray-500 px-6 py-4 text-2xl text-gray-600 hover:bg-gray-50"
             >
@@ -170,6 +182,7 @@ export default function SendRecordsModal({
             </button>
 
             <button
+              type="button"
               onClick={onSuccess}
               disabled={!canTransfer}
               className={`rounded-lg px-6 py-4 text-2xl text-white transition ${
@@ -182,7 +195,6 @@ export default function SendRecordsModal({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </DialogPortal>
   );
 }
