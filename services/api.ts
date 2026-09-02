@@ -176,15 +176,14 @@ export const authService = {
       code,
       email,
     });
-    return res.data;
+    return res.data as { is_valid: boolean; reset_token: string };
   },
   resendOtp: async (email: string) => {
     return (await api.post("/api/v1/auth/resend-verification", { email })).data;
   },
-  resetPassword: async (email: string, code: string, new_password: string) => {
+  resetPassword: async (reset_token: string, new_password: string) => {
     const response = await api.post("/api/v1/auth/reset-password", {
-      email,
-      code,
+      reset_token,
       new_password,
     });
     return response.data;

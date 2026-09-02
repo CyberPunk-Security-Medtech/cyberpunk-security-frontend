@@ -1,14 +1,15 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import OTPInput from "@components/OTPInput";
 import auth_logo from "@public/auth_logo.svg";
 import { authService } from "@services/api";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@utils/apiError";
 
 export default function ResetVerifyPage() {
   return (
@@ -19,12 +20,19 @@ export default function ResetVerifyPage() {
 }
 
 function ResetVerifyContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
 
-  const email = searchParams.get("email") || "";
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // The email is stashed in sessionStorage by the request-reset step, so it
+    // never appears in the URL alongside the code being verified here.
+    const stored = sessionStorage.getItem("passwordResetEmail") || "";
+    setEmail(stored);
+    if (!stored) router.replace("/auth/forgot_password");
+  }, [router]);
 
   const handleVerify = async () => {
     const code = otp.join("");
@@ -36,12 +44,18 @@ function ResetVerifyContent() {
     try {
       setLoading(true);
 
-      await authService.verifyPasswordReset(code, email);
+      const result = await authService.verifyPasswordReset(code, email);
+
+      // The server hands back a single-use reset token — this is the real
+      // authorization for the final password change. Keep it in
+      // sessionStorage only; never in the URL.
+      sessionStorage.setItem("passwordResetToken", result.reset_token);
+      sessionStorage.removeItem("passwordResetEmail");
 
       toast.success("Code verified. You can now reset your password.");
-      router.push(`/auth/forgot_password/new_password?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`);
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Verification failed");
+      router.push("/auth/forgot_password/new_password");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Verification failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -51,8 +65,8 @@ function ResetVerifyContent() {
     try {
       await authService.requestPasswordReset(email);
       toast.success("Code resent!");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to resend code");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to resend code. Please try again."));
     }
   };
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { authService } from "@services/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { getApiErrorMessage } from "@utils/apiError";
 import auth_logo from "@public/auth_logo.svg";
 
 export default function ForgotPasswordPage() {
@@ -17,19 +18,22 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
 
     if (!email.trim()) {
-      toast.error("Email is required");
+      toast.error("Please enter your email address.");
       return;
     }
 
     try {
       setLoading(true);
-      await authService.requestPasswordReset(email);
+      await authService.requestPasswordReset(email.trim());
 
+      // Carry the email forward in sessionStorage, not the URL — keeps the
+      // address (and later the reset token) out of history/referrer headers.
+      sessionStorage.setItem("passwordResetEmail", email.trim());
       toast.success("Password reset instructions sent to your email");
-        router.push(`/auth/forgot_password/otp_verification?email=${encodeURIComponent(email)}`);
-    } catch (err: any) {
+      router.push("/auth/forgot_password/otp_verification");
+    } catch (err) {
       toast.error(
-        err?.response?.data?.message || "Failed to send reset instructions"
+        getApiErrorMessage(err, "Failed to send reset instructions. Please try again."),
       );
     } finally {
       setLoading(false);

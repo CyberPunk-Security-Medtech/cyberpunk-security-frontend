@@ -1,15 +1,23 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import auth_logo from "@public/auth_logo.svg";
 import { authService } from "@services/api";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@utils/apiError";
+
+// Mirrors the backend password policy: minimum 12 characters, no common
+// breach-list words (the breach check runs server-side and comes back as a
+// normal reset error).
+const PASSWORD_RULES: Array<{ label: string; test: (value: string) => boolean }> = [
+  { label: "At least 12 characters", test: (value) => value.length >= 12 },
+];
 
 export default function ResetPasswordPage() {
   return (
@@ -25,23 +33,33 @@ export default function ResetPasswordPage() {
 }
 
 function ResetPasswordForm() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-
-  const email = searchParams.get("email") || "";
-  const code = searchParams.get("code") || ""; 
 
   const [new_password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+
+  useEffect(() => {
+    // The single-use reset token is stashed in sessionStorage by the OTP
+    // verification step — it must never travel in the URL.
+    if (!sessionStorage.getItem("passwordResetToken")) {
+      router.replace("/auth/forgot_password");
+    }
+  }, [router]);
+
+  const passwordErrors = passwordTouched
+    ? PASSWORD_RULES.filter((rule) => !rule.test(new_password)).map((rule) => rule.label)
+    : [];
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordTouched(true);
 
     if (!new_password || !confirmPassword) {
-      toast.error("All fields are required");
+      toast.error("Please fill in both password fields.");
       return;
     }
 
@@ -50,20 +68,34 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (new_password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    const failedRules = PASSWORD_RULES.filter((rule) => !rule.test(new_password));
+    if (failedRules.length > 0) {
+      const message = `Password must contain ${failedRules.map((r) => r.label.toLowerCase()).join(", ")}.`;
+      toast.error(message);
+      return;
+    }
+
+    const reset_token = sessionStorage.getItem("passwordResetToken");
+    if (!reset_token) {
+      toast.error("Your reset session has expired. Please start again.");
+      router.replace("/auth/forgot_password");
       return;
     }
 
     try {
       setLoading(true);
 
-      await authService.resetPassword(email, code, new_password); 
+      await authService.resetPassword(reset_token, new_password);
+
+      // The token is single-use — clear it (and anything else from this
+      // flow) now that the password has been changed.
+      sessionStorage.removeItem("passwordResetToken");
+      sessionStorage.removeItem("passwordResetEmail");
 
       toast.success("Password reset successfully");
       router.push("/auth/forgot_password/new_password/successPage");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.detail || "Failed to reset password");
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, "Failed to reset password. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -105,6 +137,8 @@ function ResetPasswordForm() {
                 placeholder="Enter Password"
                 value={new_password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => setPasswordTouched(true)}
+                aria-describedby="reset-password-rules"
                 className="w-full rounded-full border px-4 py-3 pr-10 focus:ring-2 focus:ring-[#1E237E]"
               />
               <button
@@ -116,6 +150,25 @@ function ResetPasswordForm() {
               </button>
             </div>
           </div>
+
+          {passwordTouched && passwordErrors.length > 0 ? (
+            <ul id="reset-password-rules" className="-mt-3 space-y-1 text-xs text-gray-500">
+              {PASSWORD_RULES.map((rule) => {
+                const satisfied = !passwordErrors.includes(rule.label);
+                return (
+                  <li
+                    key={rule.label}
+                    className={`flex items-center gap-1.5 ${
+                      satisfied ? "text-emerald-600" : "text-gray-500"
+                    }`}
+                  >
+                    <span aria-hidden="true">{satisfied ? "✓" : "•"}</span>
+                    {rule.label}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
 
           {/* CONFIRM PASSWORD */}
           <div>
