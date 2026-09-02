@@ -164,7 +164,7 @@ export default function SideBar({
     <>
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-dropdown bg-black/50 lg:hidden"
           aria-hidden="true"
           onClick={() => {
             setSidebarOpen?.(false);
@@ -182,7 +182,7 @@ export default function SideBar({
         ref={sidebarRef}
         aria-hidden={!isDesktop && !sidebarOpen}
         inert={!isDesktop && !sidebarOpen}
-        className={`fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col py-6 text-white transition-[transform,width] duration-300 motion-reduce:transition-none lg:static ${sidebarMinimize ? "lg:w-20" : "lg:w-[260px]"} ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className={`fixed inset-y-0 left-0 z-dropdown flex h-[100dvh] min-h-0 w-[260px] flex-col overflow-hidden py-6 text-white transition-[transform,width] duration-300 motion-reduce:transition-none lg:static ${sidebarMinimize ? "lg:w-20" : "lg:w-[260px]"} ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         style={
           {
             backgroundColor,
@@ -192,8 +192,8 @@ export default function SideBar({
           } as CSSProperties
         }
       >
-        <div>
-          <div className="px-6 mb-10 relative flex items-center justify-center min-h-[40px]">
+        <>
+          <div className="relative mb-10 flex min-h-[40px] shrink-0 items-center justify-center px-6">
             <div className="flex justify-center flex-1">
               {!sidebarMinimize && (
                 <OrganizationLogo />
@@ -252,7 +252,7 @@ export default function SideBar({
               );
             })}
           </nav> */}
-          <nav className="space-y-0.5">
+          <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-y-contain">
   {menuItems.map((item) => {
     const Icon = item.icon;
     const hasChildren = item.children && item.children.length > 0;
@@ -360,9 +360,9 @@ export default function SideBar({
     );
   })}
 </nav>
-        </div>
+        </>
 
-        <div className="px-6 mt-auto border-t border-white/10 pt-6">
+        <div className="shrink-0 border-t border-white/10 px-6 pt-6">
           <div className="relative" ref={profileMenuRef}>
             <button
               type="button"

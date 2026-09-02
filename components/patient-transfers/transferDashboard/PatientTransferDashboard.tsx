@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
+import DialogPortal from "@components/DialogPortal";
 import { hasOnboardingConsentForScopes } from "@components/patient-transfers/consentStorage";
 import {
   organizationService,
@@ -179,6 +180,7 @@ export default function PatientTransferDashboard({
         const mappedPatients = (patientRows as any[]).map((patient) => {
           const name = `${patient.first_name ?? ""} ${patient.last_name ?? ""}`.trim();
           const patientCode =
+            normalizeIdentifier(patient.patient_code) ||
             normalizeIdentifier(patient.hmo_number) ||
             normalizeIdentifier(patient.nin) ||
             patient.id.slice(0, 8);
@@ -367,7 +369,7 @@ export default function PatientTransferDashboard({
             <thead className="bg-[#effafa] text-gray-600">
               <tr>
                 <th className="px-4 py-3">Patient</th>
-                <th className="px-4 py-3">Patient ID</th>
+                <th className="px-4 py-3">Patient Code</th>
                 <th className="px-4 py-3">Age</th>
                 <th className="px-4 py-3">Gender</th>
                 <th className="px-4 py-3">Clinical Note</th>
@@ -487,8 +489,12 @@ function TransferRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
-      <div className="max-h-[95vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl">
+    <DialogPortal
+      title="Send Patient Referral"
+      isOpen
+      onClose={onClose}
+      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl"
+    >
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Send Patient Referral</h2>
@@ -497,8 +503,13 @@ function TransferRequestModal({
             </p>
           </div>
 
-          <button onClick={onClose} aria-label="Close referral modal">
-            <X size={22} />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close referral modal"
+            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+          >
+            <X size={22} aria-hidden="true" />
           </button>
         </div>
 
@@ -691,6 +702,7 @@ function TransferRequestModal({
 
         <div className="mt-6 flex justify-end gap-3">
           <button
+            type="button"
             onClick={onClose}
             className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600"
           >
@@ -698,6 +710,7 @@ function TransferRequestModal({
           </button>
 
           <button
+            type="button"
             onClick={onSubmit}
             disabled={submitting}
             className="inline-flex items-center gap-2 rounded-xl bg-[#24128f] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-[#9088c7]"
@@ -706,8 +719,7 @@ function TransferRequestModal({
             Send Referral
           </button>
         </div>
-      </div>
-    </div>
+    </DialogPortal>
   );
 }
 

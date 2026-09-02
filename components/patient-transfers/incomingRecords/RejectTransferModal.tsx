@@ -2,6 +2,7 @@
 
 import { AlertCircle, X } from "lucide-react";
 import { useState } from "react";
+import DialogPortal from "@components/DialogPortal";
 import { IncomingRecord } from "./IncomingRecordTypes";
 
 export default function RejectTransferModal({
@@ -18,15 +19,24 @@ export default function RejectTransferModal({
   const canSubmit = reason.trim().length > 0;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-xl rounded-xl bg-white shadow-2xl">
+    <DialogPortal
+      title="Reject Patients Transfer"
+      isOpen
+      onClose={onClose}
+      panelClassName="w-full max-w-xl rounded-xl bg-white shadow-2xl"
+    >
         <div className="flex items-center justify-between px-6 py-5">
           <h2 className="text-xl font-semibold text-[#111827]">
             Reject Patients Transfer
           </h2>
 
-          <button onClick={onClose} className="text-gray-500 hover:text-black">
-            <X size={20} />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Reject Patients Transfer"
+            className="rounded text-gray-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+          >
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -51,6 +61,7 @@ export default function RejectTransferModal({
 
           <div className="mt-8 grid grid-cols-2 gap-6">
             <button
+              type="button"
               onClick={onClose}
               className="rounded border border-gray-400 px-6 py-3 text-gray-700 hover:bg-gray-50"
             >
@@ -58,6 +69,7 @@ export default function RejectTransferModal({
             </button>
 
             <button
+              type="button"
               onClick={() => onDecline(reason)}
               disabled={!canSubmit}
               className={`rounded px-6 py-3 text-white ${
@@ -74,7 +86,6 @@ export default function RejectTransferModal({
             Rejecting transfer request for {record.patientName}.
           </p>
         </div>
-      </div>
-    </div>
+    </DialogPortal>
   );
 }

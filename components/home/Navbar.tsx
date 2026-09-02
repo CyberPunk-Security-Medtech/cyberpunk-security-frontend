@@ -29,7 +29,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-6xl rounded-[45px] px-6 py-3 flex items-center justify-between transition-all duration-300 ${
+      className={`fixed left-1/2 top-4 z-header flex w-[92%] max-w-6xl -translate-x-1/2 items-center justify-between rounded-[45px] px-6 py-3 transition-all duration-300 ${
         scrolled
           ? "bg-gradient-to-r from-[#859DBD]/70 via-[#859DBD]/25 to-[#859DBD]/100 shadow-lg backdrop-blur-md"
           : "bg-white/70 backdrop-blur-md"

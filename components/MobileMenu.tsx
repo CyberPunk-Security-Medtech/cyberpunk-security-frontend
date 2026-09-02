@@ -35,7 +35,7 @@ function MobileMenu({
             <Transition show={sidebarOpen} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="fixed inset-0 flex z-40 md:hidden font-sans"
+                    className="fixed inset-0 z-dropdown flex font-sans md:hidden"
                     onClose={() => setSidebarOpen(false)}
                 >
                     <TransitionChild

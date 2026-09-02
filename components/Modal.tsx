@@ -2,8 +2,7 @@
 
 import { X } from "lucide-react";
 import { ReactNode } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
+import DialogPortal from "@components/DialogPortal";
 
 interface ModalProps {
   title: string;
@@ -24,40 +23,34 @@ export default function Modal({
   header,
   headerClassName,
 }: ModalProps) {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    <DialogPortal
+      title={title}
+      isOpen={isOpen}
+      onClose={onClose}
+      backdropClassName="bg-black/50"
+      panelClassName={`flex max-h-[calc(100dvh-2rem)] w-[95%] max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-lg ${className ?? ""}`}
+    >
+      <div
+        className={`flex shrink-0 items-center justify-between px-6 py-4 text-white ${headerClassName || "bg-[#1A2380]"}`}
+      >
+        <div>
+          <h3 className="text-base font-semibold">{title}</h3>
+          {header ? <p className="text-sm text-slate-200">{header}</p> : null}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={`Close ${title}`}
+          className="rounded-md p-2 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
-          <motion.div
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
-            className={`bg-white rounded-xl shadow-lg w-[95%] max-w-3xl max-h-[95vh] flex flex-col ${className ?? ""}`}
-          >
-            {/* Header - Updated to apply headerClassName or fallback to default blue */}
-            <div className={`flex justify-between items-center text-white px-6 py-4 sticky top-0 z-10 ${headerClassName || "bg-[#1A2380]"}`}>
-              <div>
-                <h3 className="text-base font-semibold">{title}</h3>
-                {header ? <p className="text-sm text-slate-200">{header}</p> : null}
-              </div>
-              <button onClick={onClose} className="hover:opacity-80">
-                <X size={18} />
-              </button>
-            </div>
+          <X size={18} aria-hidden="true" />
+        </button>
+      </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-              {children}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        {children}
+      </div>
+    </DialogPortal>
   );
 }

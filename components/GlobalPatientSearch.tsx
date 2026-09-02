@@ -12,6 +12,9 @@ import {
 } from "@services/api";
 
 const getPatientPath = (pathname: string, patientId: string) => {
+  if (pathname.startsWith("/dashboard/admin")) {
+    return `/dashboard/admin/patient/${patientId}`;
+  }
   if (pathname.startsWith("/dashboard/doctor")) {
     return `/dashboard/doctor/patient/${patientId}`;
   }
@@ -152,7 +155,7 @@ export default function GlobalPatientSearch() {
           id={regionId}
           role="region"
           aria-label="Patient search results"
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+          className="absolute right-0 top-[calc(100%+0.5rem)] z-dropdown w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
         >
           {!activeWorkspace?.id ? (
             <p className="px-4 py-4 text-sm text-slate-600">
@@ -175,7 +178,9 @@ export default function GlobalPatientSearch() {
             <ul className="max-h-80 overflow-y-auto py-2" aria-label="Matching patients">
               {results.map((patient) => {
                 const name = `${patient.first_name} ${patient.last_name}`.trim();
-                const details = patient.email || patient.phone_number;
+                const details = patient.patient_code?.trim()
+                  ? `Patient code: ${patient.patient_code}`
+                  : patient.email || patient.phone_number;
                 const patientPath = getPatientPath(pathname, patient.id);
                 const content = (
                   <>
@@ -204,7 +209,7 @@ export default function GlobalPatientSearch() {
                       <Link
                         href={patientPath}
                         onClick={clearSearch}
-                        className="flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00B8A8]"
+                        className="flex min-h-14 cursor-pointer items-center gap-3 px-4 py-3 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00B8A8]"
                       >
                         {content}
                       </Link>
