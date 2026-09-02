@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --z-base: 0;
+  --z-header: 30;
+  --z-dropdown: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --toastify-z-index: var(--z-toast);
+}
+
+[data-sonner-toaster] {
+  z-index: var(--z-toast) !important;
+}
+
+.Toastify__toast-container {
+  z-index: var(--z-toast) !important;
+}
+
 @layer components {
   .dashboard-page-title {
     @apply text-xl font-semibold leading-tight sm:text-2xl;

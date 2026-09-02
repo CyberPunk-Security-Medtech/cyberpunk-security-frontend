@@ -13,6 +13,7 @@ import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 
 type PatientRow = {
   id: string;
+  patientCode: string;
   initials: string;
   name: string;
   gender: string;
@@ -44,6 +45,7 @@ const mapPatient = (patient: PatientListRecord): PatientRow => {
 
   return {
     id: patient?.id ?? "",
+    patientCode: patient.patient_code?.trim() || patient?.id || "Not recorded",
     initials: `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "NA",
     name: `${firstName} ${lastName}`.trim() || "Unknown Patient",
     gender: patient?.gender || "-",
@@ -168,7 +170,7 @@ export default function NewPatientsAwaitingTriage() {
             <thead className="border-b bg-gray-50 text-gray-600">
               <tr>
                 <th scope="col" className="min-w-[180px] bg-gray-50 px-4 py-3 font-medium">Patient</th>
-                <th className="px-4 py-3 font-medium">Patient ID</th>
+                <th className="px-4 py-3 font-medium">Patient Code</th>
                 <th className="px-4 py-3 font-medium">Gender</th>
                 <th className="px-4 py-3 font-medium">Condition</th>
                 <th className="px-4 py-3 font-medium">Onboarded</th>
@@ -186,7 +188,7 @@ export default function NewPatientsAwaitingTriage() {
                       <span className="break-words">{patient.name}</span>
                     </div>
                   </td>
-                  <td className="break-all px-4 py-3 text-gray-600">{patient.id}</td>
+                  <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-600">{patient.patientCode}</td>
                   <td className="px-4 py-3 text-gray-600">{patient.gender}</td>
                   <td className="px-4 py-3 text-gray-600">
                     <span className="line-clamp-1">{patient.condition}</span>

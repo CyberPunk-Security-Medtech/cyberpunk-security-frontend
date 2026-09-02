@@ -20,15 +20,11 @@ export default function Header({
   showSearch = true,
   desktopPaddingClassName = "md:px-8",
 }: HeaderProps) {
-  const { user, activeWorkspace } = useAuth();
-
-  const displayName = user
-    ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() || "User"
-    : "User";
+  const { activeWorkspace } = useAuth();
 
   return (
     <header
-      className={`sticky top-0 z-40 flex w-full min-w-0 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 py-4 ${desktopPaddingClassName}`}
+      className={`sticky top-0 z-header flex w-full min-w-0 items-center justify-between gap-3 border-b border-gray-100 bg-white px-4 py-4 ${desktopPaddingClassName}`}
     >
       <div className="flex min-w-0 items-center gap-3">
         {setSidebarOpen && (
@@ -65,15 +61,6 @@ export default function Header({
           <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-[#00B8A8]" />
         </button>
 
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-full bg-[#1A2380] flex items-center justify-center text-white text-sm font-semibold">
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-          <div className="hidden md:block">
-            <p className="text-sm font-medium text-[#1A2380]">{displayName}</p>
-            <p className="text-xs text-gray-500">Staff</p>
-          </div>
-        </div>
       </div>
     </header>
   );

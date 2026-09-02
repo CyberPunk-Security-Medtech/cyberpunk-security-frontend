@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@context/AuthContext";
 import { organizationService } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import Button from "@components/Button";
 
 type Department = {
   id: string;
+  department_code?: string | null;
   name: string;
   organization_id?: string;
   created_at?: string;
@@ -103,13 +105,13 @@ export default function DepartmentManagementPage() {
                     placeholder="Department name (e.g., Cardiology)"
                     className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#051466]"
                   />
-                  <button
+                  <Button
                     type="submit"
                     disabled={!canCreate}
-                    className="rounded-lg bg-[#051466] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg !bg-[#051466] text-sm"
                   >
                     {creating ? "Creating..." : "Create Department"}
-                  </button>
+                  </Button>
                 </form>
                 {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
               </section>
@@ -123,7 +125,7 @@ export default function DepartmentManagementPage() {
                     <thead className="bg-slate-50 text-left text-slate-600">
                       <tr>
                         <th scope="col" className="min-w-[180px] bg-slate-50 px-5 py-3 font-medium">Name</th>
-                        <th className="px-5 py-3 font-medium">Department ID</th>
+                        <th className="px-5 py-3 font-medium">Department Code</th>
                         <th className="px-5 py-3 font-medium">Created At</th>
                       </tr>
                     </thead>
@@ -144,7 +146,7 @@ export default function DepartmentManagementPage() {
                         departments.map((department) => (
                           <tr key={department.id} className="border-t">
                             <td className="bg-white px-5 py-4">{department.name}</td>
-                            <td className="px-5 py-4 font-mono text-xs">{department.id}</td>
+                            <td className="px-5 py-4 font-mono text-xs">{department.department_code?.trim() || department.id}</td>
                             <td className="px-5 py-4">{formatDateTime(department.created_at)}</td>
                           </tr>
                         ))

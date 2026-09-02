@@ -11,6 +11,7 @@ type ConsultationRow = {
   id: string;
   name: string;
   patient_id: string;
+  patient_code: string;
   condition: string;
   status: "Active" | "Discharged" | "Pending";
   date: string;
@@ -100,6 +101,7 @@ export default function TodayAppointments() {
             id: c.id,
             name: `${c.patient?.first_name ?? ""} ${c.patient?.last_name ?? ""}`.trim() || "Unknown Patient",
             patient_id: c.patient_id ?? "",
+            patient_code: c.patient?.patient_code?.trim() || c.patient_id || "-",
             condition: c.reason_for_visit ?? "-",
             status: toStatus(c.status),
             date: formatDate(c.created_at ?? c.updated_at),
@@ -135,7 +137,7 @@ export default function TodayAppointments() {
         <thead className="text-gray-600 border-b">
           <tr>
             <th scope="col" className="min-w-[160px] border-b bg-white px-4 py-3 font-medium">Patient Name</th>
-            <th scope="col" className="min-w-[220px] px-4 py-3 font-medium">Patient ID</th>
+            <th scope="col" className="min-w-[160px] px-4 py-3 font-medium">Patient Code</th>
             <th scope="col" className="min-w-[100px] px-4 py-3 font-medium">Priority</th>
             <th scope="col" className="min-w-[150px] px-4 py-3 font-medium">Condition</th>
             <th scope="col" className="min-w-[110px] px-4 py-3 font-medium">Status</th>
@@ -173,7 +175,7 @@ export default function TodayAppointments() {
               }`}
             >
               <td className="bg-white px-4 py-3 font-medium text-[#1A2380] group-hover:bg-gray-50">{a.name}</td>
-              <td className="whitespace-nowrap px-4 py-3">{a.patient_id}</td>
+              <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{a.patient_code}</td>
               <td className="whitespace-nowrap px-4 py-3">{a.priority}</td>
               <td className="px-4 py-3">{a.condition}</td>
               <td className="whitespace-nowrap px-4 py-3"><StatusBadge status={a.status} /></td>

@@ -8,13 +8,13 @@ import {
   Activity,
   Building2,
   ShieldCheck,
-  BarChart2,
   Settings,
   HelpCircle,
   Sparkles,
   ChevronDown,
   ChevronLeft,
   CreditCard,
+  ClipboardList,
 } from "lucide-react";
 import { authService } from "@services/api";
 import OrganizationLogo from "@components/shared/OrganizationLogo";
@@ -145,9 +145,8 @@ export default function Sidebar({
       ],
     },
     { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin/hmo-management" },
-    { label: "Compliance", icon: ShieldCheck, href: "/dashboard/admin/compliance" },
+    { label: "Audit Logs", icon: ClipboardList, href: "/dashboard/admin/audit-logs" },
     { label: "Billing & Payment", icon: CreditCard, href: "/dashboard/admin/billing-payment" },
-    { label: "Reports & Analytics", icon: BarChart2, href: "/dashboard/admin/reports" },
     { label: "AI Assistant", icon: Sparkles, href: "/dashboard/admin/ai-assistant" },
     { label: "Settings", icon: Settings, href: "/dashboard/admin/settings" },
     { label: "Help", icon: HelpCircle, href: "/dashboard/admin/help" },
@@ -176,7 +175,7 @@ export default function Sidebar({
     <>
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-dropdown bg-black/50 lg:hidden"
           aria-hidden="true"
           onClick={() => {
             setSidebarOpen(false);
@@ -194,10 +193,10 @@ export default function Sidebar({
         ref={sidebarRef}
         aria-hidden={!isDesktop && !sidebarOpen}
         inert={!isDesktop && !sidebarOpen}
-        className={`fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-72 shrink-0 flex-col bg-[#051466] text-slate-100 transition-transform duration-300 motion-reduce:transition-none lg:sticky lg:top-0 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-dropdown flex h-[100dvh] min-h-0 w-72 shrink-0 flex-col overflow-hidden bg-[#051466] text-slate-100 transition-transform duration-300 motion-reduce:transition-none lg:sticky lg:top-0 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
       {/* Logo Area */}
-      <div className="flex items-center justify-between border-b border-white/10 px-6 py-6">
+      <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-6">
         <OrganizationLogo />
         <button
           ref={closeButtonRef}
@@ -218,7 +217,7 @@ export default function Sidebar({
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 flex flex-col gap-y-1 px-3 py-6">
+      <nav className="flex min-h-0 flex-1 flex-col gap-y-1 overflow-y-auto overscroll-y-contain px-3 py-6">
         {navItems.map((item) => {
           const Icon = item.icon;
           const hasChildren = item.children && item.children.length > 0;
@@ -306,7 +305,7 @@ export default function Sidebar({
       </nav>
 
       {/* User Bottom Card */}
-      <div className="px-3 pb-6">
+      <div className="shrink-0 px-3 pb-6">
         <div className="relative" ref={profileMenuRef}>
           <button
             type="button"

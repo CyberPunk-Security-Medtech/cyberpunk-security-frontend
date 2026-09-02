@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, FileText, Users } from "lucide-react";
@@ -136,7 +136,7 @@ export default function RecordStaffDashboardPage() {
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="bg-[#F5F7FA] text-xs uppercase tracking-wide text-slate-600">
               <tr>
-                <th scope="col" className="min-w-[220px] bg-[#F5F7FA] px-5 py-3 font-semibold">Patient ID</th>
+                <th scope="col" className="min-w-[180px] bg-[#F5F7FA] px-5 py-3 font-semibold">Patient Code</th>
                 <th className="px-5 py-3 font-semibold">Name</th>
                 <th className="px-5 py-3 font-semibold">Ward</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
@@ -170,7 +170,7 @@ export default function RecordStaffDashboardPage() {
                 patients.map((record) => (
                   <tr key={record.id} className="border-t border-slate-100">
                     <td className="bg-white px-5 py-4 font-mono text-xs text-slate-600">
-                      {record.id}
+                      {record.patientCode}
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-medium text-[#111827]">

@@ -211,7 +211,7 @@ export default function RecordStaffPatientDetailsPage() {
             <div>
               <h1 className="dashboard-page-title text-[#111827]">{patientName}</h1>
               <p className="mt-1 break-all text-sm text-slate-500">
-                Patient ID: {formatValue(patient?.id)}
+                Patient Code: {formatValue(patient?.patient_code ?? patient?.id)}
               </p>
             </div>
           </div>

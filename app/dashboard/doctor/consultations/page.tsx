@@ -12,6 +12,7 @@ type ConsultationStatus = "Pending" | "In Progress" | "Completed" | "Cancelled";
 type ConsultationRow = {
   id: string;
   patient_id: string;
+  patient_code: string;
   patient_name: string;
   department_name: string;
   priority: string;
@@ -78,6 +79,7 @@ export default function ConsultationsPage() {
         .map((item: any) => ({
           id: item.id,
           patient_id: item.patient_id,
+          patient_code: item.patient?.patient_code?.trim() || item.patient_id,
           patient_name:
             `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
             "Unknown Patient",
@@ -113,7 +115,7 @@ export default function ConsultationsPage() {
       const searchPass =
         text.length === 0 ||
         row.patient_name.toLowerCase().includes(text) ||
-        row.patient_id.toLowerCase().includes(text) ||
+        row.patient_code.toLowerCase().includes(text) ||
         row.reason_for_visit.toLowerCase().includes(text);
       return tabPass && searchPass;
     });
@@ -296,7 +298,7 @@ export default function ConsultationsPage() {
                     <tr key={row.id} className="border-b hover:bg-gray-50">
                       <td className="bg-white px-4 py-3">
                         <div className="font-medium text-[#1A2380]">{row.patient_name}</div>
-                        <div className="break-all text-xs text-gray-500">{row.patient_id}</div>
+                        <div className="break-all text-xs text-gray-500">{row.patient_code}</div>
                       </td>
                       <td className="px-4 py-3">{row.department_name}</td>
                       <td className="px-4 py-3">
@@ -336,7 +338,7 @@ export default function ConsultationsPage() {
                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="break-words font-medium text-[#1A2380]">{row.patient_name}</p>
-                      <p className="break-all text-xs text-gray-500">{row.patient_id}</p>
+                      <p className="break-all text-xs text-gray-500">{row.patient_code}</p>
                     </div>
                     <StatusBadge status={toBadgeStatus(row.status)} />
                   </div>

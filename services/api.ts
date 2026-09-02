@@ -275,6 +275,8 @@ export type OrganizationDirectoryParams = {
 
 export type Department = {
   id: string;
+  /** Public, human-readable department identifier. Keep `id` for API requests. */
+  department_code?: string | null;
   name: string;
   organization_id: string;
   created_at?: string;
@@ -528,6 +530,8 @@ export type PatientCreatePayload = {
 
 export type PatientListRecord = {
   id: string;
+  /** Public, human-readable patient identifier. Keep `id` for API requests. */
+  patient_code?: string | null;
   first_name?: string | null;
   last_name?: string | null;
   age?: number | string | null;
@@ -544,6 +548,7 @@ export type PatientListRecord = {
 
 export type PatientSearchResult = PatientListRecord & {
   id: string;
+  patient_code: string;
   first_name: string;
   last_name: string;
   dob: string;

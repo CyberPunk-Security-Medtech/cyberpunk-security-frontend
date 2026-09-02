@@ -609,7 +609,11 @@ export default function IncomingRecordsPage({
       )}
 
       {actionLoadingId && (
-        <div className="fixed bottom-6 right-6 z-[120] rounded-lg bg-[#211783] px-5 py-3 text-sm font-medium text-white shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-toast rounded-lg bg-[#211783] px-5 py-3 text-sm font-medium text-white shadow-lg"
+        >
           Updating referral...
         </div>
       )}

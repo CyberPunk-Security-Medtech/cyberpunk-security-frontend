@@ -137,7 +137,7 @@ const handleResend = async (inv: Invitation) => {
                 </MenuButton>
                 <MenuItems
                   anchor="bottom end"
-                  className="z-50 mt-2 w-40 rounded-lg border bg-white p-1 shadow-lg focus:outline-none"
+                  className="z-dropdown mt-2 w-40 rounded-lg border bg-white p-1 shadow-lg focus:outline-none"
                 >
                   <MenuItem>
                     <button
