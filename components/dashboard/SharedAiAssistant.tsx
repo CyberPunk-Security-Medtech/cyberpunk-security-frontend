@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   aiService,
   AiChatItem,
@@ -412,13 +414,35 @@ export default function SharedAiAssistant() {
                       {message.sender === "worker" ? workerName : "AI"}
                     </p>
                     <div
-                      className={`max-w-[90%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[85%] ${
+                      className={`rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[85%] ${
                         message.sender === "worker"
-                          ? "rounded-br-sm bg-[#1A2380] text-white"
-                          : "rounded-bl-sm bg-white text-gray-700"
+                          ? "max-w-[90%] whitespace-pre-wrap rounded-br-sm bg-[#1A2380] text-white"
+                          : "max-w-[90%] rounded-bl-sm bg-white text-gray-700"
                       }`}
                     >
-                      <p className="leading-relaxed">{message.text}</p>
+                      {message.sender === "ai" ? (
+                        // AI replies arrive as markdown (headings, lists,
+                        // tables, code) — render them formatted.
+                        <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-headings:mb-1 prose-headings:mt-2 prose-headings:font-semibold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-pre:my-2 prose-code:rounded prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none prose-table:my-2 prose-blockquote:border-teal-400">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              a: ({ node, ...props }) => (
+                                <a
+                                  {...props}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-teal-600 underline"
+                                />
+                              ),
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="leading-relaxed">{message.text}</p>
+                      )}
                       {message.attachments?.length ? (
                         <ul className="mt-3 space-y-1.5 border-t border-white/20 pt-2">
                           {message.attachments.map((attachment) => (
