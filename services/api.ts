@@ -898,6 +898,42 @@ export const auditService = {
   },
 };
 
+// A set of vitals recorded against a consultation. Every measurement is
+// optional (nullable server-side); ranges mirror the backend validators:
+// temperature 20–45 °C, heart_rate 10–300 bpm, systolic 30–300 /
+// diastolic 20–200 mmHg, respiratory_rate 1–100 /min, SpO2 0–100 %,
+// weight 0.2–700 kg, height 10–300 cm.
+export type VitalsPayload = {
+  temperature?: number | null;
+  heart_rate?: number | null;
+  systolic_bp?: number | null;
+  diastolic_bp?: number | null;
+  respiratory_rate?: number | null;
+  oxygen_saturation?: number | null;
+  weight?: number | null;
+  height?: number | null;
+  notes?: string | null;
+  recorded_at?: string | null;
+};
+
+export type VitalRecord = {
+  temperature: number | null;
+  heart_rate: number | null;
+  systolic_bp: number | null;
+  diastolic_bp: number | null;
+  respiratory_rate: number | null;
+  oxygen_saturation: number | null;
+  weight: number | null;
+  height: number | null;
+  notes: string | null;
+  id: string;
+  consultation_id: string;
+  recorded_by: string;
+  recorded_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export const consultationService = {
   createConsultation: async (
     org_id: string,
@@ -1047,6 +1083,34 @@ export const consultationService = {
 
   return unwrap(response.data);
 },
+
+  /* ================= VITALS ================= */
+
+  // Vitals belong to a consultation: POST records a new set against the
+  // consultation, GET lists every set recorded so far. All fields are
+  // optional server-side; the backend range-checks each one (e.g.
+  // temperature 20–45, heart_rate 10–300) and returns 422 otherwise.
+  recordVitals: async (
+    org_id: string,
+    consultation_id: string,
+    payload: VitalsPayload,
+  ): Promise<VitalRecord> => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/vitals`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+
+  listVitals: async (
+    org_id: string,
+    consultation_id: string,
+  ): Promise<VitalRecord[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/vitals`,
+    );
+    return unwrap(response.data);
+  },
 
 };
 

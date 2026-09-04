@@ -11,6 +11,7 @@ import ActivityLogTab from "./ActivityLog";
 import LabTestTab from "./LabTestTab";
 import MedicalHistoryTab from "./MedicalHistoryTab";
 import PatientPrescriptionTab from "./PatientPrescriptionTab";
+import VitalsTab from "./VitalsTab";
 
 type ConsultationDetailsClientProps = {
   consultationId: string;
@@ -53,6 +54,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
 
   const tabs = useMemo(
     () => [
+      { label: "Vitals", content: <VitalsTab /> },
       { label: "Medical History", content: <MedicalHistoryTab /> },
       { label: "Prescription", content: <PatientPrescriptionTab /> },
       { label: "Lab Test", content: <LabTestTab /> },
