@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { invitationService } from "@services/api";
+import { invitationService, type OrganizationInvitation } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -11,13 +11,10 @@ import Pagination from "@components/dashboard/admin/staff-management/Pagination"
 
 const PAGE_SIZE = 10;
 
-interface Invitation {
-  id: string;
-  email: string;
-  role: string;
-  status: string;
-  department_id?: string | null;
-}
+// The same email can appear on several invitation rows (e.g. a revoked
+// invitation plus a re-sent one), so rows are keyed by invitation id —
+// never by email.
+type Invitation = OrganizationInvitation;
 
 export default function StaffTable() {
   const { activeWorkspace } = useAuth();
@@ -112,7 +109,7 @@ const handleResend = async (inv: Invitation) => {
 
       <tbody>
         {pagedInvitations.map((inv, i) => (
-          <tr key={inv.email} className={i % 2 ? "bg-slate-50/50" : "bg-white"}>
+          <tr key={inv.id} className={i % 2 ? "bg-slate-50/50" : "bg-white"}>
             <td className="bg-inherit px-4 py-3">{inv.email}</td>
             <td className="px-4 py-3 capitalize">{inv.role}</td>
 

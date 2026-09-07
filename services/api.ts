@@ -456,6 +456,16 @@ export const verificationService = {
   },
 };
 
+export type InvitationStatus = "pending" | "accepted" | "expired" | "revoked";
+
+export type OrganizationInvitation = {
+  id: string;
+  email: string;
+  role: string;
+  status: InvitationStatus;
+  department_id?: string | null;
+};
+
 export const invitationService = {
   async sendInvitation(
     email: string,
@@ -503,7 +513,9 @@ export const invitationService = {
     );
   },
 
-  async getOrganizationInvitations(orgId: string) {
+  async getOrganizationInvitations(
+    orgId: string,
+  ): Promise<OrganizationInvitation[]> {
     const res = await api.get(`/api/v1/organizations/${orgId}/invitations`);
     return res.data.data;
   },
