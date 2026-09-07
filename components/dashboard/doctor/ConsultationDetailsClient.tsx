@@ -149,7 +149,19 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
         )}
 
         {consultationLoading ? (
-          <p className="text-sm text-gray-500">Loading consultation details...</p>
+          <div role="status" aria-label="Loading consultation details" className="space-y-4">
+            <div className="flex gap-2" aria-hidden="true">
+              {[0, 1, 2, 3].map((tab) => (
+                <div key={tab} className="h-8 w-24 animate-pulse rounded-full bg-gray-200" />
+              ))}
+            </div>
+            <div className="space-y-3" aria-hidden="true">
+              <div className="h-3.5 w-1/2 animate-pulse rounded bg-gray-200" />
+              <div className="h-3.5 w-full animate-pulse rounded bg-gray-100" />
+              <div className="h-3.5 w-5/6 animate-pulse rounded bg-gray-100" />
+              <div className="h-3.5 w-2/3 animate-pulse rounded bg-gray-100" />
+            </div>
+          </div>
         ) : (
           <Tabs key={`consultation-details-tabs-${consultationId}`} tabs={tabs} />
         )}

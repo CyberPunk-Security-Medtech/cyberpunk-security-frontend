@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { SkeletonRow } from "@components/Skeletons";
 
 interface Patient {
   id: string;
@@ -120,7 +121,19 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
     };
   }, [activeWorkspace?.id, searchQuery]);
 
-  if (loading) return <p className="p-4 text-gray-500">Loading patients...</p>;
+  if (loading) {
+    return (
+      <div
+        role="status"
+        aria-label="Loading patients"
+        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+      >
+        {Array.from({ length: 5 }).map((_, index) => (
+          <SkeletonRow key={index} />
+        ))}
+      </div>
+    );
+  }
   if (!loading && patients.length === 0) {
     return (
       <p className="p-4 text-gray-500">

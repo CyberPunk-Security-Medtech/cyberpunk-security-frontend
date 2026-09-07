@@ -3,6 +3,7 @@
 import { StatusBadge } from "@components/StatusBadge";
 import Button from "@components/Button";
 import { useState } from "react";
+import { formatPatientCode } from "@utils/patientCode";
 import { useConsultation } from "./ConsultationContext";
 import { CreateConsultationModal } from "./ConsultationModal";
 
@@ -100,7 +101,9 @@ export default function PatientHeader() {
           </h3>
           <p className="text-sm">
             <span className="text-sm text-[#00B8A8]">PID:</span>{" "}
-            <span className="break-all text-gray-700">{patient?.id ?? "-"}</span>
+            <span className="break-all text-gray-700">
+              {formatPatientCode(patient?.patient_code, patient?.id)}
+            </span>
           </p>
         </div>
       </div>

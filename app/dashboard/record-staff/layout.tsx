@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutDashboard, Sparkles, Users } from "lucide-react";
+import { LayoutDashboard, Settings, Sparkles, Users } from "lucide-react";
 import Header from "@components/Header";
 import Sidebar from "@components/SideBar";
 import { useAuth } from "@context/AuthContext";
@@ -22,6 +22,11 @@ const recordStaffMenu: MenuItem[] = [
     name: "Ai Assistant",
     icon: Sparkles,
     href: "/dashboard/record-staff/ai-assistant",
+  },
+  {
+    name: "Settings",
+    icon: Settings,
+    href: "/dashboard/record-staff/settings",
   },
 ];
 

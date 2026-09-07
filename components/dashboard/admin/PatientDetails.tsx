@@ -6,6 +6,7 @@ import { ArrowLeft, ShieldPlus, UserRound } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import { patientService, type PatientCreatePayload, type PatientListRecord } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
+import { PageSkeleton } from "@components/Skeletons";
 
 type PatientDetailsProps = {
   patientId: string;
@@ -114,8 +115,8 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
       </Link>
 
       {loading ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm" aria-live="polite">
-          Loading patient details...
+        <section className="space-y-6" aria-live="polite">
+          <PageSkeleton />
         </section>
       ) : error ? (
         <section className="rounded-2xl border border-red-200 bg-white p-6 shadow-sm" role="alert">
@@ -140,7 +141,7 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
                 </span>
                 <div className="min-w-0">
                   <h1 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl">{patientName}</h1>
-                  <p className="mt-1 break-all text-sm text-slate-500">Patient ID: {patient.id ?? patientId}</p>
+                  <p className="mt-1 break-all text-sm text-slate-500">Patient ID: {patient.patient_code?.trim() || patient.id || patientId}</p>
                 </div>
               </div>
               <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">

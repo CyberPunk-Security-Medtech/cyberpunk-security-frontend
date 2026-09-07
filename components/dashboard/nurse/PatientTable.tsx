@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { SkeletonRow } from "@components/Skeletons";
 
 interface Patient {
   id: string;
@@ -19,20 +20,8 @@ interface Patient {
   name: string;
   age: number | string;
   gender: string;
-  condition: string;
-  status: string;
   date: string;
 }
-
-const statusClassName = (status: string) => {
-  if (status === "Active") {
-    return "text-[#00B8A8] bg-[#E6F8F7] border-[#A8E9E3]";
-  }
-  if (status === "Pending") {
-    return "text-[#E0A500] bg-[#FFF7E6] border-[#F7D799]";
-  }
-  return "text-[#6B7280] bg-[#F3F4F6] border-[#E5E7EB]";
-};
 
 type PatientTableProps = {
   searchQuery?: string;
@@ -86,8 +75,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
           age: resolvePatientAge(p.age, p.dob ?? p.date_of_birth),
           gender: p.gender || "-",
-          condition: p.symptoms || "N/A",
-          status: p.status || "Active",
           date: p.created_at
             ? new Date(p.created_at).toLocaleDateString("en-US", {
                 month: "short",
@@ -120,7 +107,19 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
     };
   }, [activeWorkspace?.id, searchQuery]);
 
-  if (loading) return <p className="p-4 text-gray-500">Loading patients...</p>;
+  if (loading) {
+    return (
+      <div
+        role="status"
+        aria-label="Loading patients"
+        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+      >
+        {Array.from({ length: 5 }).map((_, index) => (
+          <SkeletonRow key={index} />
+        ))}
+      </div>
+    );
+  }
   if (!loading && patients.length === 0) {
     return (
       <p className="p-4 text-gray-500">
@@ -132,15 +131,13 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
       <ResponsiveTableRegion label="Nurse patient records">
-        <table className="w-full min-w-[920px] border-collapse text-left text-sm">
+        <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead className="border-b bg-gray-50 text-gray-600">
             <tr>
               <th scope="col" className="min-w-[190px] bg-gray-50 px-4 py-3 font-medium">Patient Name</th>
               <th className="px-4 py-3 font-medium">Patient Code</th>
               <th className="px-4 py-3 font-medium">Age</th>
               <th className="px-4 py-3 font-medium">Gender</th>
-              <th className="px-4 py-3 font-medium">Condition</th>
-              <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Last Visit</th>
             </tr>
           </thead>
@@ -162,18 +159,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
                 <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{patient.patientCode}</td>
                 <td className="px-4 py-3">{patient.age}</td>
                 <td className="px-4 py-3">{patient.gender}</td>
-                <td className="px-4 py-3">
-                  <span className="line-clamp-1">{patient.condition}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${statusClassName(
-                      patient.status
-                    )}`}
-                  >
-                    {patient.status}
-                  </span>
-                </td>
                 <td className="px-4 py-3 text-gray-500">{patient.date}</td>
               </tr>
             ))}
@@ -199,13 +184,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
                   <p className="break-all text-xs text-gray-500">{patient.patientCode}</p>
                 </div>
               </div>
-              <span
-                className={`shrink-0 rounded-full border px-2 py-1 text-xs font-medium ${statusClassName(
-                  patient.status
-                )}`}
-              >
-                {patient.status}
-              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
@@ -214,9 +192,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
               </p>
               <p className="text-gray-500">
                 Gender: <span className="text-gray-800">{patient.gender}</span>
-              </p>
-              <p className="col-span-2 text-gray-500">
-                Condition: <span className="break-words text-gray-800">{patient.condition}</span>
               </p>
               <p className="col-span-2 text-gray-500">
                 Last Visit: <span className="text-gray-800">{patient.date}</span>

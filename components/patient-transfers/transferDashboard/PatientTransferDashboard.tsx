@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import DialogPortal from "@components/DialogPortal";
+import { TableSkeleton } from "@components/Skeletons";
 import { hasOnboardingConsentForScopes } from "@components/patient-transfers/consentStorage";
 import {
   organizationService,
@@ -379,12 +380,7 @@ export default function PatientTransferDashboard({
 
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
-                    <Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />
-                    Loading patients...
-                  </td>
-                </tr>
+                <TableSkeleton rows={5} columns={6} />
               ) : (
                 filteredPatients.map((patient) => (
                   <tr key={patient.id} className="border-t border-gray-100">

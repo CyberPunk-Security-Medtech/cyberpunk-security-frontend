@@ -29,7 +29,18 @@ import {
   AiUsageInfo,
 } from "@services/api";
 
-type Attachment = { id: string; name: string; size: number };
+type Attachment = {
+  id: string;
+  name: string;
+  size: number;
+  // Extracted text, sent to the AI inside the chat message. The AI
+  // backend has no file-upload endpoint — /ai/chat only takes a string
+  // message — so attachments are read client-side and embedded.
+  text?: string;
+  // Set when the file could not be read as text (binary/unsupported
+  // type or read failure); the send is blocked for that file.
+  error?: string;
+};
 type Message = {
   id: string;
   sender: "worker" | "ai";
@@ -40,6 +51,85 @@ const sizeLabel = (bytes: number) =>
   bytes < 1048576
     ? `${Math.max(1, Math.round(bytes / 1024))} KB`
     : `${(bytes / 1048576).toFixed(1)} MB`;
+
+// Per-attachment excerpt budget and the overall cap on the embedded
+// document text (the API rejects messages over 2000 characters, so the
+// combined message must stay under that).
+const ATTACHMENT_EXCERPT_LIMIT = 600;
+const ATTACHMENTS_TOTAL_LIMIT = 1200;
+
+const TEXT_FILE_EXTENSIONS = [
+  ".txt", ".md", ".csv", ".json", ".log", ".xml", ".yml", ".yaml",
+];
+
+const isTextFile = (file: File) =>
+  file.type.startsWith("text/") ||
+  file.type === "application/json" ||
+  file.type === "application/xml" ||
+  TEXT_FILE_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext));
+
+// Reads a document's text so it can be sent with the message. Returns
+// an error string instead of text for binary/oversized/unreadable files.
+const readAttachmentText = async (file: File): Promise<Attachment> => {
+  const base: Omit<Attachment, "text" | "error"> = {
+    id: `${file.name}-${file.size}-${file.lastModified}`,
+    name: file.name,
+    size: file.size,
+  };
+
+  if (file.size > 2 * 1024 * 1024) {
+    return { ...base, error: "file is larger than 2 MB" };
+  }
+  if (!isTextFile(file)) {
+    return {
+      ...base,
+      error: "only text, Markdown, CSV and JSON documents can be read",
+    };
+  }
+
+  try {
+    const text = (await file.text()).trim();
+    if (!text) {
+      return { ...base, error: "the file appears to be empty" };
+    }
+    return { ...base, text };
+  } catch {
+    return { ...base, error: "the file could not be read" };
+  }
+};
+
+// Builds the outgoing message: the user's prompt plus a compact
+// excerpt of each attachment, capped so the combined message stays
+// within the API's 2000-character limit.
+const buildOutgoingMessage = (
+  text: string,
+  attachments: Attachment[],
+): { message: string; unreadable: Attachment[] } => {
+  const readable = attachments.filter((a) => a.text);
+  const unreadable = attachments.filter((a) => a.error);
+
+  if (readable.length === 0) {
+    return { message: text, unreadable };
+  }
+
+  // Give each attachment an equal share of the total budget.
+  const perAttachment = Math.max(
+    150,
+    Math.floor(ATTACHMENTS_TOTAL_LIMIT / readable.length),
+  );
+  const excerpts = readable.map((attachment) => {
+    const content = attachment.text ?? "";
+    const clipped =
+      content.length > perAttachment
+        ? `${content.slice(0, perAttachment)}…`
+        : content;
+    return `[Document: ${attachment.name}]\n${clipped}`;
+  });
+
+  const documentBlock = `Attached documents:\n${excerpts.join("\n\n")}`;
+  const message = `${text}\n\n${documentBlock}`;
+  return { message, unreadable };
+};
 
 function TypingIndicator() {
   return (
@@ -183,17 +273,24 @@ export default function SharedAiAssistant() {
     }
   };
 
-  const addFiles = (event: ChangeEvent<HTMLInputElement>) => {
+  const addFiles = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
-    setAttachments((current) => [
-      ...current,
-      ...files.map((file) => ({
-        id: `${file.name}-${file.size}-${file.lastModified}`,
-        name: file.name,
-        size: file.size,
-      })),
-    ]);
     event.target.value = "";
+    if (files.length === 0) return;
+
+    // Read each file's text up front so submit can embed it in the
+    // message; files that can't be read are flagged and rejected.
+    const read = await Promise.all(files.map(readAttachmentText));
+    read.forEach((attachment) => {
+      if (attachment.error) {
+        toast.error(
+          `Could not read "${attachment.name}": ${attachment.error}.`,
+        );
+      }
+    });
+    const readable = read.filter((attachment) => !attachment.error);
+    if (readable.length === 0) return;
+    setAttachments((current) => [...current, ...readable]);
   };
 
   const submit = async (event: FormEvent) => {
@@ -201,6 +298,21 @@ export default function SharedAiAssistant() {
     const text = prompt.trim();
     if (!text || typing || !userId || limitReached) return;
     const sentAttachments = attachments;
+    const { message: outgoingMessage, unreadable } = buildOutgoingMessage(
+      text,
+      sentAttachments,
+    );
+    if (outgoingMessage.length > 2000) {
+      toast.error("Your message and attached documents are too long. Please shorten them.");
+      return;
+    }
+    if (unreadable.length > 0) {
+      // Shouldn't happen (unreadable files are filtered on add), but
+      // guard the send anyway.
+      const names = unreadable.map((a) => `"${a.name}"`).join(", ");
+      toast.error(`These documents could not be read: ${names}. Remove them before sending.`);
+      return;
+    }
     setMessages((current) => [
       ...current,
       {
@@ -216,7 +328,7 @@ export default function SharedAiAssistant() {
     try {
       const response = await aiService.chat({
         user_id: userId,
-        message: text,
+        message: outgoingMessage,
         session_id: activeSessionId,
       });
       setMessages((current) => [
@@ -511,7 +623,7 @@ export default function SharedAiAssistant() {
                 id="assistant-files"
                 type="file"
                 multiple
-                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+                accept=".txt,.md,.csv,.json,.log,.xml,.yml,.yaml,text/*"
                 className="sr-only"
                 onChange={addFiles}
               />
@@ -543,8 +655,8 @@ export default function SharedAiAssistant() {
             </button>
           </form>
           <p className="shrink-0 bg-white px-4 pb-2 text-center text-[11px] text-gray-500 sm:px-6 sm:pb-3">
-            Attachments stay on this device — only your message text is sent to
-            the AI. Do not include sensitive patient information.
+            Attachments are read on this device and an excerpt is sent with
+            your message. Do not include sensitive patient information.
           </p>
         </section>
       </div>

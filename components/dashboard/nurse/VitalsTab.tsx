@@ -172,7 +172,21 @@ export default function VitalsTab() {
       )}
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading vitals...</p>
+        <div role="status" aria-label="Loading vitals" className="space-y-3">
+          {[0, 1, 2].map((item) => (
+            <div
+              key={item}
+              className="animate-pulse rounded-xl border px-4 py-4"
+              aria-hidden="true"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <div className="h-3.5 w-32 rounded bg-gray-200" />
+                <div className="h-5 w-20 rounded bg-gray-100" />
+              </div>
+              <div className="h-3 w-full rounded bg-gray-100" />
+            </div>
+          ))}
+        </div>
       ) : vitals.length === 0 ? (
         <div className="rounded-xl border px-4 py-4 text-sm text-gray-500">
           No vitals recorded yet.

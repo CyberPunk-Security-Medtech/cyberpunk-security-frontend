@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import DialogPortal from "@components/DialogPortal";
+import { TableSkeleton } from "@components/Skeletons";
 import {
   dataSharingService,
   organizationService,
@@ -281,12 +282,7 @@ export default function SharingPermissionsPage({
 
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-5 py-14 text-center text-gray-500">
-                    <Loader2 className="mx-auto mb-2 h-5 w-5 animate-spin" />
-                    Loading sharing permissions...
-                  </td>
-                </tr>
+                <TableSkeleton rows={5} columns={7} />
               ) : (
                 filteredGrants.map((grant) => (
                   <tr key={grant.id} className="border-t border-gray-100">

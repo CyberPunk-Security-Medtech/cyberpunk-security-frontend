@@ -6,6 +6,7 @@ import { consultationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { StatusBadge } from "@components/StatusBadge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { TableSkeleton } from "@components/Skeletons";
 
 type ConsultationStatus = "Pending" | "In Progress" | "Completed" | "Cancelled";
 
@@ -276,11 +277,7 @@ export default function ConsultationsPage() {
             </thead>
             <tbody>
               {loading && (
-                <tr>
-                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
-                    Loading consultations...
-                  </td>
-                </tr>
+                <TableSkeleton rows={6} columns={7} />
               )}
 
               {!loading && filteredRows.length === 0 && (

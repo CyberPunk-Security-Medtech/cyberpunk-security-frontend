@@ -9,6 +9,7 @@ import {
   type CrossTenantAccessParams,
 } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { TableSkeleton } from "@components/Skeletons";
 
 const PAGE_SIZE = 10;
 
@@ -210,11 +211,12 @@ export default function AuditLogsTable() {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr>
-                      <td colSpan={4} className="px-5 py-12 text-center text-slate-600" role="status">
-                        Loading audit logs...
-                      </td>
-                    </tr>
+                    <TableSkeleton
+                      rows={6}
+                      columns={4}
+                      rowLeading="h-4 w-40 rounded"
+                      rowLines={["h-3 w-28", "h-3 w-20"]}
+                    />
                   ) : error ? (
                     <tr>
                       <td colSpan={4} className="px-5 py-10 text-center">

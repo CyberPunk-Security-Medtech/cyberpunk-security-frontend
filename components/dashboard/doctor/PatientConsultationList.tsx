@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { StatusBadge } from "@components/StatusBadge";
 import { useConsultation } from "./ConsultationContext";
+import { SkeletonRow } from "@components/Skeletons";
 
 const formatDate = (value?: string | null) => {
   if (!value) return "-";
@@ -37,8 +38,10 @@ export default function PatientConsultationList() {
       </div>
 
       {consultationLoading && (
-        <div className="rounded-lg border p-4 text-sm text-gray-500">
-          Loading consultations...
+        <div role="status" aria-label="Loading consultations" className="space-y-3 py-2">
+          {[0, 1, 2].map((item) => (
+            <SkeletonRow key={item} leading="h-5 w-5 rounded" lines={["h-3.5 w-3/4", "h-3 w-1/2"]} />
+          ))}
         </div>
       )}
 

@@ -23,6 +23,7 @@ import {
   statusClassName,
   type RecordStaffPatientRow,
 } from "../patientDisplay";
+import { TableSkeleton } from "@components/Skeletons";
 
 const initialForm: PatientCreatePayload = {
   first_name: "",
@@ -225,11 +226,7 @@ export default function RecordStaffPatientRecordsPage() {
             </thead>
             <tbody>
               {loadingPatients && (
-                <tr>
-                  <td className="px-5 py-8 text-center text-slate-500" colSpan={6}>
-                    Loading patient records...
-                  </td>
-                </tr>
+                <TableSkeleton rows={6} columns={6} />
               )}
 
               {!loadingPatients && patients.length === 0 && (

@@ -553,6 +553,7 @@ import {
   RawConsultation,
   getConsultationsArray,
   buildPatientName,
+  buildPatientCode,
   getPatientId,
   buildDoctorName,
 } from "./labOrderUtils";
@@ -647,6 +648,8 @@ export default function TestOrdersPageClient() {
             ...order,
             patientName: buildPatientName(consultation!, order.patientName),
             patientId: getPatientId(consultation!, order.patientId),
+            patientCode:
+              buildPatientCode(consultation!, order.patientCode) || order.patientId,
             patientGender:
               consultation?.patient?.gender ||
               (consultation as any)?.patient_gender ||

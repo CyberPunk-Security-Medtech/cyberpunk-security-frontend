@@ -13,6 +13,7 @@ import {
   wasCreatedToday,
   type RecordStaffPatientRow,
 } from "./patientDisplay";
+import { TableSkeleton } from "@components/Skeletons";
 
 const firstName = (name: string) =>
   name.split(" ").filter(Boolean)[0] || "there";
@@ -145,14 +146,7 @@ export default function RecordStaffDashboardPage() {
             </thead>
             <tbody>
               {loading && (
-                <tr>
-                  <td
-                    className="px-5 py-8 text-center text-slate-500"
-                    colSpan={5}
-                  >
-                    Loading patient records...
-                  </td>
-                </tr>
+                <TableSkeleton rows={5} columns={5} />
               )}
 
               {!loading && patients.length === 0 && (

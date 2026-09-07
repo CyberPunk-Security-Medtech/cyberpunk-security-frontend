@@ -10,6 +10,7 @@ import {
   type PatientListRecord,
 } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { SkeletonRow } from "@components/Skeletons";
 
 type PatientRow = {
   id: string;
@@ -156,7 +157,13 @@ export default function NewPatientsAwaitingTriage() {
         </div>
       )}
 
-      {loading && <p className="text-sm text-gray-500">Loading triage queue...</p>}
+      {loading && (
+        <div role="status" aria-label="Loading triage queue" className="space-y-2">
+          {[0, 1, 2, 3].map((item) => (
+            <SkeletonRow key={item} />
+          ))}
+        </div>
+      )}
 
       {!loading && visiblePatients.length === 0 && (
         <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">

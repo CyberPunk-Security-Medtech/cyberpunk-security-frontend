@@ -232,6 +232,8 @@ export type LabOrder = {
   consultation_id: string | null;
   patientName: string;
   patientId: string;
+  // Human-readable patient code (falls back to patientId when missing).
+  patientCode: string;
   patientGender: string;
   patientAge: string;
   test_type: string;
@@ -253,6 +255,7 @@ export interface RawPatient {
   full_name?: string;
   name?: string;
   patient_id?: string;
+  patient_code?: string;
   age?: string | number;
   gender?: string;
   dob?: string;
@@ -268,6 +271,7 @@ export interface RawDoctor {
 export interface RawConsultation {
   id: string;
   patient_id?: string;
+  patient_code?: string;
   doctor_id?: string | null;
   patient?: RawPatient;
   patient_name?: string;
@@ -388,6 +392,15 @@ export const mapLabOrder = (value: unknown): LabOrder => {
     firstNonEmpty(raw, ["patient_name"]) ||
     "Unknown Patient";
 
+  const patientId =
+    firstNonEmpty(patient, ["id", "patient_id"]) ||
+    firstNonEmpty(raw, ["patient_id"]) ||
+    "";
+  const patientCode =
+    firstNonEmpty(patient, ["patient_code"]) ||
+    firstNonEmpty(raw, ["patient_code"]) ||
+    patientId;
+
   const doctorFirstName = firstNonEmpty(doctor, [
     "first_name",
     "firstname",
@@ -430,10 +443,8 @@ export const mapLabOrder = (value: unknown): LabOrder => {
     consultation_id:
       firstNonEmpty(raw, ["consultation_id"]) || null,
     patientName,
-    patientId:
-      firstNonEmpty(patient, ["id", "patient_id"]) ||
-      firstNonEmpty(raw, ["patient_id"]) ||
-      "",
+    patientId,
+    patientCode,
     patientGender:
       firstNonEmpty(patient, ["gender", "sex"]) ||
       firstNonEmpty(raw, ["patient_gender"]) ||
@@ -558,6 +569,16 @@ export function getPatientId(consultation: RawConsultation, fallback = "") {
     consultation?.patient_id ||
     consultation?.patient?.id ||
     consultation?.patient?.patient_id ||
+    fallback ||
+    ""
+  );
+}
+
+// Human-readable patient code, falling back to the raw patient id.
+export function buildPatientCode(consultation: RawConsultation, fallback = "") {
+  return (
+    consultation?.patient?.patient_code ||
+    consultation?.patient_code ||
     fallback ||
     ""
   );

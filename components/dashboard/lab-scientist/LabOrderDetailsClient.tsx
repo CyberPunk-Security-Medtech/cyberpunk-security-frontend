@@ -573,7 +573,7 @@
 //                 Name: <span className="font-medium">{order.patientName}</span>
 //               </p>
 //               <p>
-//                 Patient ID: <span className="font-medium">{order.patientId}</span>
+//                 Patient ID: <span className="font-medium">{order.patientCode || order.patientId}</span>
 //               </p>
 //               <p>
 //                 Gender: <span className="font-medium">{order.patientGender}</span>
@@ -1205,7 +1205,7 @@
 //                 Name: <span className="font-medium">{order.patientName}</span>
 //               </p>
 //               <p>
-//                 Patient ID: <span className="font-medium">{order.patientId}</span>
+//                 Patient ID: <span className="font-medium">{order.patientCode || order.patientId}</span>
 //               </p>
 //               <p>
 //                 Gender: <span className="font-medium">{order.patientGender}</span>
@@ -1870,13 +1870,21 @@ export default function LabOrderDetailsClient({ id }: { id: string }) {
           try {
             const patientResponse = await patientService.getPatient(orgId, enrichedOrder.patientId);
             if (patientResponse && typeof patientResponse === "object") {
-              fullPatient = ("data" in patientResponse 
-                ? (patientResponse as { data: any }).data 
+              fullPatient = ("data" in patientResponse
+                ? (patientResponse as { data: any }).data
                 : patientResponse) as Record<string, unknown>;
             }
           } catch (patientError) {
             console.warn("Unable to load complete patient information", patientError);
           }
+        }
+
+        // Prefer the human-readable patient code once the full record is in.
+        if (fullPatient?.patient_code) {
+          enrichedOrder = {
+            ...enrichedOrder,
+            patientCode: String(fullPatient.patient_code),
+          };
         }
 
     if (!ignore) {
@@ -1992,7 +2000,7 @@ export default function LabOrderDetailsClient({ id }: { id: string }) {
                 Name: <span className="font-medium">{order.patientName}</span>
               </p>
               <p>
-                Patient ID: <span className="font-medium">{order.patientId}</span>
+                Patient ID: <span className="font-medium">{order.patientCode || order.patientId}</span>
               </p>
               <p>
                 Gender: <span className="font-medium">{order.patientGender || patientValue(["gender", "sex"], "Not recorded")}</span>

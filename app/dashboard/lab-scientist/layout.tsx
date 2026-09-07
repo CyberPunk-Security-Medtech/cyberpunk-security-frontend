@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FlaskConical, LayoutDashboard, Sparkles } from "lucide-react";
+import { FlaskConical, LayoutDashboard, Settings, Sparkles } from "lucide-react";
 import Sidebar from "@components/SideBar";
 import Header from "@components/Header";
 import { MenuItem, UserProfile, User } from "@/types/index";
@@ -23,6 +23,11 @@ const labScientistMenu: MenuItem[] = [
     name: "Ai Assistant",
     icon: Sparkles,
     href: "/dashboard/lab-scientist/ai-assistant",
+  },
+  {
+    name: "Settings",
+    icon: Settings,
+    href: "/dashboard/lab-scientist/settings",
   },
 ];
 

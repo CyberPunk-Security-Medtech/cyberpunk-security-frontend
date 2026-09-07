@@ -6,6 +6,8 @@ import { consultationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { StatusBadge } from "@components/StatusBadge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { CreateConsultationModal } from "@components/dashboard/nurse/ConsultationModal";
+import { TableSkeleton } from "@components/Skeletons";
 
 type ConsultationStatus = "Pending" | "In Progress" | "Completed" | "Cancelled";
 
@@ -53,6 +55,7 @@ export default function ConsultationsPage() {
   const [query, setQuery] = useState("");
   const [rows, setRows] = useState<ConsultationRow[]>([]);
   const [activeTab, setActiveTab] = useState<"All" | ConsultationStatus>("All");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const loadConsultations = async () => {
     if (!orgId) return;
@@ -137,58 +140,33 @@ export default function ConsultationsPage() {
   const renderActionButtons = (row: ConsultationRow) => {
     const detailHref = `/dashboard/nurse/consultations/${row.id}?patient_id=${row.patient_id}`;
 
-    if (row.status === "Pending") {
-      return (
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-          <span className="w-full rounded-md bg-green-50 px-3 py-1.5 text-center text-green-700 sm:w-auto">
-            Routed to Department
-          </span>
-          <button
-            type="button"
-            onClick={() => router.push(detailHref)}
-            className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
-          >
-            Details
-          </button>
-        </div>
-      );
-    }
-
-    if (row.status === "In Progress") {
-      return (
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-          <span className="w-full rounded-md bg-blue-50 px-3 py-1.5 text-center text-blue-700 sm:w-auto">
-            With Doctor
-          </span>
-          <button
-            type="button"
-            onClick={() => router.push(detailHref)}
-            className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
-          >
-            Details
-          </button>
-        </div>
-      );
-    }
-
     return (
       <button
         type="button"
         onClick={() => router.push(detailHref)}
         className="w-full rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50 sm:w-auto"
       >
-        View
+        Details
       </button>
     );
   };
 
   return (
     <div className="min-w-0 space-y-6 py-2 sm:py-4">
-      <div className="space-y-1">
-        <h2 className="text-xl font-semibold text-[#003C36] sm:text-2xl">Consultation Queue</h2>
-        <p className="text-sm text-gray-500">
-          Track pending, active and completed consultations across your patients.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-[#003C36] sm:text-2xl">Consultation Queue</h2>
+          <p className="text-sm text-gray-500">
+            Track pending, active and completed consultations across your patients.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsCreateOpen(true)}
+          className="w-full rounded-md bg-[#006B5F] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#005249] sm:w-auto"
+        >
+          + New Consultation
+        </button>
       </div>
 
       <div className="min-w-0 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -237,11 +215,7 @@ export default function ConsultationsPage() {
             </thead>
             <tbody>
               {loading && (
-                <tr>
-                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
-                    Loading consultations...
-                  </td>
-                </tr>
+                <TableSkeleton rows={6} columns={7} />
               )}
 
               {!loading && filteredRows.length === 0 && (
@@ -325,6 +299,14 @@ export default function ConsultationsPage() {
             })}
         </div>
       </div>
+
+      <CreateConsultationModal
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onCreated={() => {
+          void loadConsultations();
+        }}
+      />
     </div>
   );
 }

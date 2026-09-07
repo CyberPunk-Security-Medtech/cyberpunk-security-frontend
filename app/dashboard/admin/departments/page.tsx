@@ -5,6 +5,7 @@ import { useAuth } from "@context/AuthContext";
 import { organizationService } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import Button from "@components/Button";
+import { TableSkeleton } from "@components/Skeletons";
 
 type Department = {
   id: string;
@@ -131,11 +132,12 @@ export default function DepartmentManagementPage() {
                     </thead>
                     <tbody>
                       {loading ? (
-                        <tr>
-                          <td className="px-5 py-4 text-slate-600" colSpan={3}>
-                            Loading departments...
-                          </td>
-                        </tr>
+                        <TableSkeleton
+                          rows={4}
+                          columns={3}
+                          rowLeading="h-4 w-40 rounded"
+                          rowLines={["h-3 w-24"]}
+                        />
                       ) : departments.length === 0 ? (
                         <tr>
                           <td className="px-5 py-4 text-slate-600" colSpan={3}>

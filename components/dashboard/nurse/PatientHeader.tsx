@@ -23,7 +23,6 @@ export default function PatientHeader() {
     consultationLoading,
     selectedConsultation,
     patientId,
-    hasConsultation,
     refreshConsultations,
   } = useConsultation();
 
@@ -44,21 +43,14 @@ export default function PatientHeader() {
         </button>
 
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          {hasConsultation ? (
-            <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-              <span className="h-2 w-2 rounded-full bg-green-500" />
-              Routed to Department
-            </span>
-          ) : (
-            <Button
-              type="button"
-              onSubmitHandler={() => setIsCreateModalOpen(true)}
-              disabled={consultationLoading}
-              className="w-full rounded-md bg-[#006B5F] px-4 py-2 text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50 sm:w-auto sm:px-6"
-            >
-              {consultationLoading ? "Loading..." : "Create Consultation"}
-            </Button>
-          )}
+          <Button
+            type="button"
+            onSubmitHandler={() => setIsCreateModalOpen(true)}
+            disabled={consultationLoading}
+            className="w-full rounded-md bg-[#006B5F] px-4 py-2 text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50 sm:w-auto sm:px-6"
+          >
+            {consultationLoading ? "Loading..." : "Create Consultation"}
+          </Button>
         </div>
       </div>
 
@@ -71,8 +63,8 @@ export default function PatientHeader() {
             {patientLoading ? "Loading patient..." : fullName}
           </h3>
           <p className="text-sm">
-            <span className="text-sm text-[#00B8A8]">PID:</span>{" "}
-            <span className="break-all text-gray-700">{patient?.id ?? "-"}</span>
+            <span className="text-sm text-[#00B8A8]">Patient ID:</span>{" "}
+            <span className="break-all text-gray-700">{patient?.patient_code || patient?.id || "-"}</span>
           </p>
         </div>
       </div>

@@ -17,6 +17,7 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { consultationService, patientService } from "@services/api";
 import { formatPatientDate } from "../../patientDisplay";
+import { PageSkeleton } from "@components/Skeletons";
 
 type ConsultationStatus =
   | "Pending"
@@ -168,11 +169,7 @@ export default function RecordStaffPatientDetailsPage() {
   const initials = useMemo(() => getInitials(patient), [patient]);
 
   if (loading) {
-    return (
-      <div className="rounded-xl bg-white p-6 text-sm text-slate-500 shadow-sm">
-        Loading patient details...
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (error) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutDashboard, Package2, Sparkles, BarChart3 } from "lucide-react";
+import { BarChart3, LayoutDashboard, Package2, Settings, Sparkles } from "lucide-react";
 import Sidebar from "@components/SideBar";
 import Header from "@components/Header";
 import { MenuItem, UserProfile } from "@/types/index";
@@ -14,6 +14,7 @@ const pharmacyMenu: MenuItem[] = [
   { name: "Inventory", icon: Package2, href: "/dashboard/pharmacy/inventory" },
   { name: "Reports", icon: BarChart3, href: "/dashboard/pharmacy/reports" },
   { name: "Ai Assistant", icon: Sparkles, href: "/dashboard/pharmacy/ai-assistant" },
+  { name: "Settings", icon: Settings, href: "/dashboard/pharmacy/settings" },
 ];
 
 export default function PharmacyDashboardLayout({

@@ -23,7 +23,6 @@ interface Props {
 }
 
 type FormState = {
-  patientId: string;
   firstName: string;
   lastName: string;
   dob: string;
@@ -48,7 +47,6 @@ type FormState = {
 };
 
 const emptyForm: FormState = {
-  patientId: "",
   firstName: "",
   lastName: "",
   dob: "",
@@ -271,17 +269,6 @@ export default function AddNewPatientRecordModal({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-500">Patient ID</label>
-                  <input
-                    name="patientId"
-                    value={formData.patientId}
-                    onChange={handleChange}
-                    placeholder="Patient ID (optional)"
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
-                  />
-                </div>
-
                 <div className="space-y-1">
                   <label className="text-xs text-gray-500">First Name</label>
                   <input
@@ -566,7 +553,7 @@ export default function AddNewPatientRecordModal({
                   type="button"
                   className="rounded-full bg-[#006B5F] text-white px-4 py-2 text-xs md:text-sm font-medium transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
                 >
-                  {submitting ? "Creating..." : "Create patient records"}
+                  {submitting ? "Creating..." : "Create patient record"}
                 </button>
               </div>
             </div>

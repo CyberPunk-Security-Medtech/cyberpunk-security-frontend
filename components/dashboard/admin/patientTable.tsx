@@ -6,6 +6,7 @@ import { useAuth } from "@context/AuthContext";
 import { patientService, type PatientListRecord } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { TableSkeleton } from "@components/Skeletons";
 
 type AdminPatient = {
   id: string;
@@ -90,11 +91,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
 
           <tbody>
             {loading && (
-              <tr>
-                <td className="px-4 py-6 text-center text-slate-500" colSpan={7}>
-                  Loading patients...
-                </td>
-              </tr>
+              <TableSkeleton rows={6} columns={7} />
             )}
 
             {!loading && patients.length === 0 && (

@@ -6,6 +6,7 @@ import { StatusBadge } from "@components/StatusBadge";
 import { useAuth } from "@context/AuthContext";
 import { consultationService, organizationService } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { TableSkeleton } from "@components/Skeletons";
 
 type ConsultationRow = {
   id: string;
@@ -146,11 +147,7 @@ export default function TodayAppointments() {
         </thead>
         <tbody>
           {loading && (
-            <tr>
-              <td className="px-4 py-6 text-center text-gray-500" colSpan={6}>
-                Loading appointments...
-              </td>
-            </tr>
+            <TableSkeleton rows={4} columns={6} />
           )}
           {!loading && todaysAppointments.length === 0 && (
             <tr>

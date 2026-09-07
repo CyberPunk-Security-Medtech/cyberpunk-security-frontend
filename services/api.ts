@@ -139,7 +139,8 @@ const isNotFoundError = (error: unknown): boolean => {
 };
 
 const AI_API_BASE_URL =
-  process.env.NEXT_PUBLIC_AI_API_BASE_URL ?? "http://13.51.109.85";
+  process.env.NEXT_PUBLIC_AI_API_BASE_URL ??
+  "https://aibackend.privacurehealth.com";
 
 // Separate axios instance for the dedicated AI service
 export const aiApi = axios.create({ baseURL: AI_API_BASE_URL });
@@ -1549,6 +1550,10 @@ export type AiChatResponse = {
 };
 
 export const aiService = {
+  // The AI service's /ai/chat only accepts a text `message` (max 2000
+  // chars) — there is no file-upload endpoint. The assistant therefore
+  // reads attachment text client-side and embeds a trimmed excerpt in
+  // the message (see SharedAiAssistant's submit handler).
   chat: async (payload: {
     user_id: string;
     message: string;

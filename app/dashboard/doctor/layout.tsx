@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Sidebar from '@components/SideBar';
 import Header from '@components/Header';
-import { ClipboardList, LayoutDashboard, Users, Sparkles, ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, ClipboardList, LayoutDashboard, Settings, Sparkles, Users } from "lucide-react";
 import { MenuItem, UserProfile } from '@/types/index';
 import { useAuth } from '@context/AuthContext';
 
@@ -12,6 +12,7 @@ const doctorMenu: MenuItem[] = [
   { name: "Patients Records", icon: Users, href: "/dashboard/doctor/patient-records" },
   { name: "Consultations", icon: ClipboardList, href: "/dashboard/doctor/consultations" },
   { name: "Ai Assistant", icon: Sparkles, href: "/dashboard/doctor/ai-assistant"},
+  { name: "Settings", icon: Settings, href: "/dashboard/doctor/settings" },
   {
     name: "Patient Transfers",
     icon: ArrowLeftRight,

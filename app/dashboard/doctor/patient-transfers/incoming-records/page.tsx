@@ -23,6 +23,7 @@ import {
   type Referral,
 } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
+import { CardGridSkeleton } from "@components/Skeletons";
 
 type FilterType = "All" | IncomingRecordStatus;
 
@@ -283,7 +284,11 @@ const mapReferralToRecord = (
     sharedContent?: IncomingRecordSharedContent;
   },
 ): IncomingRecord => {
-  const patientLabel = `Patient ${referral.patient_id.slice(0, 8)}`;
+  // Prefer the human-readable patient code; fall back to the raw id.
+  const patientCode =
+    getStringField(options?.patient, "patient_code") ||
+    referral.patient_id;
+  const patientLabel = `Patient ${patientCode}`;
   const patientName = formatPatientName(options?.patient, patientLabel);
   const vitals = getVitalsFromConsultation(options?.consultation);
   const statusMap: Record<string, IncomingRecordStatus> = {
@@ -298,7 +303,7 @@ const mapReferralToRecord = (
     id: referral.id,
     initials: getInitials(patientName),
     patientName,
-    gpid: referral.patient_id.slice(0, 8),
+    gpid: patientCode,
     priority: referral.priority === "urgent" || referral.priority === "emergency" ? "Urgent" : "Normal",
     condition: referral.reason,
     fromHospital:
@@ -485,6 +490,7 @@ export default function IncomingRecordsPage({
               }),
               patientName: record.patientName,
               initials: record.initials,
+              gpid: record.gpid,
               age: record.age,
               gender: record.gender,
               bloodGroup: record.bloodGroup,
@@ -587,8 +593,8 @@ export default function IncomingRecordsPage({
       }
     >
       {loading ? (
-        <div className="px-6 py-16 text-center text-sm text-gray-500 md:px-12">
-          Loading incoming referrals...
+        <div className="px-6 py-8 md:px-12">
+          <CardGridSkeleton count={6} cardClassName="h-36" />
         </div>
       ) : !selectedRecord ? (
         <IncomingRecordsList

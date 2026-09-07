@@ -447,6 +447,7 @@ import {
   mapStatusToApi,
   getConsultationsArray,
   buildPatientName,
+  buildPatientCode,
   getPatientId,
   buildDoctorName,
   statusFilters,
@@ -523,6 +524,8 @@ export default function LabScientistDashboardClient() {
             ...order,
             patientName: buildPatientName(consultation!, order.patientName),
             patientId: getPatientId(consultation!, order.patientId),
+            patientCode:
+              buildPatientCode(consultation!, order.patientCode) || order.patientId,
             orderingDoctor: buildDoctorName(
               consultation!,
               order.orderingDoctor
@@ -719,7 +722,7 @@ export default function LabScientistDashboardClient() {
                           {order.patientName || "Unknown Patient"}
                         </div>
                         <div className="break-all text-xs text-gray-500">
-                          {order.patientId || "-"}
+                          {order.patientCode || order.patientId || "-"}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -802,7 +805,7 @@ export default function LabScientistDashboardClient() {
                         {order.patientName || "Unknown Patient"}
                       </p>
                       <p className="break-all text-xs text-gray-500">
-                        {order.patientId || "-"}
+                        {order.patientCode || order.patientId || "-"}
                       </p>
                     </div>
                     <StatusBadge
