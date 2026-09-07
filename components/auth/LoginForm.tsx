@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getApiErrorMessage } from "@utils/apiError";
+import { verificationService } from "@services/api";
 import type {
   TwoFactorChallenge as TwoFactorChallengeResponse,
   TwoFactorMethod,
@@ -58,11 +59,36 @@ export default function LoginForm() {
       return;
     }
 
-    router.replace(
-      workspaces.length === 0
-        ? "/onboarding/hospital-info"
-        : "/auth/workspace-select",
-    );
+    const determineDestination = async () => {
+      if (workspaces.length === 0) {
+        router.replace("/onboarding/hospital-info");
+        return;
+      }
+
+      // Onboarding creates the organization in its first step, so a user
+      // who left mid-flow has a workspace but an unfinished verification.
+      // A single unverified organization means the setup was started but
+      // never submitted — resume it instead of dropping them into the
+      // workspace list.
+      if (workspaces.length === 1) {
+        try {
+          const status = await verificationService.getStatus(
+            workspaces[0].id,
+          );
+          if (status.verification_status === "unverified") {
+            router.replace("/onboarding/hospital-info");
+            return;
+          }
+        } catch {
+          // Verification status unavailable — fall through to workspace
+          // selection rather than blocking the login.
+        }
+      }
+
+      router.replace("/auth/workspace-select");
+    };
+
+    void determineDestination();
   }, [
     hydrated,
     authLoading,

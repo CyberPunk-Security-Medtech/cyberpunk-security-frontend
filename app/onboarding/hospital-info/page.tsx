@@ -69,7 +69,8 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 export default function OnboardingPage() {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
-  const { user, hydrated, refreshWorkspaces } = useAuth();
+  const { user, hydrated, workspaces, workspaceLoading, refreshWorkspaces } =
+    useAuth();
   const hasStartedRestoration = useRef(false);
 
   const [step, setStep] = useState<OnboardingStep>(1);
@@ -113,9 +114,33 @@ export default function OnboardingPage() {
   }, []);
 
   const restoreDraft = useCallback(async () => {
-    const draftOrganizationId = localStorage.getItem(
+    let draftOrganizationId = localStorage.getItem(
       ONBOARDING_ORGANIZATION_KEY,
     );
+
+    // logout() clears all of localStorage, wiping the draft key. Fall back
+    // to the signed-in user's workspaces: a single organization that is
+    // still unverified (or rejected and awaiting resubmission) is the
+    // unfinished onboarding, so adopt it instead of creating a duplicate
+    // hospital.
+    if (!draftOrganizationId && workspaces.length === 1) {
+      try {
+        const status = await verificationService.getStatus(workspaces[0].id);
+        if (
+          status.verification_status === "unverified" ||
+          status.verification_status === "rejected"
+        ) {
+          draftOrganizationId = workspaces[0].id;
+          localStorage.setItem(
+            ONBOARDING_ORGANIZATION_KEY,
+            draftOrganizationId,
+          );
+        }
+      } catch {
+        // Verification status unavailable — fall through and let the user
+        // start onboarding from scratch.
+      }
+    }
 
     if (!draftOrganizationId) {
       setIsRestoring(false);
@@ -147,10 +172,10 @@ export default function OnboardingPage() {
     } finally {
       setIsRestoring(false);
     }
-  }, [loadVerificationDraft]);
+  }, [loadVerificationDraft, workspaces]);
 
   useEffect(() => {
-    if (!hydrated || hasStartedRestoration.current) return;
+    if (!hydrated || workspaceLoading) return;
 
     if (!user) {
       router.replace("/auth/signup");
@@ -158,9 +183,10 @@ export default function OnboardingPage() {
       return;
     }
 
+    if (hasStartedRestoration.current) return;
     hasStartedRestoration.current = true;
     void restoreDraft();
-  }, [hydrated, restoreDraft, router, user]);
+  }, [hydrated, workspaceLoading, restoreDraft, router, user]);
 
   const handleNextFromHospital = async (data: HospitalInformation) => {
     let draftOrganizationId = organizationId;
@@ -189,11 +215,24 @@ export default function OnboardingPage() {
           )
         : null;
 
+      // image_url is a signed, per-response link — the upload response may
+      // return it null even on success. Re-fetch the organization so the
+      // logo preview always receives the actual image URL.
+      let savedImageUrl = savedOrganization?.image_url ?? null;
+      if (data.logoFile && !savedImageUrl) {
+        try {
+          const refreshedOrganization =
+            await organizationService.getOrganization(draftOrganizationId);
+          savedImageUrl = refreshedOrganization.image_url ?? null;
+        } catch {
+          // Keep the local preview below as the fallback.
+        }
+      }
+
       setHospitalData({
         name: data.name,
         logoFile: null,
-        logoPreview:
-          savedOrganization?.image_url ?? data.logoPreview ?? null,
+        logoPreview: savedImageUrl ?? data.logoPreview ?? null,
       });
 
       const [status, uploadedDocuments] = await Promise.all([
