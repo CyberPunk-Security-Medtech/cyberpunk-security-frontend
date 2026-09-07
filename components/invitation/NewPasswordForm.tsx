@@ -131,7 +131,7 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
           type="text"
           name="firstName"
           placeholder="First Name"
-          className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           value={formData.firstName}
           onChange={handleChange}
           required
@@ -145,7 +145,7 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
           type="text"
           name="lastName"
           placeholder="Last Name"
-          className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           value={formData.lastName}
           onChange={handleChange}
           required
@@ -160,7 +160,7 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
           type={showPassword ? "text" : "password"}
           name="password"
           placeholder="Enter Password"
-          className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           value={password}
         onChange={(e) => setPassword(e.target.value)}
           required
@@ -183,7 +183,7 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
           type={showConfirmPassword ? "text" : "password"}
           name="confirmPassword"
           placeholder="Enter Confirm Password"
-          className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           value={confirmPassword}
          onChange={(e) => setConfirmPassword(e.target.value)}
           required
@@ -199,7 +199,7 @@ export default function SetPasswordForm({ email, invitationId, onSuccess }: Prop
         
       <button
         type="submit"
-        className="w-full bg-blue-900 text-white py-2 rounded-full"
+        className="min-h-11 w-full rounded-full bg-[#1E237E] py-2 text-white transition-colors hover:bg-[#171B65] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
         disabled={loading}
       >
         {loading ? "Registering..." : "Create Account"}

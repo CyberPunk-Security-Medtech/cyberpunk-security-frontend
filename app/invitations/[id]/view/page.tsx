@@ -455,7 +455,14 @@ export default function AcceptInvitationPage() {
 
     if (!user) return "login";
 
-    if (user.email !== invite.email) return "login";
+    // Compare case-insensitively: the invitation email is whatever the
+    // admin typed, which may not match the account's stored casing — a
+    // strict comparison would loop the user back to the login step even
+    // after a successful login.
+    if (
+      user.email?.toLowerCase() !== invite.email?.toLowerCase()
+    )
+      return "login";
 
     return "accept";
   }, [invite, user, hydrated,authLoading, status]);
@@ -533,16 +540,17 @@ export default function AcceptInvitationPage() {
           />
         )}
 
-        {step === "login" && <LoginPrompt 
-        email={invite!.email}
-         onSuccess ={() => {setStatus("idle")}}
-         redirectTo={`/auth/login?email=${encodeURIComponent(invite!.email)}&redirect=/invitations/${id}/view`}
-        />}
+        {step === "login" && (
+          <LoginPrompt
+            email={invite!.email}
+            redirectTo={`/auth/login?email=${encodeURIComponent(invite!.email)}&redirect=/invitations/${id}/view`}
+          />
+        )}
 
         {step === "accept" && (
           <button
             onClick={acceptInvite}
-            className="w-full mt-6 bg-blue-900 text-white py-2 rounded-full"
+            className="min-h-11 mt-6 w-full rounded-full bg-[#1E237E] py-2 text-white transition-colors hover:bg-[#171B65] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] focus-visible:ring-offset-2 motion-reduce:transition-none"
           >
             Accept Invitation
           </button>
