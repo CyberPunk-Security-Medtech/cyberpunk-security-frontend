@@ -226,7 +226,7 @@ export default function RecordStaffPatientRecordsPage() {
             </thead>
             <tbody>
               {loadingPatients && (
-                <TableSkeleton rows={6} columns={6} />
+                <TableSkeleton columns={6} />
               )}
 
               {!loadingPatients && patients.length === 0 && (

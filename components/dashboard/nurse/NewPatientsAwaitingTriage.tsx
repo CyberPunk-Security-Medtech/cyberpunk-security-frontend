@@ -10,7 +10,7 @@ import {
   type PatientListRecord,
 } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
-import { SkeletonRow } from "@components/Skeletons";
+import { LoaderIcon } from "@components/Skeletons";
 
 type PatientRow = {
   id: string;
@@ -158,10 +158,8 @@ export default function NewPatientsAwaitingTriage() {
       )}
 
       {loading && (
-        <div role="status" aria-label="Loading triage queue" className="space-y-2">
-          {[0, 1, 2, 3].map((item) => (
-            <SkeletonRow key={item} />
-          ))}
+        <div className="py-6">
+          <LoaderIcon />
         </div>
       )}
 

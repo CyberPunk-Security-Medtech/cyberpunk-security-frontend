@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
-import { SkeletonRow } from "@components/Skeletons";
+import { LoaderIcon } from "@components/Skeletons";
 
 interface Patient {
   id: string;
@@ -109,14 +109,8 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
 
   if (loading) {
     return (
-      <div
-        role="status"
-        aria-label="Loading patients"
-        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
-      >
-        {Array.from({ length: 5 }).map((_, index) => (
-          <SkeletonRow key={index} />
-        ))}
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <LoaderIcon />
       </div>
     );
   }

@@ -211,12 +211,7 @@ export default function AuditLogsTable() {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <TableSkeleton
-                      rows={6}
-                      columns={4}
-                      rowLeading="h-4 w-40 rounded"
-                      rowLines={["h-3 w-28", "h-3 w-20"]}
-                    />
+                    <TableSkeleton columns={4} />
                   ) : error ? (
                     <tr>
                       <td colSpan={4} className="px-5 py-10 text-center">

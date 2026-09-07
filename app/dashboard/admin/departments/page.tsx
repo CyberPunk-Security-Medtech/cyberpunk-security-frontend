@@ -132,12 +132,7 @@ export default function DepartmentManagementPage() {
                     </thead>
                     <tbody>
                       {loading ? (
-                        <TableSkeleton
-                          rows={4}
-                          columns={3}
-                          rowLeading="h-4 w-40 rounded"
-                          rowLines={["h-3 w-24"]}
-                        />
+                        <TableSkeleton columns={3} />
                       ) : departments.length === 0 ? (
                         <tr>
                           <td className="px-5 py-4 text-slate-600" colSpan={3}>

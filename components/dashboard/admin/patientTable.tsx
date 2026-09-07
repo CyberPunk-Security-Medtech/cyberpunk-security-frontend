@@ -91,7 +91,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
 
           <tbody>
             {loading && (
-              <TableSkeleton rows={6} columns={7} />
+              <TableSkeleton columns={7} />
             )}
 
             {!loading && patients.length === 0 && (

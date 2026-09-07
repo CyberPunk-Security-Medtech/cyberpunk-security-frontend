@@ -11,7 +11,6 @@ import {
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import DialogPortal from "@components/DialogPortal";
-import { TableSkeleton } from "@components/Skeletons";
 import { hasOnboardingConsentForScopes } from "@components/patient-transfers/consentStorage";
 import {
   organizationService,
@@ -24,6 +23,7 @@ import {
   type ShareScope,
 } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
+import { TableSkeleton } from "@components/Skeletons";
 
 type TransferPatient = {
   id: string;
@@ -380,7 +380,7 @@ export default function PatientTransferDashboard({
 
             <tbody>
               {loading ? (
-                <TableSkeleton rows={5} columns={6} />
+                <TableSkeleton columns={6} />
               ) : (
                 filteredPatients.map((patient) => (
                   <tr key={patient.id} className="border-t border-gray-100">

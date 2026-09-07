@@ -147,7 +147,7 @@ export default function TodayAppointments() {
         </thead>
         <tbody>
           {loading && (
-            <TableSkeleton rows={4} columns={6} />
+            <TableSkeleton columns={6} />
           )}
           {!loading && todaysAppointments.length === 0 && (
             <tr>

@@ -215,7 +215,7 @@ export default function ConsultationsPage() {
             </thead>
             <tbody>
               {loading && (
-                <TableSkeleton rows={6} columns={7} />
+                <TableSkeleton columns={7} />
               )}
 
               {!loading && filteredRows.length === 0 && (

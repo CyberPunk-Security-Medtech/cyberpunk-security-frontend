@@ -146,7 +146,7 @@ export default function RecordStaffDashboardPage() {
             </thead>
             <tbody>
               {loading && (
-                <TableSkeleton rows={5} columns={5} />
+                <TableSkeleton columns={5} />
               )}
 
               {!loading && patients.length === 0 && (

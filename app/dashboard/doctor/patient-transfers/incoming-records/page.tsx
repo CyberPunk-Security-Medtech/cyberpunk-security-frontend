@@ -23,7 +23,7 @@ import {
   type Referral,
 } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
-import { CardGridSkeleton } from "@components/Skeletons";
+import { LoaderIcon } from "@components/Skeletons";
 
 type FilterType = "All" | IncomingRecordStatus;
 
@@ -594,7 +594,7 @@ export default function IncomingRecordsPage({
     >
       {loading ? (
         <div className="px-6 py-8 md:px-12">
-          <CardGridSkeleton count={6} cardClassName="h-36" />
+          <LoaderIcon />
         </div>
       ) : !selectedRecord ? (
         <IncomingRecordsList

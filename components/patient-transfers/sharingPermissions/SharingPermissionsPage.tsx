@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import DialogPortal from "@components/DialogPortal";
-import { TableSkeleton } from "@components/Skeletons";
 import {
   dataSharingService,
   organizationService,
@@ -21,6 +20,7 @@ import {
   type GrantStatus,
   type OrganizationDirectoryEntry,
 } from "@services/api";
+import { TableSkeleton } from "@components/Skeletons";
 
 type PermissionFilter = "all" | GrantStatus;
 
@@ -282,7 +282,7 @@ export default function SharingPermissionsPage({
 
             <tbody>
               {loading ? (
-                <TableSkeleton rows={5} columns={7} />
+                <TableSkeleton columns={7} />
               ) : (
                 filteredGrants.map((grant) => (
                   <tr key={grant.id} className="border-t border-gray-100">
