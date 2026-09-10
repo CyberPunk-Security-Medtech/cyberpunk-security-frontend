@@ -947,6 +947,49 @@ export type VitalRecord = {
   updated_at: string;
 };
 
+export type ConsultationStatus =
+  | "Pending"
+  | "In Progress"
+  | "Completed"
+  | "Cancelled";
+
+export type ConsultationPriority = "Routine" | "Urgent" | "Emergency";
+
+export type ConsultationNote = {
+  id: string;
+  consultation_id: string;
+  content: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ConsultationRecord = {
+  id: string;
+  organization_id: string;
+  patient_id: string;
+  department_id: string;
+  reason_for_visit: string;
+  priority: ConsultationPriority;
+  creator_id: string;
+  doctor_id: string | null;
+  referral_id: string | null;
+  status: ConsultationStatus;
+  notes: ConsultationNote[];
+  vital_records: VitalRecord[];
+  /** Kept for compatibility with consultations created before structured vital records. */
+  vitals?: string | null;
+  patient: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  started_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export const consultationService = {
   createConsultation: async (
     org_id: string,
@@ -954,10 +997,10 @@ export const consultationService = {
       patient_id: string;
       department_id: string;
       reason_for_visit: string;
-      priority?: "Routine" | "Urgent" | "Emergency";
+      priority?: ConsultationPriority;
       vitals?: string | null;
     },
-  ) => {
+  ): Promise<ConsultationRecord> => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations`,
       payload,
@@ -968,11 +1011,11 @@ export const consultationService = {
   listConsultations: async (
     org_id: string,
     params?: {
-      status_filter?: "Pending" | "In Progress" | "Completed" | "Cancelled";
+      status_filter?: ConsultationStatus;
       department_id?: string;
        patient_id?: string;
     },
-  ) => {
+  ): Promise<ConsultationRecord[]> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/consultations`,
       {
@@ -1002,7 +1045,10 @@ export const consultationService = {
 
 },
 
-  getConsultation: async (org_id: string, consultation_id: string) => {
+  getConsultation: async (
+    org_id: string,
+    consultation_id: string,
+  ): Promise<ConsultationRecord> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}`,
     );
@@ -1020,15 +1066,31 @@ export const consultationService = {
   completeConsultation: async (
     org_id: string,
     consultation_id: string,
-    payload?: {
-      status?: "Pending" | "In Progress" | "Completed" | "Cancelled";
-      clinical_notes?: string | null;
-      doctor_id?: string | null;
-    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/complete`,
-      payload ?? {},
+    );
+    return unwrap(response.data);
+  },
+
+  addConsultationNote: async (
+    org_id: string,
+    consultation_id: string,
+    content: string,
+  ): Promise<ConsultationNote> => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/notes`,
+      { content },
+    );
+    return unwrap(response.data);
+  },
+
+  listConsultationNotes: async (
+    org_id: string,
+    consultation_id: string,
+  ): Promise<ConsultationNote[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/notes`,
     );
     return unwrap(response.data);
   },
