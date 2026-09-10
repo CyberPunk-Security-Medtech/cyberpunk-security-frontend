@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { consultationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
@@ -23,8 +23,23 @@ type ConsultationRow = {
   updated_at: string | null;
 };
 
-const STATUS_TABS: Array<"All" | ConsultationStatus> = [
-  "All",
+type ConsultationApiRecord = {
+  id: string;
+  patient_id: string;
+  patient?: {
+    patient_code?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
+  } | null;
+  department?: { name?: string | null } | null;
+  priority?: string | null;
+  reason_for_visit?: string | null;
+  status: ConsultationStatus;
+  updated_at?: string | null;
+  created_at?: string | null;
+};
+
+const STATUS_TABS: ConsultationStatus[] = [
   "Pending",
   "In Progress",
   "Completed",
@@ -52,90 +67,68 @@ export default function ConsultationsPage() {
   const orgId = activeWorkspace?.id ?? null;
 
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
   const [rows, setRows] = useState<ConsultationRow[]>([]);
-  const [activeTab, setActiveTab] = useState<"All" | ConsultationStatus>("All");
+  const [activeTab, setActiveTab] = useState<ConsultationStatus>("Pending");
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [refreshVersion, setRefreshVersion] = useState(0);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const loadConsultations = async () => {
-    if (!orgId) return;
-    setLoading(true);
-    try {
-      const [pending, inProgress, completed, cancelled] = await Promise.all([
-        consultationService.listConsultations(orgId, { status_filter: "Pending" }),
-        consultationService.listConsultations(orgId, { status_filter: "In Progress" }),
-        consultationService.listConsultations(orgId, { status_filter: "Completed" }),
-        consultationService.listConsultations(orgId, { status_filter: "Cancelled" }),
-      ]);
-
-      const merged = [
-        ...(pending ?? []),
-        ...(inProgress ?? []),
-        ...(completed ?? []),
-        ...(cancelled ?? []),
-      ];
-
-      const unique = Array.from(new Map(merged.map((item: any) => [item.id, item])).values());
-
-      const normalized: ConsultationRow[] = unique
-        .map((item: any) => ({
-          id: item.id,
-          patient_id: item.patient_id,
-          patient_code: item.patient?.patient_code?.trim() || item.patient_id,
-          patient_name:
-            `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
-            "Unknown Patient",
-          department_name: item.department?.name ?? "-",
-          priority: item.priority ?? "-",
-          reason_for_visit: item.reason_for_visit ?? "-",
-          status: item.status as ConsultationStatus,
-          updated_at: item.updated_at ?? item.created_at ?? null,
-        }))
-        .sort((a, b) => {
-          const aTime = new Date(a.updated_at ?? 0).getTime();
-          const bTime = new Date(b.updated_at ?? 0).getTime();
-          return bTime - aTime;
-        });
-
-      setRows(normalized);
-    } catch (error) {
-      console.error("Failed to load consultations", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    void loadConsultations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgId]);
+    let cancelled = false;
 
-  const filteredRows = useMemo(() => {
-    const text = query.trim().toLowerCase();
-    return rows.filter((row) => {
-      const tabPass = activeTab === "All" || row.status === activeTab;
-      const searchPass =
-        text.length === 0 ||
-        row.patient_name.toLowerCase().includes(text) ||
-        row.patient_code.toLowerCase().includes(text) ||
-        row.reason_for_visit.toLowerCase().includes(text);
-      return tabPass && searchPass;
-    });
-  }, [rows, query, activeTab]);
+    const loadConsultations = async () => {
+      if (!orgId) {
+        setRows([]);
+        setLoading(false);
+        return;
+      }
 
-  const counts = useMemo(() => {
-    const base: Record<string, number> = {
-      All: rows.length,
-      Pending: 0,
-      "In Progress": 0,
-      Completed: 0,
-      Cancelled: 0,
+      setLoading(true);
+      setLoadError(null);
+
+      try {
+        const result = await consultationService.listConsultations(orgId, {
+          status_filter: activeTab,
+        });
+        const consultations = (Array.isArray(result) ? result : []) as ConsultationApiRecord[];
+        const normalized: ConsultationRow[] = consultations
+          .map((item) => ({
+            id: item.id,
+            patient_id: item.patient_id,
+            patient_code: item.patient?.patient_code?.trim() || item.patient_id,
+            patient_name:
+              `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
+              "Unknown Patient",
+            department_name: item.department?.name ?? "-",
+            priority: item.priority ?? "-",
+            reason_for_visit: item.reason_for_visit ?? "-",
+            status: item.status,
+            updated_at: item.updated_at ?? item.created_at ?? null,
+          }))
+          .sort((a, b) => {
+            const aTime = new Date(a.updated_at ?? 0).getTime();
+            const bTime = new Date(b.updated_at ?? 0).getTime();
+            return bTime - aTime;
+          });
+
+        if (!cancelled) setRows(normalized);
+      } catch (error) {
+        console.error("Failed to load consultations", error);
+        if (!cancelled) {
+          setRows([]);
+          setLoadError("Unable to load consultations. Please try again.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
-    for (const row of rows) {
-      base[row.status] += 1;
-    }
-    return base;
-  }, [rows]);
+
+    void loadConsultations();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, orgId, refreshVersion]);
 
   const renderActionButtons = (row: ConsultationRow) => {
     const detailHref = `/dashboard/nurse/consultations/${row.id}?patient_id=${row.patient_id}`;
@@ -169,7 +162,7 @@ export default function ConsultationsPage() {
         </button>
       </div>
 
-      <div className="min-w-0 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="min-w-0">
         <div className="flex flex-wrap gap-2">
           {STATUS_TABS.map((tab) => {
             const isActive = activeTab === tab;
@@ -177,6 +170,7 @@ export default function ConsultationsPage() {
               <button
                 key={tab}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => setActiveTab(tab)}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
                   isActive
@@ -184,19 +178,11 @@ export default function ConsultationsPage() {
                     : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                {tab} ({counts[tab] ?? 0})
+                {tab}
               </button>
             );
           })}
         </div>
-
-        <input
-          type="text"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by patient, reason or ID"
-          className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8] lg:max-w-sm"
-        />
       </div>
 
       <div className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -218,16 +204,33 @@ export default function ConsultationsPage() {
                 <TableSkeleton columns={7} />
               )}
 
-              {!loading && filteredRows.length === 0 && (
+              {!loading && loadError && (
                 <tr>
-                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
-                    No consultations found.
+                  <td className="px-4 py-6 text-gray-600" colSpan={7}>
+                    <div className="flex flex-wrap items-center gap-3" role="alert">
+                      <span>{loadError}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRefreshVersion((current) => current + 1)}
+                        className="rounded-md border border-[#006B5F] px-3 py-1.5 font-medium text-[#006B5F] transition-colors hover:bg-[#E6F8F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2"
+                      >
+                        Try again
+                      </button>
+                    </div>
                   </td>
                 </tr>
               )}
 
-              {!loading &&
-                filteredRows.map((row) => {
+              {!loading && !loadError && rows.length === 0 && (
+                <tr>
+                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
+                    No {activeTab.toLowerCase()} consultations found.
+                  </td>
+                </tr>
+              )}
+
+              {!loading && !loadError &&
+                rows.map((row) => {
                   return (
                     <tr key={row.id} className="border-b hover:bg-gray-50">
                       <td className="bg-white px-4 py-3">
@@ -258,14 +261,14 @@ export default function ConsultationsPage() {
             </div>
           )}
 
-          {!loading && filteredRows.length === 0 && (
+          {!loading && rows.length === 0 && (
             <div className="rounded-lg border p-4 text-sm text-gray-500">
               No consultations found.
             </div>
           )}
 
           {!loading &&
-            filteredRows.map((row) => {
+            rows.map((row) => {
               return (
                 <div key={row.id} className="overflow-hidden rounded-lg border border-gray-200 p-4">
                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
@@ -304,7 +307,7 @@ export default function ConsultationsPage() {
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onCreated={() => {
-          void loadConsultations();
+          setRefreshVersion((current) => current + 1);
         }}
       />
     </div>

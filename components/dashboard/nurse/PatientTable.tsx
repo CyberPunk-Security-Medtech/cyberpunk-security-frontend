@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import {
   patientService,
   type PatientListRecord,
-  type PatientSearchResult,
 } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { resolvePatientAge } from "@utils/patientAge";
@@ -23,20 +22,14 @@ interface Patient {
   date: string;
 }
 
-type PatientTableProps = {
-  searchQuery?: string;
-};
-
-export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
+export default function PatientTable() {
   const router = useRouter();
   const { activeWorkspace } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
-  const patientCacheRef = useRef<{ orgId: string; records: PatientListRecord[] } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    const normalizedQuery = searchQuery.trim();
 
     const fetchPatients = async () => {
       setLoading(true);
@@ -47,26 +40,8 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
           return;
         }
 
-        let data: Array<PatientListRecord | PatientSearchResult>;
-
-        if (normalizedQuery.length >= 2) {
-          const searchResults = await patientService.searchPatients(activeWorkspace.id, {
-              q: normalizedQuery,
-              limit: 100,
-            });
-          const cachedRecords = patientCacheRef.current?.orgId === activeWorkspace.id
-            ? patientCacheRef.current.records
-            : [];
-          const cachedById = new Map(cachedRecords.map((record) => [record.id, record]));
-          data = searchResults.map((result) => ({
-            ...result,
-            ...cachedById.get(result.id),
-          }));
-        } else {
-          const response = await patientService.getPatients(activeWorkspace.id);
-          data = Array.isArray(response) ? response as PatientListRecord[] : [];
-          patientCacheRef.current = { orgId: activeWorkspace.id, records: data };
-        }
+        const response = await patientService.getPatients(activeWorkspace.id);
+        const data = Array.isArray(response) ? response as PatientListRecord[] : [];
 
         const mappedPatients = data.map((p) => ({
           id: p.id,
@@ -96,16 +71,12 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
       }
     };
 
-    const timer = window.setTimeout(
-      () => void fetchPatients(),
-      normalizedQuery.length >= 2 ? 300 : 0,
-    );
+    void fetchPatients();
 
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
     };
-  }, [activeWorkspace?.id, searchQuery]);
+  }, [activeWorkspace?.id]);
 
   if (loading) {
     return (
@@ -116,9 +87,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
   }
   if (!loading && patients.length === 0) {
     return (
-      <p className="p-4 text-gray-500">
-        {searchQuery.trim().length >= 2 ? `No patients found for “${searchQuery.trim()}”.` : "No patients found."}
-      </p>
+      <p className="p-4 text-gray-500">No patients found.</p>
     );
   }
 
