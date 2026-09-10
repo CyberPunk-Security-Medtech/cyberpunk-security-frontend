@@ -545,6 +545,35 @@ export type PatientCreatePayload = {
   policy_expiry_date?: string | null;
 };
 
+/**
+ * Editable patient fields accepted by the organization patient PATCH endpoint.
+ * Identity fields such as the patient code, NIN, and external identifiers are
+ * deliberately absent because the API does not allow them to be changed.
+ */
+export type PatientUpdatePayload = {
+  first_name?: string;
+  last_name?: string;
+  dob?: string;
+  gender?: "Male" | "Female" | "Other";
+  marital_status?: "Single" | "Married" | "Divorced" | "Widowed" | null;
+  blood_group?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-" | null;
+  email?: string | null;
+  phone_number?: string | null;
+  allergies?: string | null;
+  past_medical_history?: string | null;
+  family_medical_history?: string | null;
+  symptoms?: string | null;
+  current_medications?: string | null;
+  immunizations?: string | null;
+  lifestyle_info?: string | null;
+  enrollee_type?: string | null;
+  hmo_provider?: string | null;
+  hmo_plan?: string | null;
+  hmo_number?: string | null;
+  policy_start_date?: string | null;
+  policy_expiry_date?: string | null;
+};
+
 export type PatientListRecord = {
   id: string;
   /** Public, human-readable patient identifier. Keep `id` for API requests. */
@@ -562,6 +591,9 @@ export type PatientListRecord = {
   department?: string | null;
   ward?: string | null;
 };
+
+/** The full patient representation returned by the patient detail endpoint. */
+export type PatientRecord = PatientListRecord & Partial<PatientUpdatePayload>;
 
 export type PatientSearchResult = PatientListRecord & {
   id: string;
@@ -743,9 +775,21 @@ export const patientService = {
     return unwrap(response.data);
   },
 
-  getPatient: async (org_id: string, patient_id: string) => {
+  getPatient: async (org_id: string, patient_id: string): Promise<PatientRecord> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/patients/${patient_id}`,
+    );
+    return unwrap(response.data);
+  },
+
+  updatePatient: async (
+    org_id: string,
+    patient_id: string,
+    payload: PatientUpdatePayload,
+  ): Promise<PatientRecord> => {
+    const response = await api.patch(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}`,
+      payload,
     );
     return unwrap(response.data);
   },

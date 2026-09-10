@@ -84,7 +84,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
               <th scope="col" className="min-w-[120px] px-4 py-3">Age/Gender</th>
               <th scope="col" className="min-w-[170px] px-4 py-3">Hospital</th>
               <th scope="col" className="min-w-[120px] px-4 py-3">Status</th>
-              <th scope="col" className="min-w-[150px] px-4 py-3">Date of birth</th>
+              <th scope="col" className="min-w-[150px] px-4 py-3">Date</th>
               <th scope="col" className="min-w-[150px] px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
@@ -130,14 +130,12 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
                   >
                     View
                   </Link>
-                  <button
-                    type="button"
-                    disabled
-                    title="Patient editing is unavailable until the server provides a patient update endpoint."
-                    className="min-h-10 cursor-not-allowed px-2 text-slate-400"
+                  <Link
+                    href={`/dashboard/admin/patient/${p.id}/edit`}
+                    className="inline-flex min-h-10 items-center px-2 text-[#051466] hover:text-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
                   >
                     Edit
-                  </button>
+                  </Link>
                   <button aria-label={`More actions for ${p.name}`} className="min-h-10 min-w-10 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">...</button>
                 </td>
               </tr>
