@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { StatusBadge } from "@components/StatusBadge";
 import { DiagnosisModal } from "./DiagnosisModal";
 import Button from "@components/Button";
 import { useConsultation } from "./ConsultationContext";
 import { consultationService, patientService } from "@services/api";
 import { toast } from "react-toastify";
+import {
+  ClinicalListThumbnail,
+  DiagnosisEmptyState,
+} from "@components/dashboard/consultations/ClinicalListPresentation";
 
 export default function MedicalHistoryTab() {
   const [open, setOpen] = useState(false);
@@ -92,9 +95,7 @@ export default function MedicalHistoryTab() {
 
         <div className="space-y-4">
           {filteredRows.length === 0 && (
-            <div className="rounded-xl border p-4 text-sm text-gray-500">
-              No diagnosis records yet.
-            </div>
+            <DiagnosisEmptyState tone="doctor" />
           )}
 
           {filteredRows.map((h: any) => (
@@ -102,18 +103,18 @@ export default function MedicalHistoryTab() {
               key={h.id}
               className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="min-w-0">
-                <h4 className="break-words font-medium text-[#1A2380]">{h.primary_diagnosis}</h4>
-                <p className="break-words text-xs text-gray-500">
-                  {h.secondary_diagnosis || h.symptoms || "No additional notes"}
-                </p>
+              <div className="flex min-w-0 items-center gap-3">
+                <ClinicalListThumbnail kind="diagnosis" tone="doctor" />
+                <div className="min-w-0">
+                  <h4 className="break-words font-medium text-[#1A2380]">{h.primary_diagnosis}</h4>
+                  <p className="break-words text-xs text-gray-500">
+                    {h.secondary_diagnosis || h.symptoms || "No additional notes"}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <p className="text-xs text-gray-500">
-                  {h.updated_at ? new Date(h.updated_at).toLocaleDateString() : "-"}
-                </p>
-                <StatusBadge status="Active" />
-              </div>
+              <p className="text-xs text-gray-500">
+                {h.updated_at ? new Date(h.updated_at).toLocaleDateString() : "-"}
+              </p>
             </div>
           ))}
         </div>
