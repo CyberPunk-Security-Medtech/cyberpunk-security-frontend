@@ -713,6 +713,28 @@ export type CrossTenantAccessParams = {
   offset?: number;
 };
 
+export type ActivityLogRecord = {
+  id: string;
+  action: string;
+  organization_id?: string | null;
+  target_model?: string | null;
+  target_id?: string | null;
+  details: Record<string, unknown>;
+  ip_address?: string | null;
+  timestamp: string;
+  user?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  } | null;
+  actor_name: string | null;
+};
+
+export type ActivityLogPaginationParams = {
+  limit?: number;
+  offset?: number;
+};
+
 export const patientService = {
   getPatients: async (
     org_id: string,
@@ -907,6 +929,28 @@ export const auditService = {
     const response = await api.get("/api/v1/audit/cross-tenant-access", {
       params: { ...params, org_id },
     });
+    return unwrap(response.data);
+  },
+};
+
+export const activityService = {
+  listConsultationActivity: async (
+    org_id: string,
+    consultation_id: string,
+    params?: ActivityLogPaginationParams,
+    signal?: AbortSignal,
+  ): Promise<ActivityLogRecord[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/activity-logs`,
+      {
+        params: {
+          target_model: "consultation",
+          target_id: consultation_id,
+          ...params,
+        },
+        signal,
+      },
+    );
     return unwrap(response.data);
   },
 };
