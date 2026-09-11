@@ -5,6 +5,7 @@ import { PatientPrescriptionModal } from "./PatientPrescriptionModal";
 import { useConsultation } from "./ConsultationContext";
 import { patientService } from "@services/api";
 import { StatusBadge } from "@components/StatusBadge";
+import { ConsultationStartNotice } from "@components/dashboard/consultations/ConsultationStartNotice";
 
 export default function PatientPrescriptionTab() {
   const [open, setOpen] = useState(false);
@@ -63,9 +64,7 @@ export default function PatientPrescriptionTab() {
         </div>
 
         {!isSelectedConsultationActive && !isCompletedConsultation && (
-          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-            Start an active consultation before adding prescriptions.
-          </p>
+          <ConsultationStartNotice role="doctor" workflow="prescription" />
         )}
 
         <div className="space-y-3">
