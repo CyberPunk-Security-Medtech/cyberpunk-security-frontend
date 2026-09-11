@@ -1,7 +1,11 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { consultationService, patientService } from "@services/api";
+import {
+  consultationService,
+  patientService,
+  type VitalsPayload,
+} from "@services/api";
 import { useAuth } from "@context/AuthContext";
 
 type ConsultationStatus = "idle" | "starting" | "active";
@@ -28,7 +32,7 @@ type ConsultationContextType = {
     department_id: string;
     reason_for_visit: string;
     priority?: "Routine" | "Urgent" | "Emergency";
-    vitals?: string | null;
+    vital_record?: VitalsPayload | null;
   }) => Promise<string | null>;
 };
 
@@ -135,7 +139,7 @@ export function ConsultationProvider({
     department_id: string;
     reason_for_visit: string;
     priority?: "Routine" | "Urgent" | "Emergency";
-    vitals?: string | null;
+    vital_record?: VitalsPayload | null;
   }) => {
     if (!orgId || !patientId) return null;
     try {
@@ -144,7 +148,7 @@ export function ConsultationProvider({
         department_id: payload.department_id,
         reason_for_visit: payload.reason_for_visit,
         priority: payload.priority ?? "Routine",
-        vitals: payload.vitals ?? null,
+        vital_record: payload.vital_record ?? null,
       });
 
       await refreshConsultations();
