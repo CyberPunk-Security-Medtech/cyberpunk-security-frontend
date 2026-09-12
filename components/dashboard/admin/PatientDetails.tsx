@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ShieldPlus, UserRound } from "lucide-react";
+import { ArrowLeft, Pencil, ShieldPlus } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
-import { patientService, type PatientCreatePayload, type PatientListRecord } from "@services/api";
+import { patientService, type PatientRecord } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
 import { PageSkeleton } from "@components/Skeletons";
 
@@ -12,9 +12,7 @@ type PatientDetailsProps = {
   patientId: string;
 };
 
-type PatientDetailRecord = PatientListRecord & Partial<PatientCreatePayload>;
-
-const isPatientDetailRecord = (value: unknown): value is PatientDetailRecord =>
+const isPatientDetailRecord = (value: unknown): value is PatientRecord =>
   typeof value === "object" && value !== null;
 
 const displayValue = (value?: string | number | null) => {
@@ -60,7 +58,7 @@ function DetailsSection({
 
 export default function PatientDetails({ patientId }: PatientDetailsProps) {
   const { activeWorkspace, hydrated } = useAuth();
-  const [patient, setPatient] = useState<PatientDetailRecord | null>(null);
+  const [patient, setPatient] = useState<PatientRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -141,13 +139,24 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
                 </span>
                 <div className="min-w-0">
                   <h1 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl">{patientName}</h1>
-                  <p className="mt-1 break-all text-sm text-slate-500">Patient ID: {patient.patient_code?.trim() || patient.id || patientId}</p>
+                  <p className="mt-1 break-all text-sm text-slate-500">
+                    Patient code: {patient.patient_code?.trim() || patient.id || patientId}
+                  </p>
                 </div>
               </div>
-              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                <ShieldPlus size={15} aria-hidden="true" />
-                Patient record
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                  <ShieldPlus size={15} aria-hidden="true" />
+                  Patient record
+                </span>
+                <Link
+                  href={`/dashboard/admin/patient/${patientId}/edit`}
+                  className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                  Edit patient
+                </Link>
+              </div>
             </div>
           </section>
 
@@ -184,10 +193,6 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
             <DetailItem label="Policy expiry date" value={formatDate(patient.policy_expiry_date)} />
           </DetailsSection>
 
-          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-            <UserRound size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
-            Patient editing is unavailable until the server provides a supported patient-update endpoint. The current record is shown read-only.
-          </p>
         </>
       ) : null}
     </div>
