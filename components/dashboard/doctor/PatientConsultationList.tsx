@@ -114,23 +114,12 @@ export default function PatientConsultationList() {
                         </div>
                       </div>
 
-                      <p className="mb-4 rounded-lg border border-[#DADDFE] bg-[#EEF2FF] px-3 py-2 text-xs text-[#1A2380]">
-                        Preview mode uses lightweight list data. Open full details for complete
-                        consultation records.
-                      </p>
-
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
                           href={detailHref}
                           className="rounded-md bg-[#1A2380] px-4 py-2 text-sm text-white hover:bg-[#111B66]"
                         >
                           Open Full Consultation
-                        </Link>
-                        <Link
-                          href={`/dashboard/doctor/patient/${consultation.patient_id}`}
-                          className="rounded-md border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                          Patient Overview
                         </Link>
                       </div>
                     </div>

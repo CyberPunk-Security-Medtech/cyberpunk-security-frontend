@@ -62,7 +62,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
   const tabs = useMemo(
     () => [
       { label: "Vitals", content: <VitalsTab /> },
-      { label: "Medical History", content: <MedicalHistoryTab /> },
+      { label: "Diagnosis", content: <MedicalHistoryTab /> },
       { label: "Prescription", content: <PatientPrescriptionTab /> },
       { label: "Lab Test", content: <LabTestTab /> },
       { label: "Activity Log", content: <ActivityLogTab /> },
@@ -162,11 +162,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 text-sm text-gray-700 md:grid-cols-2 xl:grid-cols-3">
-          <div className="rounded-md bg-gray-50 p-3">
-            <p className="text-xs text-gray-500">Consultation ID</p>
-            <p className="break-all font-medium">{selectedConsultationId || consultationId}</p>
-          </div>
+        <div className="grid grid-cols-1 gap-3 text-sm text-gray-700 sm:grid-cols-2">
           <div className="rounded-md bg-gray-50 p-3">
             <p className="text-xs text-gray-500">Created</p>
             <p className="font-medium">{formatDate(selectedConsultation?.created_at)}</p>
