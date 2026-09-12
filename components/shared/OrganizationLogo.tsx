@@ -23,10 +23,16 @@ export default function OrganizationLogo({
   className,
 }: OrganizationLogoProps) {
   const { activeWorkspace } = useAuth();
-  const [failed, setFailed] = useState(false);
+  // Track which URL failed so switching to another workspace (with a fresh
+  // signed link) clears the error instead of sticking on the fallback.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
   const src = activeWorkspace?.img;
-  const hasLogo = Boolean(src) && src !== "/workspace.svg" && !failed;
+  const hasLogo =
+    typeof src === "string" &&
+    src.length > 0 &&
+    src !== "/workspace.svg" &&
+    failedSrc !== src;
 
   if (!hasLogo) {
     // eslint-disable-next-line @next/next/no-img-element
@@ -48,7 +54,7 @@ export default function OrganizationLogo({
       alt={activeWorkspace?.name ?? "Organization logo"}
       width={width}
       height={height}
-      onError={() => setFailed(true)}
+      onError={() => setFailedSrc(src ?? "")}
       className={className}
     />
   );

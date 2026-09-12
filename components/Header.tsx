@@ -2,8 +2,8 @@
 
 import { Bell, Menu } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
-import Image from "next/image";
 import GlobalPatientSearch from "@components/GlobalPatientSearch";
+import WorkspaceAvatar from "@components/shared/WorkspaceAvatar";
 
 interface HeaderProps {
   setSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,13 +40,7 @@ export default function Header({
             <Menu size={20} className="text-[#1A2380]" />
           </button>
         )}
-        <Image
-          src="/images/Avatar.png"
-          alt="Organization logo"
-          width={36}
-          height={36}
-          className="h-9 w-9 rounded-full object-cover"
-        />
+        <WorkspaceAvatar workspace={activeWorkspace} size={36} />
         <h2
           className={`min-w-0 truncate text-base font-semibold sm:text-lg ${organizationNameClassName}`}
         >

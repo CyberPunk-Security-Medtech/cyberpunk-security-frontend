@@ -977,6 +977,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setWorkspaces(normalized);
       localStorage.setItem("workspaces", JSON.stringify(normalized));
+
+      // image_url is a signed, expiring link, so the cached active
+      // workspace's logo goes stale between sessions. Refresh it from the
+      // fresh pool while keeping the user's selected workspace.
+      const storedActive = localStorage.getItem("activeWorkspace");
+      if (storedActive) {
+        try {
+          const parsed = JSON.parse(storedActive) as Workspace;
+          const fresh = normalized.find((ws) => ws.id === parsed.id);
+          if (fresh) {
+            setActiveWorkspace(fresh);
+            localStorage.setItem("activeWorkspace", JSON.stringify(fresh));
+          }
+        } catch {
+          // Corrupted cache — keep the current selection untouched.
+        }
+      }
     } catch (e) {
       console.error("Workspace load failed", e);
     } finally {

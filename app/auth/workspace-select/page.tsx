@@ -131,6 +131,7 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@context/AuthContext";
+import WorkspaceAvatar from "@components/shared/WorkspaceAvatar";
 
 const dashboardRouteByRole: Record<string, string> = {
   admin: "/dashboard/admin",
@@ -224,16 +225,9 @@ export default function WorkspaceSelectPage() {
             
             {/* Title Row */}
             <div className="flex items-center mb-6">
-              <div className="bg-[#E9FFFB] w-[42px] h-[42px] rounded-full flex items-center justify-center">
-                <Image
-                  src= {ws.img}
-                  width={20}
-                  height={20}
-                  alt="Lightning"
-                />
-              </div>
+              <WorkspaceAvatar workspace={ws} size={42} className="mr-3" />
 
-              <h3 className="ml-3 text-[17px] font-medium text-gray-800">
+              <h3 className="text-[17px] font-medium text-gray-800">
                 {ws.name}
               </h3>
             </div>
