@@ -7,6 +7,7 @@ import { StatusBadge } from "@components/StatusBadge";
 import { consultationService, patientService } from "@services/api";
 import { useConsultation } from "./ConsultationContext";
 import { toast } from "react-toastify";
+import { ClinicalListThumbnail } from "@components/dashboard/consultations/ClinicalListPresentation";
 
 export default function LabTestTab() {
   const [open, setOpen] = useState(false);
@@ -101,9 +102,12 @@ export default function LabTestTab() {
         )}
         {filteredTests.map((t: any) => (
           <div key={t.id} className="flex flex-col gap-3 rounded-xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="break-words font-medium text-[#003C36]">{t.test_name}</p>
-              <p className="break-words text-xs text-gray-500">{t.test_category || "Uncategorized"}</p>
+            <div className="flex min-w-0 items-center gap-3">
+              <ClinicalListThumbnail kind="lab-test" tone="nurse" />
+              <div className="min-w-0">
+                <p className="break-words font-medium text-[#003C36]">{t.test_name}</p>
+                <p className="break-words text-xs text-gray-500">{t.test_category || "Uncategorized"}</p>
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               {t.priority && (
