@@ -7,6 +7,7 @@ import {
   type ConsultationPriority,
   type ConsultationRecord,
   type VitalsPayload,
+  type PatientDetailRecord,
 } from "@services/api";
 import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
@@ -16,7 +17,8 @@ type ConsultationStatus = "idle" | "starting" | "active";
 type ConsultationContextType = {
   patientId: string;
   orgId: string | null;
-  patient: any | null;
+  patient: PatientDetailRecord | null;
+  patientError: string;
   patientLoading: boolean;
   consultations: ConsultationRecord[];
   consultationLoading: boolean;
@@ -53,8 +55,9 @@ export function ConsultationProvider({
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
 
-  const [patient, setPatient] = useState<any | null>(null);
-  const [patientLoading, setPatientLoading] = useState(false);
+  const [patient, setPatient] = useState<PatientDetailRecord | null>(null);
+  const [patientError, setPatientError] = useState("");
+  const [patientLoading, setPatientLoading] = useState(true);
 
   const [consultations, setConsultations] = useState<ConsultationRecord[]>([]);
   const [consultationLoading, setConsultationLoading] = useState(false);
@@ -63,13 +66,24 @@ export function ConsultationProvider({
   const [selectedConsultationId, setSelectedConsultationId] = useState<string | null>(null);
 
   const refreshPatient = async () => {
-    if (!orgId || !patientId) return;
+    if (!orgId || !patientId) {
+      setPatient(null);
+      setPatientError("Select an organization workspace to view this patient.");
+      setPatientLoading(false);
+      return;
+    }
     setPatientLoading(true);
+    setPatientError("");
     try {
       const result = await patientService.getPatient(orgId, patientId);
-      setPatient(result);
+      if (typeof result !== "object" || result === null) {
+        throw new Error("The patient record returned an unsupported format.");
+      }
+      setPatient(result as PatientDetailRecord);
     } catch (error) {
       console.error("Failed to load patient", error);
+      setPatient(null);
+      setPatientError("Unable to load patient details. Please try again.");
     } finally {
       setPatientLoading(false);
     }
@@ -207,6 +221,7 @@ export function ConsultationProvider({
       patientId,
       orgId,
       patient,
+      patientError,
       patientLoading,
       consultations,
       consultationLoading,
@@ -229,6 +244,7 @@ export function ConsultationProvider({
       patientId,
       orgId,
       patient,
+      patientError,
       patientLoading,
       consultations,
       consultationLoading,

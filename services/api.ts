@@ -594,6 +594,7 @@ export type PatientListRecord = {
 
 /** The full patient representation returned by the patient detail endpoint. */
 export type PatientRecord = PatientListRecord & Partial<PatientUpdatePayload>;
+export type PatientDetailRecord = PatientRecord;
 
 export type PatientSearchResult = PatientListRecord & {
   id: string;
