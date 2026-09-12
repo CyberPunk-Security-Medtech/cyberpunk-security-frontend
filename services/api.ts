@@ -563,6 +563,8 @@ export type PatientListRecord = {
   ward?: string | null;
 };
 
+export type PatientDetailRecord = PatientListRecord & Partial<PatientCreatePayload>;
+
 export type PatientSearchResult = PatientListRecord & {
   id: string;
   patient_code: string;
