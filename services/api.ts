@@ -1710,27 +1710,51 @@ export type AiChatMessage = {
   created_at: string;
 };
 
+export type AiAttachmentInfo = {
+  filename: string;
+  mime_type: string;
+  processed_as: "text" | "image";
+};
+
 export type AiChatResponse = {
   reply: string;
   model_used: string;
   session_id: string;
   usage: AiUsageInfo;
   temporary: boolean;
+  attachments?: AiAttachmentInfo[];
 };
 
 export const aiService = {
-  // The AI service's /ai/chat only accepts a text `message` (max 2000
-  // chars) — there is no file-upload endpoint. The assistant therefore
-  // reads attachment text client-side and embeds a trimmed excerpt in
-  // the message (see SharedAiAssistant's submit handler).
+  // The AI service's /ai/chat accepts multipart/form-data only (FastAPI
+  // Form fields): a text `message` (max 2000 chars) plus an optional
+  // repeatable `file` field — up to 3 attachments per message (PDF,
+  // DOCX, TXT, CSV, PNG, JPG), processed server-side.
   chat: async (payload: {
     user_id: string;
     message: string;
     session_id?: string | null;
     model?: AiModel | null;
     temporary?: boolean;
+    files?: File[];
   }): Promise<AiChatResponse> => {
-    const response = await aiApi.post("/ai/chat", payload);
+    const form = new FormData();
+    form.append("user_id", payload.user_id);
+    form.append("message", payload.message);
+    if (payload.session_id) {
+      form.append("session_id", payload.session_id);
+    }
+    if (payload.model) {
+      form.append("model", payload.model);
+    }
+    if (payload.temporary) {
+      form.append("temporary", "true");
+    }
+    for (const file of payload.files ?? []) {
+      form.append("file", file);
+    }
+    // Let axios set the multipart boundary automatically.
+    const response = await aiApi.post("/ai/chat", form);
     return response.data;
   },
 
