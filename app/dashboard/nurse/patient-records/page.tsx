@@ -9,7 +9,6 @@ import { useState } from 'react';
 export default function PatientsRecords() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [refreshVersion, setRefreshVersion] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const handlePatientCreated = () => {
     setRefreshVersion((current) => current + 1);
@@ -27,7 +26,7 @@ export default function PatientsRecords() {
         <Button
           type="button"
           onSubmitHandler={() => setIsModalOpen(true)}
-          className="w-full rounded-md bg-[#006B5F] px-5 py-2.5 font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
+          className="w-full rounded-md !bg-[#006B5F] px-5 py-2.5 font-medium text-white transition-colors hover:!bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none sm:w-auto"
         >
           + Add New Patient Record
         </Button>
@@ -39,47 +38,8 @@ export default function PatientsRecords() {
         />
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative w-full lg:max-w-sm">
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            aria-label="Search patients by name, phone number, email, or NIN"
-            maxLength={100}
-            placeholder="Search patient"
-            className="w-full border border-gray-200 rounded-full pl-10 pr-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8]"
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-4 h-4 absolute left-4 top-2.5 text-gray-400"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.2-5.2M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" />
-          </svg>
-        </div>
-
-        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:w-auto lg:grid-cols-2">
-          <select className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:ring-[#00B8A8]">
-            <option>Department</option>
-            <option>Cardiology</option>
-            <option>Neurology</option>
-            <option>Pediatrics</option>
-          </select>
-          <select className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:ring-[#00B8A8]">
-            <option>Last Visit</option>
-            <option>This Week</option>
-            <option>This Month</option>
-          </select>
-        </div>
-      </div>
-
       {/* Table */}
-      <PatientTable key={refreshVersion} searchQuery={searchQuery} />
+      <PatientTable key={refreshVersion} />
     </div>
   )
 }
