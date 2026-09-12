@@ -13,6 +13,9 @@ import MedicalHistoryTab from "./MedicalHistoryTab";
 import PatientPrescriptionTab from "./PatientPrescriptionTab";
 import VitalsTab from "./VitalsTab";
 import { LoaderIcon } from "@components/Skeletons";
+import Button from "@components/Button";
+import { getApiErrorMessage } from "@utils/apiError";
+import { toast } from "react-toastify";
 
 type ConsultationDetailsClientProps = {
   consultationId: string;
@@ -45,7 +48,10 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     isSelectedConsultationActive,
     consultationStatus,
     startConsultation,
+    orgId,
+    refreshConsultations,
   } = useConsultation();
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     if (selectedConsultationId !== consultationId) {
@@ -66,6 +72,29 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
 
   const isPending =
     String(selectedConsultation?.status ?? "").toLowerCase() === "pending";
+  const isInProgress =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "in progress";
+
+  const handleComplete = async () => {
+    if (!orgId || !selectedConsultationId || completing) return;
+
+    setCompleting(true);
+    try {
+      await consultationService.completeConsultation(orgId, selectedConsultationId);
+      await refreshConsultations();
+      toast.success("Consultation marked as complete");
+    } catch (requestError) {
+      console.error("Failed to complete consultation", requestError);
+      toast.error(
+        getApiErrorMessage(
+          requestError,
+          "Unable to complete the consultation. Please try again.",
+        ),
+      );
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   return (
     <div className="space-y-6 py-2 sm:py-4">
@@ -119,6 +148,16 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
               >
                 {consultationStatus === "starting" ? "Starting..." : "Start Consultation"}
               </button>
+            )}
+            {isInProgress && (
+              <Button
+                type="button"
+                onClick={handleComplete}
+                disabled={completing}
+                className="bg-[#1A2380] text-white hover:bg-[#111B66]"
+              >
+                {completing ? "Completing..." : "Mark as Complete"}
+              </Button>
             )}
           </div>
         </div>
@@ -197,7 +236,7 @@ export default function ConsultationDetailsClient({
           ...(cancelled ?? []),
         ];
 
-        const match = merged.find((item: any) => item.id === consultationId);
+        const match = merged.find((item) => item.id === consultationId);
         if (mounted) {
           setResolvedPatientId(match?.patient_id ?? null);
         }

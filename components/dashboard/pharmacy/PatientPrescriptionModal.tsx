@@ -962,10 +962,7 @@ export function PatientPrescriptionModal({
         patient_id: patientId,
         status_filter: "In Progress",
       });
-      const list: Consultation[] =
-        Array.isArray(response)
-          ? response
-          : response?.consultations ?? response?.data ?? [];
+      const list: Consultation[] = response;
 
       setConsultations(list);
     } catch (error) {

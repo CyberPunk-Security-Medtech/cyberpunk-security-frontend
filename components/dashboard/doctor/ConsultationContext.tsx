@@ -1,7 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { consultationService, patientService } from "@services/api";
+import {
+  consultationService,
+  patientService,
+  type ConsultationPriority,
+  type ConsultationRecord,
+} from "@services/api";
 import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
 
@@ -12,14 +17,14 @@ type ConsultationContextType = {
   orgId: string | null;
   patient: any | null;
   patientLoading: boolean;
-  consultations: any[];
+  consultations: ConsultationRecord[];
   consultationLoading: boolean;
   consultationStatus: ConsultationStatus;
   isConsultationActive: boolean;
   isSelectedConsultationActive: boolean;
   currentConsultationId: string | null;
   selectedConsultationId: string | null;
-  selectedConsultation: any | null;
+  selectedConsultation: ConsultationRecord | null;
   hasConsultation: boolean;
   hasOpenConsultation: boolean;
   canStartConsultation: boolean;
@@ -29,7 +34,7 @@ type ConsultationContextType = {
   createConsultation: (payload: {
     department_id: string;
     reason_for_visit: string;
-    priority?: "Routine" | "Urgent" | "Emergency";
+    priority?: ConsultationPriority;
     vitals?: string | null;
   }) => Promise<string | null>;
   startConsultation: () => Promise<void>;
@@ -50,7 +55,7 @@ export function ConsultationProvider({
   const [patient, setPatient] = useState<any | null>(null);
   const [patientLoading, setPatientLoading] = useState(false);
 
-  const [consultations, setConsultations] = useState<any[]>([]);
+  const [consultations, setConsultations] = useState<ConsultationRecord[]>([]);
   const [consultationLoading, setConsultationLoading] = useState(false);
   const [consultationStatus, setConsultationStatus] = useState<ConsultationStatus>("idle");
   const [currentConsultationId, setCurrentConsultationId] = useState<string | null>(null);
@@ -87,12 +92,14 @@ export function ConsultationProvider({
         ...(cancelledResult ?? []),
       ];
       const uniqueById = Array.from(
-        new Map(merged.map((c: any) => [c.id, c])).values()
+        new Map<string, ConsultationRecord>(
+          merged.map((consultation) => [consultation.id, consultation]),
+        ).values(),
       );
 
       const mine = uniqueById
-        .filter((c: any) => c.patient_id === patientId)
-        .sort((a: any, b: any) => {
+        .filter((consultation) => consultation.patient_id === patientId)
+        .sort((a, b) => {
           const aTime = new Date(a.updated_at ?? a.created_at ?? 0).getTime();
           const bTime = new Date(b.updated_at ?? b.created_at ?? 0).getTime();
           return bTime - aTime;
@@ -139,7 +146,7 @@ export function ConsultationProvider({
   const createConsultation = async (payload: {
     department_id: string;
     reason_for_visit: string;
-    priority?: "Routine" | "Urgent" | "Emergency";
+    priority?: ConsultationPriority;
     vitals?: string | null;
   }) => {
     if (!orgId || !patientId) return null;

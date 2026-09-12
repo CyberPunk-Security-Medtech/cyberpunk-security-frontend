@@ -159,7 +159,7 @@ export default function ConsultationsPage() {
   const handleComplete = async (row: ConsultationRow) => {
     if (!orgId) return;
     await withRowLoading(row.id, async () => {
-      await consultationService.completeConsultation(orgId, row.id, { status: "Completed" });
+      await consultationService.completeConsultation(orgId, row.id);
       await loadConsultations();
     });
   };

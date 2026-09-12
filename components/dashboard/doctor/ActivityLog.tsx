@@ -30,13 +30,13 @@ export default function ActivityLogTab() {
       time: formatDate(selectedConsultation.updated_at || selectedConsultation.created_at),
     });
 
-    if (selectedConsultation.clinical_notes) {
+    selectedConsultation.notes.forEach((note) => {
       items.push({
         type: "Doctor Note",
-        text: selectedConsultation.clinical_notes,
-        time: formatDate(selectedConsultation.updated_at || selectedConsultation.created_at),
+        text: note.content,
+        time: formatDate(note.created_at),
       });
-    }
+    });
 
     return items;
   }, [selectedConsultation]);
