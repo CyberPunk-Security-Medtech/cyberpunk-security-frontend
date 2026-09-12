@@ -4,7 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Modal from "@components/Modal";
 import { FieldLabel, Input, Select, Textarea } from "@components/Field";
 import { StatusBadge } from "@components/StatusBadge";
-import { consultationService, patientService } from "@services/api";
+import { ConsultationStartNotice } from "@components/dashboard/consultations/ConsultationStartNotice";
+import {
+  consultationService,
+  LAB_TEST_PRIORITIES,
+  patientService,
+  type LabTestPriority,
+} from "@services/api";
 import { useConsultation } from "./ConsultationContext";
 import { toast } from "react-toastify";
 import { ClinicalListThumbnail } from "@components/dashboard/consultations/ClinicalListPresentation";
@@ -19,9 +25,18 @@ export default function LabTestTab() {
     patientId,
     selectedConsultationId,
     isSelectedConsultationActive,
+    selectedConsultation,
   } = useConsultation();
 
-  const [form, setForm] = useState({
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
+
+  const [form, setForm] = useState<{
+    test_name: string;
+    test_category: string;
+    priority: LabTestPriority;
+    clinical_notes: string;
+  }>({
     test_name: "",
     test_category: "",
     priority: "Routine",
@@ -89,10 +104,8 @@ export default function LabTestTab() {
           + Order Lab Test
         </button>
       </div>
-      {!isSelectedConsultationActive && (
-        <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-          Start an active consultation before ordering lab tests.
-        </p>
+      {!isSelectedConsultationActive && !isCompletedConsultation && (
+        <ConsultationStartNotice role="nurse" workflow="lab-test" />
       )}
       <div className="space-y-3">
         {filteredTests.length === 0 && (
@@ -146,14 +159,22 @@ export default function LabTestTab() {
               />
             </div>
             <div>
-              <FieldLabel>Priority</FieldLabel>
+              <FieldLabel htmlFor="nurse-lab-test-priority">Priority</FieldLabel>
               <Select
+                id="nurse-lab-test-priority"
                 value={form.priority}
-                onChange={(e) => setForm((prev) => ({ ...prev, priority: e.target.value }))}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    priority: e.target.value as LabTestPriority,
+                  }))
+                }
               >
-                <option>Routine</option>
-                <option>Urgent</option>
-                <option>Stat</option>
+                {LAB_TEST_PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ))}
               </Select>
             </div>
           </div>

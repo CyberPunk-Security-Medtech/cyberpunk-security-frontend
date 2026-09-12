@@ -1078,6 +1078,17 @@ export type ConsultationRecord = {
   updated_at: string;
 };
 
+export const LAB_TEST_PRIORITIES = ["Routine", "Urgent", "Stat"] as const;
+
+export type LabTestPriority = (typeof LAB_TEST_PRIORITIES)[number];
+
+export type CreateLabTestPayload = {
+  test_name: string;
+  test_category?: string | null;
+  priority: LabTestPriority;
+  clinical_notes?: string | null;
+};
+
 export const consultationService = {
   createConsultation: async (
     org_id: string,
@@ -1202,12 +1213,7 @@ export const consultationService = {
   orderLabTest: async (
     org_id: string,
     consultation_id: string,
-    labData: {
-      test_name: string;
-      test_category?: string | null;
-      priority?: string;
-      clinical_notes?: string | null;
-    },
+    labData: CreateLabTestPayload,
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/lab-tests`,
