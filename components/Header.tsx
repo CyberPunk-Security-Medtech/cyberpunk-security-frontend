@@ -11,6 +11,7 @@ interface HeaderProps {
   sidebarId?: string;
   showSearch?: boolean;
   desktopPaddingClassName?: string;
+  organizationNameClassName?: string;
 }
 
 export default function Header({
@@ -19,6 +20,7 @@ export default function Header({
   sidebarId = "dashboard-sidebar",
   showSearch = true,
   desktopPaddingClassName = "md:px-8",
+  organizationNameClassName = "text-[#1A2380]",
 }: HeaderProps) {
   const { activeWorkspace } = useAuth();
 
@@ -45,7 +47,9 @@ export default function Header({
           height={36}
           className="h-9 w-9 rounded-full object-cover"
         />
-        <h2 className="min-w-0 truncate text-base font-semibold text-[#1A2380] sm:text-lg">
+        <h2
+          className={`min-w-0 truncate text-base font-semibold sm:text-lg ${organizationNameClassName}`}
+        >
           {activeWorkspace?.name || "Sisyphus Medical Center"}
         </h2>
       </div>

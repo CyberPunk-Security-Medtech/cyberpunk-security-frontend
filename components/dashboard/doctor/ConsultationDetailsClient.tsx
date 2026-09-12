@@ -13,6 +13,9 @@ import MedicalHistoryTab from "./MedicalHistoryTab";
 import PatientPrescriptionTab from "./PatientPrescriptionTab";
 import VitalsTab from "./VitalsTab";
 import { LoaderIcon } from "@components/Skeletons";
+import Button from "@components/Button";
+import { getApiErrorMessage } from "@utils/apiError";
+import { toast } from "react-toastify";
 
 type ConsultationDetailsClientProps = {
   consultationId: string;
@@ -45,7 +48,10 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     isSelectedConsultationActive,
     consultationStatus,
     startConsultation,
+    orgId,
+    refreshConsultations,
   } = useConsultation();
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     if (selectedConsultationId !== consultationId) {
@@ -56,7 +62,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
   const tabs = useMemo(
     () => [
       { label: "Vitals", content: <VitalsTab /> },
-      { label: "Medical History", content: <MedicalHistoryTab /> },
+      { label: "Diagnosis", content: <MedicalHistoryTab /> },
       { label: "Prescription", content: <PatientPrescriptionTab /> },
       { label: "Lab Test", content: <LabTestTab /> },
       { label: "Activity Log", content: <ActivityLogTab /> },
@@ -66,6 +72,29 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
 
   const isPending =
     String(selectedConsultation?.status ?? "").toLowerCase() === "pending";
+  const isInProgress =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "in progress";
+
+  const handleComplete = async () => {
+    if (!orgId || !selectedConsultationId || completing) return;
+
+    setCompleting(true);
+    try {
+      await consultationService.completeConsultation(orgId, selectedConsultationId);
+      await refreshConsultations();
+      toast.success("Consultation marked as complete");
+    } catch (requestError) {
+      console.error("Failed to complete consultation", requestError);
+      toast.error(
+        getApiErrorMessage(
+          requestError,
+          "Unable to complete the consultation. Please try again.",
+        ),
+      );
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   return (
     <div className="space-y-6 py-2 sm:py-4">
@@ -120,14 +149,20 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
                 {consultationStatus === "starting" ? "Starting..." : "Start Consultation"}
               </button>
             )}
+            {isInProgress && (
+              <Button
+                type="button"
+                onClick={handleComplete}
+                disabled={completing}
+                className="bg-[#1A2380] text-white hover:bg-[#111B66]"
+              >
+                {completing ? "Completing..." : "Mark as Complete"}
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 text-sm text-gray-700 md:grid-cols-2 xl:grid-cols-3">
-          <div className="rounded-md bg-gray-50 p-3">
-            <p className="text-xs text-gray-500">Consultation ID</p>
-            <p className="break-all font-medium">{selectedConsultationId || consultationId}</p>
-          </div>
+        <div className="grid grid-cols-1 gap-3 text-sm text-gray-700 sm:grid-cols-2">
           <div className="rounded-md bg-gray-50 p-3">
             <p className="text-xs text-gray-500">Created</p>
             <p className="font-medium">{formatDate(selectedConsultation?.created_at)}</p>
@@ -197,7 +232,7 @@ export default function ConsultationDetailsClient({
           ...(cancelled ?? []),
         ];
 
-        const match = merged.find((item: any) => item.id === consultationId);
+        const match = merged.find((item) => item.id === consultationId);
         if (mounted) {
           setResolvedPatientId(match?.patient_id ?? null);
         }

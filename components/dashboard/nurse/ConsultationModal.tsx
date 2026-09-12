@@ -7,6 +7,12 @@ import Button from '@components/Button'
 import { organizationService, patientService, PatientService } from '@services/api'
 import { toast } from 'react-toastify'
 import { getApiErrorMessage } from '@utils/apiError'
+import VitalsFormFields, {
+  buildVitalRecord,
+  EMPTY_VITALS_FORM,
+  type VitalsFormErrors,
+  type VitalsFormValues,
+} from '@components/dashboard/consultations/VitalsFormFields'
 
 interface CreateConsultationModalProps {
   open: boolean
@@ -40,8 +46,9 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
     department_id: '',
     reason_for_visit: '',
     priority: 'Routine',
-    vitals: ''
   })
+  const [vitalsForm, setVitalsForm] = useState<VitalsFormValues>(EMPTY_VITALS_FORM)
+  const [vitalsErrors, setVitalsErrors] = useState<VitalsFormErrors>({})
 
   // Patient picker is only needed when no patient was passed in.
   const needsPatientSelection = !patientId
@@ -92,7 +99,24 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
-  const handleSubmit = async () => {
+  const handleVitalsChange = (name: keyof VitalsFormValues, value: string) => {
+    setVitalsForm((current) => ({ ...current, [name]: value }))
+    if (name !== 'notes') {
+      setVitalsErrors((current) => {
+        const nextErrors = { ...current }
+        delete nextErrors[name]
+        return nextErrors
+      })
+    }
+  }
+
+  const handleClose = () => {
+    setVitalsErrors({})
+    onClose()
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     const workspace = JSON.parse(localStorage.getItem('activeWorkspace') || '{}')
     const orgId = workspace?.id
     const effectivePatientId = patientId ?? selectedPatientId
@@ -101,15 +125,24 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
       return
     }
 
+    const { payload: vitalRecord, errors } = buildVitalRecord(vitalsForm)
+    if (Object.keys(errors).length > 0) {
+      setVitalsErrors(errors)
+      return
+    }
+
     setLoading(true)
     try {
       const res = await PatientService.createConsultation(orgId, {
         patient_id: effectivePatientId,
-        ...form
+        ...form,
+        vital_record: vitalRecord,
       })
       const consultationId = res.data.id
       onCreated(consultationId)
-      setForm({ department_id: '', reason_for_visit: '', priority: 'Routine', vitals: '' })
+      setForm({ department_id: '', reason_for_visit: '', priority: 'Routine' })
+      setVitalsForm(EMPTY_VITALS_FORM)
+      setVitalsErrors({})
       setSelectedPatientId('')
       onClose()
       toast.success('Consultation created')
@@ -125,10 +158,10 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
     <Modal
       title="Create Consultation"
       isOpen={open}
-      onClose={onClose}
+      onClose={handleClose}
       headerClassName="bg-[#003C36]"
     >
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         {needsPatientSelection && (
           <div>
             <FieldLabel htmlFor="patient">Patient</FieldLabel>
@@ -202,28 +235,24 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
           </Select>
         </div>
 
-        <div>
-          <FieldLabel htmlFor="vitals">Vitals / Notes</FieldLabel>
-          <Textarea
-            id="vitals"
-            rows={3}
-            placeholder="e.g. BP 120/80, temp 37.1°C"
-            value={form.vitals}
-            onChange={(e) => setForm({ ...form, vitals: e.target.value })}
-          />
-        </div>
+        <VitalsFormFields
+          idPrefix="nurse-consultation-vitals"
+          values={vitalsForm}
+          errors={vitalsErrors}
+          disabled={loading}
+          onChange={handleVitalsChange}
+        />
 
         <div className="flex justify-end gap-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-full border px-6 py-2.5 text-sm font-medium"
           >
             Cancel
           </button>
           <Button
-            type="button"
-            onSubmitHandler={handleSubmit}
+            type="submit"
             disabled={
               loading ||
               !form.reason_for_visit ||

@@ -1,5 +1,4 @@
-import PatientConsultationList from "@components/dashboard/doctor/PatientConsultationList";
-import PatientHeader from "@components/dashboard/doctor/PatientHeader";
+import DoctorPatientDetails from "@components/dashboard/doctor/DoctorPatientDetails";
 import { ConsultationProvider } from "@components/dashboard/doctor/ConsultationContext";
 
 export default async function PatientDetails({
@@ -11,8 +10,7 @@ export default async function PatientDetails({
 
   return (
     <ConsultationProvider patientId={id}>
-      <PatientHeader />
-      <PatientConsultationList />
+      <DoctorPatientDetails />
     </ConsultationProvider>
   );
 }

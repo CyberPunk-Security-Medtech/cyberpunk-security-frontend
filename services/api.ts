@@ -545,6 +545,35 @@ export type PatientCreatePayload = {
   policy_expiry_date?: string | null;
 };
 
+/**
+ * Editable patient fields accepted by the organization patient PATCH endpoint.
+ * Identity fields such as the patient code, NIN, and external identifiers are
+ * deliberately absent because the API does not allow them to be changed.
+ */
+export type PatientUpdatePayload = {
+  first_name?: string;
+  last_name?: string;
+  dob?: string;
+  gender?: "Male" | "Female" | "Other";
+  marital_status?: "Single" | "Married" | "Divorced" | "Widowed" | null;
+  blood_group?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-" | null;
+  email?: string | null;
+  phone_number?: string | null;
+  allergies?: string | null;
+  past_medical_history?: string | null;
+  family_medical_history?: string | null;
+  symptoms?: string | null;
+  current_medications?: string | null;
+  immunizations?: string | null;
+  lifestyle_info?: string | null;
+  enrollee_type?: string | null;
+  hmo_provider?: string | null;
+  hmo_plan?: string | null;
+  hmo_number?: string | null;
+  policy_start_date?: string | null;
+  policy_expiry_date?: string | null;
+};
+
 export type PatientListRecord = {
   id: string;
   /** Public, human-readable patient identifier. Keep `id` for API requests. */
@@ -562,6 +591,10 @@ export type PatientListRecord = {
   department?: string | null;
   ward?: string | null;
 };
+
+/** The full patient representation returned by the patient detail endpoint. */
+export type PatientRecord = PatientListRecord & Partial<PatientUpdatePayload>;
+export type PatientDetailRecord = PatientRecord;
 
 export type PatientSearchResult = PatientListRecord & {
   id: string;
@@ -713,6 +746,28 @@ export type CrossTenantAccessParams = {
   offset?: number;
 };
 
+export type ActivityLogRecord = {
+  id: string;
+  action: string;
+  organization_id?: string | null;
+  target_model?: string | null;
+  target_id?: string | null;
+  details: Record<string, unknown>;
+  ip_address?: string | null;
+  timestamp: string;
+  user?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  } | null;
+  actor_name: string | null;
+};
+
+export type ActivityLogPaginationParams = {
+  limit?: number;
+  offset?: number;
+};
+
 export const patientService = {
   getPatients: async (
     org_id: string,
@@ -743,9 +798,21 @@ export const patientService = {
     return unwrap(response.data);
   },
 
-  getPatient: async (org_id: string, patient_id: string) => {
+  getPatient: async (org_id: string, patient_id: string): Promise<PatientRecord> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/patients/${patient_id}`,
+    );
+    return unwrap(response.data);
+  },
+
+  updatePatient: async (
+    org_id: string,
+    patient_id: string,
+    payload: PatientUpdatePayload,
+  ): Promise<PatientRecord> => {
+    const response = await api.patch(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}`,
+      payload,
     );
     return unwrap(response.data);
   },
@@ -911,6 +978,28 @@ export const auditService = {
   },
 };
 
+export const activityService = {
+  listConsultationActivity: async (
+    org_id: string,
+    consultation_id: string,
+    params?: ActivityLogPaginationParams,
+    signal?: AbortSignal,
+  ): Promise<ActivityLogRecord[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/activity-logs`,
+      {
+        params: {
+          target_model: "consultation",
+          target_id: consultation_id,
+          ...params,
+        },
+        signal,
+      },
+    );
+    return unwrap(response.data);
+  },
+};
+
 // A set of vitals recorded against a consultation. Every measurement is
 // optional (nullable server-side); ranges mirror the backend validators:
 // temperature 20–45 °C, heart_rate 10–300 bpm, systolic 30–300 /
@@ -947,6 +1036,60 @@ export type VitalRecord = {
   updated_at: string;
 };
 
+export type ConsultationStatus =
+  | "Pending"
+  | "In Progress"
+  | "Completed"
+  | "Cancelled";
+
+export type ConsultationPriority = "Routine" | "Urgent" | "Emergency";
+
+export type ConsultationNote = {
+  id: string;
+  consultation_id: string;
+  content: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ConsultationRecord = {
+  id: string;
+  organization_id: string;
+  patient_id: string;
+  department_id: string;
+  reason_for_visit: string;
+  priority: ConsultationPriority;
+  creator_id: string;
+  doctor_id: string | null;
+  referral_id: string | null;
+  status: ConsultationStatus;
+  notes: ConsultationNote[];
+  vital_records: VitalRecord[];
+  /** Kept for compatibility with consultations created before structured vital records. */
+  vitals?: string | null;
+  patient: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  started_at: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const LAB_TEST_PRIORITIES = ["Routine", "Urgent", "Stat"] as const;
+
+export type LabTestPriority = (typeof LAB_TEST_PRIORITIES)[number];
+
+export type CreateLabTestPayload = {
+  test_name: string;
+  test_category?: string | null;
+  priority: LabTestPriority;
+  clinical_notes?: string | null;
+};
+
 export const consultationService = {
   createConsultation: async (
     org_id: string,
@@ -954,10 +1097,10 @@ export const consultationService = {
       patient_id: string;
       department_id: string;
       reason_for_visit: string;
-      priority?: "Routine" | "Urgent" | "Emergency";
-      vitals?: string | null;
+      priority?: ConsultationPriority;
+      vital_record?: VitalsPayload | null;
     },
-  ) => {
+  ): Promise<ConsultationRecord> => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations`,
       payload,
@@ -968,11 +1111,11 @@ export const consultationService = {
   listConsultations: async (
     org_id: string,
     params?: {
-      status_filter?: "Pending" | "In Progress" | "Completed" | "Cancelled";
+      status_filter?: ConsultationStatus;
       department_id?: string;
        patient_id?: string;
     },
-  ) => {
+  ): Promise<ConsultationRecord[]> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/consultations`,
       {
@@ -1002,7 +1145,10 @@ export const consultationService = {
 
 },
 
-  getConsultation: async (org_id: string, consultation_id: string) => {
+  getConsultation: async (
+    org_id: string,
+    consultation_id: string,
+  ): Promise<ConsultationRecord> => {
     const response = await api.get(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}`,
     );
@@ -1020,15 +1166,31 @@ export const consultationService = {
   completeConsultation: async (
     org_id: string,
     consultation_id: string,
-    payload?: {
-      status?: "Pending" | "In Progress" | "Completed" | "Cancelled";
-      clinical_notes?: string | null;
-      doctor_id?: string | null;
-    },
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/complete`,
-      payload ?? {},
+    );
+    return unwrap(response.data);
+  },
+
+  addConsultationNote: async (
+    org_id: string,
+    consultation_id: string,
+    content: string,
+  ): Promise<ConsultationNote> => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/notes`,
+      { content },
+    );
+    return unwrap(response.data);
+  },
+
+  listConsultationNotes: async (
+    org_id: string,
+    consultation_id: string,
+  ): Promise<ConsultationNote[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/notes`,
     );
     return unwrap(response.data);
   },
@@ -1052,12 +1214,7 @@ export const consultationService = {
   orderLabTest: async (
     org_id: string,
     consultation_id: string,
-    labData: {
-      test_name: string;
-      test_category?: string | null;
-      priority?: string;
-      clinical_notes?: string | null;
-    },
+    labData: CreateLabTestPayload,
   ) => {
     const response = await api.post(
       `/api/v1/organizations/${org_id}/consultations/${consultation_id}/lab-tests`,
@@ -1479,7 +1636,7 @@ export const PatientService = {
       department_id?: string;
       reason_for_visit?: string;
       priority?: string;
-      vitals?: string;
+      vital_record?: VitalsPayload | null;
     },
   ) => {
     return {
@@ -1493,7 +1650,7 @@ export const PatientService = {
             | "Urgent"
             | "Emergency"
             | undefined) ?? "Routine",
-        vitals: payload.vitals ?? null,
+        vital_record: payload.vital_record ?? null,
       }),
     };
   },

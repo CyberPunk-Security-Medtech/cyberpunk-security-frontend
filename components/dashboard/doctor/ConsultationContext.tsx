@@ -1,7 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { consultationService, patientService } from "@services/api";
+import {
+  consultationService,
+  patientService,
+  type ConsultationPriority,
+  type ConsultationRecord,
+  type VitalsPayload,
+  type PatientDetailRecord,
+} from "@services/api";
 import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
 
@@ -10,16 +17,17 @@ type ConsultationStatus = "idle" | "starting" | "active";
 type ConsultationContextType = {
   patientId: string;
   orgId: string | null;
-  patient: any | null;
+  patient: PatientDetailRecord | null;
+  patientError: string;
   patientLoading: boolean;
-  consultations: any[];
+  consultations: ConsultationRecord[];
   consultationLoading: boolean;
   consultationStatus: ConsultationStatus;
   isConsultationActive: boolean;
   isSelectedConsultationActive: boolean;
   currentConsultationId: string | null;
   selectedConsultationId: string | null;
-  selectedConsultation: any | null;
+  selectedConsultation: ConsultationRecord | null;
   hasConsultation: boolean;
   hasOpenConsultation: boolean;
   canStartConsultation: boolean;
@@ -29,8 +37,8 @@ type ConsultationContextType = {
   createConsultation: (payload: {
     department_id: string;
     reason_for_visit: string;
-    priority?: "Routine" | "Urgent" | "Emergency";
-    vitals?: string | null;
+    priority?: ConsultationPriority;
+    vital_record?: VitalsPayload | null;
   }) => Promise<string | null>;
   startConsultation: () => Promise<void>;
 };
@@ -47,23 +55,35 @@ export function ConsultationProvider({
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
 
-  const [patient, setPatient] = useState<any | null>(null);
-  const [patientLoading, setPatientLoading] = useState(false);
+  const [patient, setPatient] = useState<PatientDetailRecord | null>(null);
+  const [patientError, setPatientError] = useState("");
+  const [patientLoading, setPatientLoading] = useState(true);
 
-  const [consultations, setConsultations] = useState<any[]>([]);
+  const [consultations, setConsultations] = useState<ConsultationRecord[]>([]);
   const [consultationLoading, setConsultationLoading] = useState(false);
   const [consultationStatus, setConsultationStatus] = useState<ConsultationStatus>("idle");
   const [currentConsultationId, setCurrentConsultationId] = useState<string | null>(null);
   const [selectedConsultationId, setSelectedConsultationId] = useState<string | null>(null);
 
   const refreshPatient = async () => {
-    if (!orgId || !patientId) return;
+    if (!orgId || !patientId) {
+      setPatient(null);
+      setPatientError("Select an organization workspace to view this patient.");
+      setPatientLoading(false);
+      return;
+    }
     setPatientLoading(true);
+    setPatientError("");
     try {
       const result = await patientService.getPatient(orgId, patientId);
-      setPatient(result);
+      if (typeof result !== "object" || result === null) {
+        throw new Error("The patient record returned an unsupported format.");
+      }
+      setPatient(result as PatientDetailRecord);
     } catch (error) {
       console.error("Failed to load patient", error);
+      setPatient(null);
+      setPatientError("Unable to load patient details. Please try again.");
     } finally {
       setPatientLoading(false);
     }
@@ -87,12 +107,14 @@ export function ConsultationProvider({
         ...(cancelledResult ?? []),
       ];
       const uniqueById = Array.from(
-        new Map(merged.map((c: any) => [c.id, c])).values()
+        new Map<string, ConsultationRecord>(
+          merged.map((consultation) => [consultation.id, consultation]),
+        ).values(),
       );
 
       const mine = uniqueById
-        .filter((c: any) => c.patient_id === patientId)
-        .sort((a: any, b: any) => {
+        .filter((consultation) => consultation.patient_id === patientId)
+        .sort((a, b) => {
           const aTime = new Date(a.updated_at ?? a.created_at ?? 0).getTime();
           const bTime = new Date(b.updated_at ?? b.created_at ?? 0).getTime();
           return bTime - aTime;
@@ -139,8 +161,8 @@ export function ConsultationProvider({
   const createConsultation = async (payload: {
     department_id: string;
     reason_for_visit: string;
-    priority?: "Routine" | "Urgent" | "Emergency";
-    vitals?: string | null;
+    priority?: ConsultationPriority;
+    vital_record?: VitalsPayload | null;
   }) => {
     if (!orgId || !patientId) return null;
     try {
@@ -149,7 +171,7 @@ export function ConsultationProvider({
         department_id: payload.department_id,
         reason_for_visit: payload.reason_for_visit,
         priority: payload.priority ?? "Routine",
-        vitals: payload.vitals ?? null,
+        vital_record: payload.vital_record ?? null,
       });
 
       await refreshConsultations();
@@ -199,6 +221,7 @@ export function ConsultationProvider({
       patientId,
       orgId,
       patient,
+      patientError,
       patientLoading,
       consultations,
       consultationLoading,
@@ -221,6 +244,7 @@ export function ConsultationProvider({
       patientId,
       orgId,
       patient,
+      patientError,
       patientLoading,
       consultations,
       consultationLoading,
