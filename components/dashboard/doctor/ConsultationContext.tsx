@@ -6,6 +6,7 @@ import {
   patientService,
   type ConsultationPriority,
   type ConsultationRecord,
+  type VitalsPayload,
 } from "@services/api";
 import { isAxiosError } from "axios";
 import { useAuth } from "@context/AuthContext";
@@ -35,7 +36,7 @@ type ConsultationContextType = {
     department_id: string;
     reason_for_visit: string;
     priority?: ConsultationPriority;
-    vitals?: string | null;
+    vital_record?: VitalsPayload | null;
   }) => Promise<string | null>;
   startConsultation: () => Promise<void>;
 };
@@ -147,7 +148,7 @@ export function ConsultationProvider({
     department_id: string;
     reason_for_visit: string;
     priority?: ConsultationPriority;
-    vitals?: string | null;
+    vital_record?: VitalsPayload | null;
   }) => {
     if (!orgId || !patientId) return null;
     try {
@@ -156,7 +157,7 @@ export function ConsultationProvider({
         department_id: payload.department_id,
         reason_for_visit: payload.reason_for_visit,
         priority: payload.priority ?? "Routine",
-        vitals: payload.vitals ?? null,
+        vital_record: payload.vital_record ?? null,
       });
 
       await refreshConsultations();

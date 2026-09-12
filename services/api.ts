@@ -1086,7 +1086,7 @@ export const consultationService = {
       department_id: string;
       reason_for_visit: string;
       priority?: ConsultationPriority;
-      vitals?: string | null;
+      vital_record?: VitalsPayload | null;
     },
   ): Promise<ConsultationRecord> => {
     const response = await api.post(
@@ -1629,7 +1629,7 @@ export const PatientService = {
       department_id?: string;
       reason_for_visit?: string;
       priority?: string;
-      vitals?: string;
+      vital_record?: VitalsPayload | null;
     },
   ) => {
     return {
@@ -1643,7 +1643,7 @@ export const PatientService = {
             | "Urgent"
             | "Emergency"
             | undefined) ?? "Routine",
-        vitals: payload.vitals ?? null,
+        vital_record: payload.vital_record ?? null,
       }),
     };
   },
