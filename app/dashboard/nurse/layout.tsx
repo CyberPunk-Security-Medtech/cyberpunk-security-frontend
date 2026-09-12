@@ -126,7 +126,7 @@ export default function DashboardLayout({
           desktopPaddingClassName="md:px-12"
           organizationNameClassName="text-[var(--dashboard-accent)]"
         />
-        <main className="min-w-0 flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
+        <main className="relative min-w-0 flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
       </div>
     </div>
   );

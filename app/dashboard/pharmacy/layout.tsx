@@ -50,7 +50,7 @@ export default function PharmacyDashboardLayout({
           sidebarOpen={sidebarOpen}
           desktopPaddingClassName="md:px-8"
         />
-        <main className="min-w-0 flex-1 overflow-auto px-4 py-5 md:px-8">{children}</main>
+        <main className="relative min-w-0 flex-1 overflow-auto px-4 py-5 md:px-8">{children}</main>
       </div>
     </div>
   );

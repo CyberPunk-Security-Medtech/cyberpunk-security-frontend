@@ -76,7 +76,7 @@ export default function DashboardLayout({
           sidebarOpen={sidebarOpen}
           desktopPaddingClassName="md:px-12"
         />
-        <main className="min-w-0 flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
+        <main className="relative min-w-0 flex-1 overflow-y-auto px-4 py-4 md:px-12">{children}</main>
       </div>
     </div>
   );
