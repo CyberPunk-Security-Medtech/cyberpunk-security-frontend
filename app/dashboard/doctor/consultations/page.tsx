@@ -2,13 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { consultationService } from "@services/api";
+import {
+  consultationService,
+  type ConsultationPage,
+  type ConsultationStatus,
+} from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { StatusBadge } from "@components/StatusBadge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { TableSkeleton } from "@components/Skeletons";
 
-type ConsultationStatus = "Pending" | "In Progress" | "Completed" | "Cancelled";
+type StatusFilter = ConsultationStatus | "All";
+type QueueQuery = { status: StatusFilter; page: number; pageSize: number };
 
 type ConsultationRow = {
   id: string;
@@ -22,7 +27,7 @@ type ConsultationRow = {
   updated_at: string | null;
 };
 
-const STATUS_TABS: Array<"All" | ConsultationStatus> = [
+const STATUS_TABS: StatusFilter[] = [
   "All",
   "Pending",
   "In Progress",
@@ -38,46 +43,68 @@ const formatDate = (value?: string | null): string => {
 };
 
 const toBadgeStatus = (
-  status: ConsultationStatus
-): "Active" | "Pending" | "Completed" => {
+  status: ConsultationStatus,
+): "Active" | "Pending" | "Completed" | "Cancelled" => {
   if (status === "In Progress") return "Active";
   if (status === "Completed") return "Completed";
+  if (status === "Cancelled") return "Cancelled";
   return "Pending";
 };
 
 export default function ConsultationsPage() {
-  const router = useRouter();
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
 
+  return <ConsultationQueue key={orgId ?? "no-workspace"} orgId={orgId} />;
+}
+
+function ConsultationQueue({ orgId }: { orgId: string | null }) {
+  const router = useRouter();
+  const [queueQuery, setQueueQuery] = useState<QueueQuery>({ status: "All", page: 1, pageSize: 20 });
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
+  const [search, setSearch] = useState("");
   const [rows, setRows] = useState<ConsultationRow[]>([]);
-  const [activeTab, setActiveTab] = useState<"All" | ConsultationStatus>("All");
+  const [pagination, setPagination] = useState<Omit<ConsultationPage, "data"> | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [refreshVersion, setRefreshVersion] = useState(0);
   const [actionLoadingById, setActionLoadingById] = useState<Record<string, boolean>>({});
+  const activeTab = queueQuery.status;
 
-  const loadConsultations = async () => {
-    if (!orgId) return;
+  const changeQueueQuery = (next: QueueQuery) => {
     setLoading(true);
-    try {
-      const [pending, inProgress, completed, cancelled] = await Promise.all([
-        consultationService.listConsultations(orgId, { status_filter: "Pending" }),
-        consultationService.listConsultations(orgId, { status_filter: "In Progress" }),
-        consultationService.listConsultations(orgId, { status_filter: "Completed" }),
-        consultationService.listConsultations(orgId, { status_filter: "Cancelled" }),
-      ]);
+    setSearch("");
+    setQueueQuery(next);
+  };
 
-      const merged = [
-        ...(pending ?? []),
-        ...(inProgress ?? []),
-        ...(completed ?? []),
-        ...(cancelled ?? []),
-      ];
+  useEffect(() => {
+    const controller = new AbortController();
 
-      const unique = Array.from(new Map(merged.map((item: any) => [item.id, item])).values());
+    const loadConsultations = async () => {
+      if (!orgId) {
+        setRows([]);
+        setPagination(null);
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setLoadError(null);
+      try {
+        const result = await consultationService.listConsultationsPage(
+          orgId,
+          {
+            ...(queueQuery.status === "All" ? {} : { status_filter: queueQuery.status }),
+            page: queueQuery.page,
+            page_size: queueQuery.pageSize,
+          },
+          controller.signal,
+        );
+        if (controller.signal.aborted) return;
 
-      const normalized: ConsultationRow[] = unique
-        .map((item: any) => ({
+        if (queueQuery.page > Math.max(1, result.total_pages)) {
+          setQueueQuery((current) => ({ ...current, page: Math.max(1, result.total_pages) }));
+          return;
+        }
+        setRows(result.data.map((item) => ({
           id: item.id,
           patient_id: item.patient_id,
           patient_code: item.patient?.patient_code?.trim() || item.patient_id,
@@ -87,54 +114,41 @@ export default function ConsultationsPage() {
           department_name: item.department?.name ?? "-",
           priority: item.priority ?? "-",
           reason_for_visit: item.reason_for_visit ?? "-",
-          status: item.status as ConsultationStatus,
+          status: item.status,
           updated_at: item.updated_at ?? item.created_at ?? null,
-        }))
-        .sort((a, b) => {
-          const aTime = new Date(a.updated_at ?? 0).getTime();
-          const bTime = new Date(b.updated_at ?? 0).getTime();
-          return bTime - aTime;
+        })));
+        setPagination({
+          page: result.page,
+          page_size: result.page_size,
+          total: result.total,
+          total_pages: result.total_pages,
         });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("Failed to load consultations", error);
+        setRows([]);
+        setPagination(null);
+        setLoadError("Unable to load consultations. Please try again.");
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    };
 
-      setRows(normalized);
-    } catch (error) {
-      console.error("Failed to load consultations", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
     void loadConsultations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgId]);
+    return () => controller.abort();
+  }, [orgId, queueQuery, refreshVersion]);
 
   const filteredRows = useMemo(() => {
-    const text = query.trim().toLowerCase();
+    const text = search.trim().toLowerCase();
     return rows.filter((row) => {
-      const tabPass = activeTab === "All" || row.status === activeTab;
       const searchPass =
         text.length === 0 ||
         row.patient_name.toLowerCase().includes(text) ||
         row.patient_code.toLowerCase().includes(text) ||
         row.reason_for_visit.toLowerCase().includes(text);
-      return tabPass && searchPass;
+      return searchPass;
     });
-  }, [rows, query, activeTab]);
-
-  const counts = useMemo(() => {
-    const base: Record<string, number> = {
-      All: rows.length,
-      Pending: 0,
-      "In Progress": 0,
-      Completed: 0,
-      Cancelled: 0,
-    };
-    for (const row of rows) {
-      base[row.status] += 1;
-    }
-    return base;
-  }, [rows]);
+  }, [rows, search]);
 
   const withRowLoading = async (id: string, fn: () => Promise<void>) => {
     setActionLoadingById((prev) => ({ ...prev, [id]: true }));
@@ -149,7 +163,6 @@ export default function ConsultationsPage() {
     if (!orgId) return;
     await withRowLoading(row.id, async () => {
       await consultationService.attendConsultation(orgId, row.id);
-      await loadConsultations();
       router.push(
         `/dashboard/doctor/consultations/${row.id}?patient_id=${row.patient_id}`
       );
@@ -160,7 +173,7 @@ export default function ConsultationsPage() {
     if (!orgId) return;
     await withRowLoading(row.id, async () => {
       await consultationService.completeConsultation(orgId, row.id);
-      await loadConsultations();
+      setRefreshVersion((current) => current + 1);
     });
   };
 
@@ -239,14 +252,17 @@ export default function ConsultationsPage() {
               <button
                 key={tab}
                 type="button"
-                onClick={() => setActiveTab(tab)}
+                aria-pressed={isActive}
+                onClick={() => {
+                  if (tab !== activeTab) changeQueueQuery({ ...queueQuery, status: tab, page: 1 });
+                }}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
                   isActive
                     ? "bg-[#1A2380] text-white"
                     : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                {tab} ({counts[tab] ?? 0})
+                {tab}
               </button>
             );
           })}
@@ -254,9 +270,10 @@ export default function ConsultationsPage() {
 
         <input
           type="text"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by patient, reason or ID"
+          aria-label="Search consultations on this page"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search this page by patient, reason or ID"
           className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8] lg:max-w-sm"
         />
       </div>
@@ -280,15 +297,38 @@ export default function ConsultationsPage() {
                 <TableSkeleton columns={7} />
               )}
 
-              {!loading && filteredRows.length === 0 && (
+              {!loading && loadError && (
                 <tr>
-                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
-                    No consultations found.
+                  <td className="px-4 py-6 text-gray-600" colSpan={7}>
+                    <div className="flex flex-wrap items-center gap-3" role="alert">
+                      <span>{loadError}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRefreshVersion((current) => current + 1)}
+                        className="rounded-md border border-[#1A2380] px-3 py-1.5 font-medium text-[#1A2380] hover:bg-[#E3E7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380]"
+                      >
+                        Try again
+                      </button>
+                    </div>
                   </td>
                 </tr>
               )}
 
-              {!loading &&
+              {!loading && !loadError && filteredRows.length === 0 && (
+                <tr>
+                  <td className="px-4 py-6 text-gray-500" colSpan={7}>
+                    {!orgId
+                      ? "Select an organization workspace to view consultations."
+                      : search.trim()
+                        ? "No matches on this page. Try another page or clear the search."
+                        : activeTab === "All"
+                          ? "No consultations found."
+                          : `No ${activeTab.toLowerCase()} consultations found.`}
+                  </td>
+                </tr>
+              )}
+
+              {!loading && !loadError &&
                 filteredRows.map((row) => {
                   const rowLoading = !!actionLoadingById[row.id];
                   return (
@@ -314,54 +354,40 @@ export default function ConsultationsPage() {
           </table>
         </ResponsiveTableRegion>
 
-        <div className="hidden">
-          {loading && (
-            <div className="rounded-lg border p-4 text-sm text-gray-500">
-              Loading consultations...
+        {orgId && (
+          <nav aria-label="Consultation pagination" className="flex flex-col gap-3 border-t p-4 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <label className="flex items-center gap-2 text-gray-600">
+              Rows per page
+              <select
+                aria-label="Rows per page"
+                value={queueQuery.pageSize}
+                onChange={(event) => changeQueueQuery({ ...queueQuery, pageSize: Number(event.target.value), page: 1 })}
+                className="min-h-10 rounded-md border bg-white px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380]"
+              >
+                {[10, 20, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+              </select>
+            </label>
+            <p role="status" aria-live="polite" className="text-gray-600">
+              {loading ? "Loading consultations..." : loadError ? "Page unavailable" : pagination && pagination.total > 0
+                ? `Showing ${(pagination.page - 1) * pagination.page_size + 1}–${Math.min(pagination.page * pagination.page_size, pagination.total)} of ${pagination.total} · Page ${pagination.page} of ${pagination.total_pages}`
+                : "0 consultations"}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={loading || queueQuery.page <= 1}
+                onClick={() => changeQueueQuery({ ...queueQuery, page: queueQuery.page - 1 })}
+                className="min-h-10 rounded-md border px-3 font-medium text-[#1A2380] hover:bg-[#E3E7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] disabled:cursor-not-allowed disabled:opacity-50"
+              >Previous</button>
+              <button
+                type="button"
+                disabled={loading || !!loadError || !pagination || queueQuery.page >= pagination.total_pages}
+                onClick={() => changeQueueQuery({ ...queueQuery, page: queueQuery.page + 1 })}
+                className="min-h-10 rounded-md border px-3 font-medium text-[#1A2380] hover:bg-[#E3E7FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] disabled:cursor-not-allowed disabled:opacity-50"
+              >Next</button>
             </div>
-          )}
-
-          {!loading && filteredRows.length === 0 && (
-            <div className="rounded-lg border p-4 text-sm text-gray-500">
-              No consultations found.
-            </div>
-          )}
-
-          {!loading &&
-            filteredRows.map((row) => {
-              const rowLoading = !!actionLoadingById[row.id];
-              return (
-                <div key={row.id} className="overflow-hidden rounded-lg border border-gray-200 p-4">
-                  <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="break-words font-medium text-[#1A2380]">{row.patient_name}</p>
-                      <p className="break-all text-xs text-gray-500">{row.patient_code}</p>
-                    </div>
-                    <StatusBadge status={toBadgeStatus(row.status)} />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-2 text-xs text-gray-600 sm:grid-cols-2">
-                    <p>
-                      Department: <span className="font-medium text-gray-800">{row.department_name}</span>
-                    </p>
-                    <p>
-                      Priority: <span className="font-medium text-gray-800">{row.priority}</span>
-                    </p>
-                    <p className="sm:col-span-2">
-                      Reason: <span className="break-words font-medium text-gray-800">{row.reason_for_visit}</span>
-                    </p>
-                    <p className="sm:col-span-2">
-                      Updated: <span className="font-medium text-gray-800">{formatDate(row.updated_at)}</span>
-                    </p>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {renderActionButtons(row, rowLoading)}
-                  </div>
-                </div>
-              );
-            })}
-        </div>
+          </nav>
+        )}
       </div>
     </div>
   );
