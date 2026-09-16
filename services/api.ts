@@ -753,7 +753,6 @@ export type ActivityLogRecord = {
   target_model?: string | null;
   target_id?: string | null;
   details: Record<string, unknown>;
-  ip_address?: string | null;
   timestamp: string;
   user?: {
     id: string;
@@ -986,13 +985,9 @@ export const activityService = {
     signal?: AbortSignal,
   ): Promise<ActivityLogRecord[]> => {
     const response = await api.get(
-      `/api/v1/organizations/${org_id}/activity-logs`,
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/activity-logs`,
       {
-        params: {
-          target_model: "consultation",
-          target_id: consultation_id,
-          ...params,
-        },
+        params,
         signal,
       },
     );
