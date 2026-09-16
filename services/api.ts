@@ -753,7 +753,6 @@ export type ActivityLogRecord = {
   target_model?: string | null;
   target_id?: string | null;
   details: Record<string, unknown>;
-  ip_address?: string | null;
   timestamp: string;
   user?: {
     id: string;
@@ -986,13 +985,9 @@ export const activityService = {
     signal?: AbortSignal,
   ): Promise<ActivityLogRecord[]> => {
     const response = await api.get(
-      `/api/v1/organizations/${org_id}/activity-logs`,
+      `/api/v1/organizations/${org_id}/consultations/${consultation_id}/activity-logs`,
       {
-        params: {
-          target_model: "consultation",
-          target_id: consultation_id,
-          ...params,
-        },
+        params,
         signal,
       },
     );
@@ -1070,9 +1065,11 @@ export type ConsultationRecord = {
   vitals?: string | null;
   patient: {
     id: string;
+    patient_code?: string | null;
     first_name: string;
     last_name: string;
   };
+  department?: { id: string; name: string } | null;
   started_at: string | null;
   completed_at: string | null;
   created_at: string;
@@ -1090,7 +1087,34 @@ export type CreateLabTestPayload = {
   clinical_notes?: string | null;
 };
 
+export type ConsultationPageParams = {
+  status_filter?: ConsultationStatus;
+  department_id?: string;
+  page: number;
+  page_size: number;
+};
+
+export type ConsultationPage = {
+  data: ConsultationRecord[];
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
+};
+
 export const consultationService = {
+  listConsultationsPage: async (
+    org_id: string,
+    params: ConsultationPageParams,
+    signal?: AbortSignal,
+  ): Promise<ConsultationPage> => {
+    const response = await api.get<ConsultationPage>(
+      `/api/v1/organizations/${org_id}/consultations`,
+      { params, signal },
+    );
+    // Keep the response envelope: unwrapping data would discard pagination.
+    return response.data;
+  },
   createConsultation: async (
     org_id: string,
     payload: {
@@ -1113,16 +1137,24 @@ export const consultationService = {
     params?: {
       status_filter?: ConsultationStatus;
       department_id?: string;
-       patient_id?: string;
+      patient_id?: string;
     },
   ): Promise<ConsultationRecord[]> => {
-    const response = await api.get(
-      `/api/v1/organizations/${org_id}/consultations`,
-      {
-        params,
-      },
-    );
-    return unwrap(response.data);
+    // Existing callers expect the complete array. Keep that contract while the
+    // queue uses listConsultationsPage to load just its visible server page.
+    const records: ConsultationRecord[] = [];
+    let pageNumber = 1;
+    let totalPages = 1;
+    do {
+      const response = await api.get<ConsultationPage>(
+        `/api/v1/organizations/${org_id}/consultations`,
+        { params: { ...params, page: pageNumber, page_size: 100 } },
+      );
+      records.push(...response.data.data);
+      totalPages = response.data.total_pages;
+      pageNumber += 1;
+    } while (pageNumber <= totalPages);
+    return records;
   },
 
   getPatientConsultations: async (
