@@ -52,7 +52,7 @@ export default function MedicalHistoryTab() {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:gap-8">
-      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+      <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Diagnosis</h3>
           <button
@@ -76,7 +76,7 @@ export default function MedicalHistoryTab() {
           {filteredRows.map((h) => (
             <div
               key={h.id}
-              className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <ClinicalListThumbnail kind="diagnosis" tone="doctor" />

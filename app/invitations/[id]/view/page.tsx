@@ -98,7 +98,7 @@
 
 //   return (
 //     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-//       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 text-center">
+//       <div className="w-full max-w-md bg-white rounded-md shadow-xl p-6 text-center">
 //         <h2 className="text-xl font-bold text-gray-900">
 //           You’ve been invited
 //         </h2>
@@ -215,7 +215,7 @@
 
 //   return (
 //     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-//       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 text-center">
+//       <div className="w-full max-w-md bg-white rounded-md shadow-xl p-6 text-center">
 //         <h2 className="text-xl font-bold">You’ve been invited</h2>
 
 //         <p className="text-sm text-gray-600 mt-2">
@@ -336,7 +336,7 @@
 
 //   return (
 //     <Centered>
-//       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 text-center">
+//       <div className="w-full max-w-md bg-white rounded-md shadow-xl p-6 text-center">
 //         <h2 className="text-xl font-bold">You’ve been invited {" "} {invite?.email}</h2>
 
 //         {/* <p className="text-sm text-gray-600 mt-2">{invite?.email}</p> */}
@@ -384,11 +384,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { invitationService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import SetPasswordForm from "@components/invitation/NewPasswordForm";
 import LoginPrompt from "@components/invitation/NewLoginForm";
+import InvitationAcceptedArt from "@components/invitation/InvitationAcceptedArt";
 
 type InviteData = {
   email: string;
@@ -415,11 +416,11 @@ export default function AcceptInvitationPage() {
   const router = useRouter();
 
   // IMPORTANT: Auth context MUST expose loading state
-  const { user, hydrated, authLoading, refreshWorkspaces } = useAuth();
+  const { user, hydrated, authLoading, refreshWorkspaces, refreshSession } = useAuth();
 
   const [invite, setInvite] = useState<InviteData | null>(null);
   const [error, setError] = useState("");
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "joining" | "success" | "error">("idle");
 
   /* -----------------------------
      Load invitation details
@@ -446,6 +447,7 @@ export default function AcceptInvitationPage() {
   const step: Step = useMemo(() => {
     if (status === "error") return "error";
     if (status === "success") return "success";
+    if (status === "joining") return "loading";
 
     if (!invite) return "loading";
 
@@ -475,25 +477,39 @@ export default function AcceptInvitationPage() {
       await invitationService.acceptInvite(id);
       await refreshWorkspaces();
       setStatus("success");
-      setTimeout(() => router.push("/auth/workspace-select"), 1500);
     } catch {
       setError("Failed to accept invitation.");
       setStatus("error");
     }
   };
 
-  const handleRegisterSuccess = () => {
-    setInvite((previous) =>
-      previous ? { ...previous, user_exists: true } : previous
-    );
-    setStatus("idle");
+  // Registering an invited user signs them in (auth cookies) but doesn't
+  // accept the invitation. New users have just proven who they are, so accept
+  // for them and go straight to the welcome screen — no second login.
+  const handleRegisterSuccess = async () => {
+    setStatus("joining");
+    try {
+      await invitationService.acceptInvite(id);
+      await refreshSession();
+      setStatus("success");
+    } catch {
+      // Account exists now; fall back to the regular sign-in → accept path.
+      setInvite((previous) =>
+        previous ? { ...previous, user_exists: true } : previous
+      );
+      setStatus("idle");
+    }
   };
 
   /* -----------------------------
      UI STATES
   ------------------------------ */
   if (step === "loading") {
-    return <Centered>Loading invitation…</Centered>;
+    return (
+      <Centered>
+        {status === "joining" ? "Setting up your account…" : "Loading invitation…"}
+      </Centered>
+    );
   }
 
   if (step === "error") {
@@ -507,10 +523,27 @@ export default function AcceptInvitationPage() {
 
   if (step === "success") {
     return (
-      <Centered>
-        <CheckCircle className="mx-auto text-green-600 mb-3" size={40} />
-        <p>Invitation accepted!</p>
-      </Centered>
+      <main className="flex min-h-screen items-center justify-center bg-white px-4">
+        <div className="flex w-full max-w-md flex-col items-center text-center">
+          <InvitationAcceptedArt className="h-40 w-40 sm:h-48 sm:w-48" />
+          <h1 className="mt-6 text-3xl font-bold text-gray-900 sm:text-4xl">
+            Invitation Accepted
+          </h1>
+          {invite?.organization?.name ? (
+            <p className="mt-2 text-sm text-gray-500">
+              You&apos;ve joined {invite.organization.name}.
+            </p>
+          ) : null}
+          <button
+            type="button"
+            autoFocus
+            onClick={() => router.push("/auth/workspace-select")}
+            className="mt-8 min-h-12 w-full rounded-full bg-[#1A2380] px-6 text-base font-medium text-white transition-colors hover:bg-[#11185F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none"
+          >
+            Continue
+          </button>
+        </div>
+      </main>
     );
   }
 
@@ -519,7 +552,7 @@ export default function AcceptInvitationPage() {
   ------------------------------ */
   return (
     <Centered>
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 text-center">
+      <div className="w-full max-w-md bg-white rounded-md shadow-xl p-6 text-center">
         <h2 className="text-xl font-bold">
           You’ve been invited {invite?.email}
         </h2>
@@ -528,7 +561,7 @@ export default function AcceptInvitationPage() {
           {invite?.organization?.name}
         </p>
 
-        <span className="inline-block mt-3 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs">
+        <span className="inline-block mt-3 px-3 py-1 rounded-md bg-blue-100 text-blue-700 text-xs">
           Role: {invite?.role}
         </span>
 

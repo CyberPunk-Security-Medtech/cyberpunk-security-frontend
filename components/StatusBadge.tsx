@@ -26,5 +26,5 @@ Abnormal: "bg-[#FFEAEA] text-[#E62E2E]",
 Completed: "bg-[#E8FFF6] text-[#00B885]",
 Cancelled: "bg-gray-100 text-gray-600",
 };
-return <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${colors[status]}`}>{status}</span>;
+return <span className={`inline-flex items-center rounded-md px-3 py-1 text-xs font-medium ${colors[status]}`}>{status}</span>;
 }

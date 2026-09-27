@@ -35,19 +35,19 @@ export default function AdminInfoStep({ onBack, onNext, defaultValues }: { onBac
       <div className="space-y-3">
         <div>
           <label className="text-sm text-gray-700">Full name</label>
-          <input {...register("fullname")} className={`w-full px-4 py-3 rounded-full border ${errors.fullname ? "border-red-500" : "border-gray-200"} focus:ring-2 focus:ring-blue-700`} />
+          <input {...register("fullname")} className={`w-full px-4 py-3 rounded-md border ${errors.fullname ? "border-red-500" : "border-gray-200"} focus:ring-2 focus:ring-blue-700`} />
           {errors.fullname && <p className="text-xs text-red-500 mt-1">{errors.fullname.message}</p>}
         </div>
 
   <div>
           <label className="text-sm text-gray-700">Phone</label>
-          <input {...register("phone")} className={`w-full px-4 py-3 rounded-full border ${errors.phone ? "border-red-500" : "border-gray-200"} focus:ring-2 focus:ring-blue-700`} />
+          <input {...register("phone")} className={`w-full px-4 py-3 rounded-md border ${errors.phone ? "border-red-500" : "border-gray-200"} focus:ring-2 focus:ring-blue-700`} />
           {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
         </div>
 
         <div>
           <label className="text-sm text-gray-700">Email</label>
-          <input {...register("email")} className={`w-full px-4 py-3 rounded-full border ${errors.email ? "border-red-500" : "border-gray-200"} focus:ring-2 focus:ring-blue-700`} />
+          <input {...register("email")} className={`w-full px-4 py-3 rounded-md border ${errors.email ? "border-red-500" : "border-gray-200"} focus:ring-2 focus:ring-blue-700`} />
           {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
         </div>
 
@@ -59,7 +59,7 @@ export default function AdminInfoStep({ onBack, onNext, defaultValues }: { onBac
     <input
       {...register("password")}
       type={show ? "text" : "password"}
-      className={`w-full px-4 py-3 rounded-full border ${
+      className={`w-full px-4 py-3 rounded-md border ${
         errors.password ? "border-red-500" : "border-gray-200"
       } focus:ring-2 focus:ring-blue-700 pr-12`}
     />
@@ -89,8 +89,8 @@ export default function AdminInfoStep({ onBack, onNext, defaultValues }: { onBac
       </div>
 
       <div className="flex items-center justify-between gap-3 pt-2">
-        <button type="button" onClick={onBack} className="px-4 py-2 rounded-full border border-gray-300 text-gray-700">Back</button>
-        <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-full bg-[#1A2380] text-white font-semibold">{isSubmitting ? "Saving..." : "Continue"}</button>
+        <button type="button" onClick={onBack} className="px-4 py-2 rounded-md border border-gray-300 text-gray-700">Back</button>
+        <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-md bg-[#1A2380] text-white font-semibold">{isSubmitting ? "Saving..." : "Continue"}</button>
       </div>
     </motion.form>
   );

@@ -63,7 +63,7 @@
 //             )}
 
 //             {/* Card Content */}
-//             <div className="bg-white shadow-md rounded-3xl p-6 flex flex-col items-center text-center
+//             <div className="bg-white shadow-md rounded-md p-6 flex flex-col items-center text-center
 //                             transition-transform duration-300 hover:scale-105 relative z-10 min-h-[400px]">
 //               {/* Circular Image */}
 //               <div className="relative w-36 h-36 mb-4 rounded-full overflow-hidden flex-shrink-0">
@@ -152,7 +152,7 @@ export default function TeamSection() {
               className="relative flex flex-col items-center w-full"
             >
               {/* Card */}
-              <div className="bg-white shadow-[0_4px_25px_rgba(0,0,0,0.06)] rounded-2xl p-6 flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-2 relative z-10 w-full h-[280px]">
+              <div className="bg-white shadow-[0_4px_25px_rgba(0,0,0,0.06)] rounded-md p-6 flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-2 relative z-10 w-full h-[280px]">
                 {/* Circular Image with gradient ring and white gap */}
                 <div className="relative w-[110px] h-[110px] mb-5 rounded-full bg-gradient-to-br from-[#1A2380] to-[#00B8A8] p-[3px] flex-shrink-0">
                   <div className="w-full h-full rounded-full border-[3px] border-white overflow-hidden relative">

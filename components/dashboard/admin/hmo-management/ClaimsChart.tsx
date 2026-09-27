@@ -18,10 +18,10 @@ export default function ClaimsChart({
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 border flex flex-col">
+    <div className="bg-white rounded-md shadow-sm p-6 border flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-medium">Claims</h2>
-        <button className="border rounded-full px-4 py-1 text-xs text-[#051466] hover:bg-slate-50">
+        <button className="border rounded-md px-4 py-1 text-xs text-[#051466] hover:bg-slate-50">
           View Claims
         </button>
       </div>

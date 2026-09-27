@@ -38,7 +38,7 @@ export default function HMOManagementPage() {
 
 
 
-          <div className="bg-white rounded-xl border overflow-hidden">
+          <div className="bg-white rounded-md border overflow-hidden">
 
             <HMOTable />
 

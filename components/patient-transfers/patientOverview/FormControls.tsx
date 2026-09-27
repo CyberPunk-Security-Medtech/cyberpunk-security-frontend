@@ -14,7 +14,7 @@ export function CheckboxRow({
   return (
     <button onClick={onClick} className="flex items-center gap-3 text-left">
       <span
-        className={`flex h-9 w-9 items-center justify-center rounded-lg border-2 ${
+        className={`flex h-9 w-9 items-center justify-center rounded-md border-2 ${
           checked
             ? "border-[#211783] bg-[#211783] text-white"
             : "border-gray-400 bg-white text-transparent"
@@ -40,12 +40,12 @@ export function SelectableBox({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-4 rounded-lg border-2 px-5 py-5 text-left ${
+      className={`flex items-center gap-4 rounded-md border-2 px-5 py-5 text-left ${
         checked ? "border-[#211783] bg-[#F1F0FF]" : "border-gray-300 bg-white"
       }`}
     >
       <span
-        className={`flex h-8 w-8 items-center justify-center rounded-lg border-2 ${
+        className={`flex h-8 w-8 items-center justify-center rounded-md border-2 ${
           checked
             ? "border-[#211783] bg-[#211783] text-white"
             : "border-gray-400 bg-white text-transparent"
@@ -75,14 +75,14 @@ export function RecordOption({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-5 rounded-lg border-2 px-5 py-5 text-left transition ${
+      className={`flex w-full items-center gap-5 rounded-md border-2 px-5 py-5 text-left transition ${
         checked
           ? "border-[#7C83E8] bg-[#EEF0FF]"
           : "border-gray-300 bg-white hover:bg-gray-50"
       }`}
     >
       <span
-        className={`flex h-10 w-10 items-center justify-center rounded-lg border-2 ${
+        className={`flex h-10 w-10 items-center justify-center rounded-md border-2 ${
           checked
             ? "border-[#211783] bg-[#211783] text-white"
             : "border-gray-400 bg-white text-transparent"

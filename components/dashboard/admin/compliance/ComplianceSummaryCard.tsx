@@ -14,7 +14,7 @@ export default function ComplianceSummaryCard({
   valueColor = "text-[#22C55E]",
 }: ComplianceSummaryCardProps) {
   return (
-    <div className="flex min-h-32 w-full flex-col rounded-xl border border-slate-200 bg-white px-4 py-4 sm:min-h-36">
+    <div className="flex min-h-32 w-full flex-col rounded-md border border-slate-200 bg-white px-4 py-4 sm:min-h-36">
       <div className="flex items-center justify-between gap-3 text-sm font-medium text-slate-800">
         <span>{title}</span>
         <span className="text-slate-500" aria-hidden="true">{icon}</span>

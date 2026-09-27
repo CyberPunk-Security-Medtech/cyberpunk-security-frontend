@@ -63,7 +63,7 @@ export default function ProfileSettings({
             type="button"
             disabled
             aria-describedby="photo-unavailable"
-            className="dashboard-button min-h-11 rounded-lg border border-slate-300 px-4 text-sm text-slate-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70 sm:min-h-10"
+            className="dashboard-button min-h-11 rounded-md border border-slate-300 px-4 text-sm text-slate-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-70 sm:min-h-10"
           >
             Remove Photo
           </button>
@@ -92,14 +92,14 @@ export default function ProfileSettings({
               value={values[id]}
               readOnly
               aria-readonly="true"
-              className="h-10 w-full rounded-lg border border-slate-300 bg-slate-100 px-3 text-sm text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
+              className="h-10 w-full rounded-md border border-slate-300 bg-slate-100 px-3 text-sm text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
             />
           </div>
         ))}
       </div>
 
       {membershipUnavailable && (
-        <p role="status" className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <p role="status" className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
           Job title and department could not be refreshed. Other profile details are still available.
         </p>
       )}

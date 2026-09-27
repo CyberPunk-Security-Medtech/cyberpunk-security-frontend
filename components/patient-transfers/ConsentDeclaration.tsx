@@ -13,7 +13,7 @@ export default function ConsentDeclaration({
 }: Props) {
   return (
     <>
-      <div className="mt-8 rounded-xl border border-gray-300 bg-white p-8">
+      <div className="mt-8 rounded-md border border-gray-300 bg-white p-8">
         <h3 className="mb-6 text-xl font-bold text-gray-900">
           Consent Declaration
         </h3>
@@ -100,7 +100,7 @@ export default function ConsentDeclaration({
       </div>
 
       {!allVerified && (
-        <div className="mt-8 flex items-center gap-3 rounded-xl border border-gray-300 bg-white px-8 py-6 text-gray-500">
+        <div className="mt-8 flex items-center gap-3 rounded-md border border-gray-300 bg-white px-8 py-6 text-gray-500">
           <Info className="h-5 w-5" />
           <p className="text-sm">
             Please complete all verification methods before providing consent.

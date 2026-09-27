@@ -7,7 +7,7 @@ function TopicCard({
   items: { label: string; value: number; color: string }[];
 }) {
   return (
-    <div className="p-5 bg-white rounded-2xl shadow-sm">
+    <div className="p-5 bg-white rounded-md shadow-sm">
       <h3 className="mb-4 font-medium">{title}</h3>
       <div className="space-y-4">
         {items.map((item) => (

@@ -67,7 +67,7 @@ export default function FAQSection() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="border border-[#E0EEF4] rounded-xl p-4 shadow-sm bg-white relative z-10"
+                  className="border border-[#E0EEF4] rounded-md p-4 shadow-sm bg-white relative z-10"
                 >
                   <button
                     onClick={() => setActive(active === i ? null : i)}
@@ -115,7 +115,7 @@ export default function FAQSection() {
               <input
                 type="text"
                 placeholder="Let me know"
-                className="w-full border border-[#E0EEF4] rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-[#00A9B7]"
+                className="w-full border border-[#E0EEF4] rounded-md px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-[#00A9B7]"
               />
             </form>
           </div>

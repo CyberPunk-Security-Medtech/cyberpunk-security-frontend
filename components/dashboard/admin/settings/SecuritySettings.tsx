@@ -103,7 +103,7 @@ export default function SecuritySettings() {
                 value={form[field.key]}
                 onChange={(event) => updateField(field.key, event.target.value)}
                 aria-describedby="password-requirements"
-                className="h-10 w-full rounded-lg border border-slate-300 bg-slate-100 px-3 text-sm text-slate-800 outline-none focus:border-[#051466] focus-visible:ring-2 focus-visible:ring-[#051466]"
+                className="h-10 w-full rounded-md border border-slate-300 bg-slate-100 px-3 text-sm text-slate-800 outline-none focus:border-[#051466] focus-visible:ring-2 focus-visible:ring-[#051466]"
               />
             </div>
           ))}
@@ -117,7 +117,7 @@ export default function SecuritySettings() {
           <button
             type="submit"
             disabled={submitting}
-            className="dashboard-button min-h-11 w-full rounded-lg bg-[#1A2380] px-5 text-sm font-semibold text-white hover:bg-[#11185F] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10 sm:w-auto"
+            className="dashboard-button min-h-11 w-full rounded-md bg-[#1A2380] px-5 text-sm font-semibold text-white hover:bg-[#11185F] disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10 sm:w-auto"
           >
             {submitting ? "Updating password..." : "Update password"}
           </button>

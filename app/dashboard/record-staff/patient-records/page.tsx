@@ -197,14 +197,14 @@ export default function RecordStaffPatientRecordsPage() {
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#003C36] px-5 py-3 text-sm font-semibold text-white hover:bg-[#002E29]"
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-[#003C36] px-5 py-3 text-sm font-semibold text-white hover:bg-[#002E29]"
         >
           <Plus size={16} />
           Add New Patient Record
         </button>
       </section>
 
-      <section className="overflow-hidden rounded-xl bg-white shadow-sm">
+      <section className="overflow-hidden rounded-md bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-4">
           <h2 className="font-semibold text-[#111827]">Patient Records</h2>
           <p className="mt-1 text-sm text-slate-500">
@@ -258,7 +258,7 @@ export default function RecordStaffPatientRecordsPage() {
                     <td className="px-5 py-4 text-slate-700">{patient.ward}</td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${statusClassName(
+                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-semibold ${statusClassName(
                           patient.status,
                         )}`}
                       >
@@ -311,7 +311,7 @@ export default function RecordStaffPatientRecordsPage() {
                   value={form.first_name}
                   onChange={(event) => updateField("first_name", event.target.value)}
                   placeholder="Enter First Name"
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
               <div>
@@ -321,7 +321,7 @@ export default function RecordStaffPatientRecordsPage() {
                   value={form.last_name}
                   onChange={(event) => updateField("last_name", event.target.value)}
                   placeholder="Enter Last Name"
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
               <div>
@@ -332,7 +332,7 @@ export default function RecordStaffPatientRecordsPage() {
                   max={getTodayDateInputValue()}
                   value={form.dob}
                   onChange={(event) => updateField("dob", event.target.value)}
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
               <div>
@@ -346,7 +346,7 @@ export default function RecordStaffPatientRecordsPage() {
                       event.target.value as PatientCreatePayload["gender"],
                     )
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 >
                   {genderOptions.map((option) => (
                     <option key={option} value={option}>
@@ -362,7 +362,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("marital_status", asOptional(event.target.value))
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 >
                   <option value="">Select Marital Status</option>
                   {maritalStatusOptions.map((option) => (
@@ -379,7 +379,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("blood_group", asOptional(event.target.value))
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 >
                   <option value="">Select Blood Group</option>
                   {bloodGroupOptions.map((option) => (
@@ -397,7 +397,7 @@ export default function RecordStaffPatientRecordsPage() {
                   value={form.email}
                   onChange={(event) => updateField("email", event.target.value)}
                   placeholder="Enter Email Address"
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
               <div>
@@ -407,7 +407,7 @@ export default function RecordStaffPatientRecordsPage() {
                   value={form.phone_number}
                   onChange={(event) => updateField("phone_number", event.target.value)}
                   placeholder="+234 -"
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
             </div>
@@ -431,7 +431,7 @@ export default function RecordStaffPatientRecordsPage() {
                     onChange={(event) => updateField(field, event.target.value)}
                     placeholder={placeholder}
                     rows={4}
-                    className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                    className="w-full resize-none rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                   />
                 </div>
               ))}
@@ -453,7 +453,7 @@ export default function RecordStaffPatientRecordsPage() {
                 {(["hmo", "self_pay"] as const).map((option) => (
                   <label
                     key={option}
-                    className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#003C36] bg-emerald-50 text-[#003C36]" : "border-slate-200 text-slate-700"}`}
+                    className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-semibold transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#003C36] bg-emerald-50 text-[#003C36]" : "border-slate-200 text-slate-700"}`}
                   >
                     <input
                       type="radio"
@@ -484,7 +484,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("enrollee_type", asOptional(event.target.value))
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 >
                   <option value="">Select Enrollee Type</option>
                   {enrolleeTypeOptions.map((option) => (
@@ -503,7 +503,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("hmo_provider", asOptional(event.target.value))
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 >
                   <option value="">Select HMO Provider</option>
                   {hmoProviderOptions.map((option) => (
@@ -522,7 +522,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("hmo_plan", asOptional(event.target.value))
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 >
                   <option value="">Select Plan</option>
                   {hmoPlanOptions.map((option) => (
@@ -540,7 +540,7 @@ export default function RecordStaffPatientRecordsPage() {
                   value={form.hmo_number ?? ""}
                   onChange={(event) => updateField("hmo_number", event.target.value)}
                   placeholder="Enter HMO ID / Enrollee Number"
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
               <div>
@@ -552,7 +552,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("policy_start_date", event.target.value)
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
               <div>
@@ -564,7 +564,7 @@ export default function RecordStaffPatientRecordsPage() {
                   onChange={(event) =>
                     updateField("policy_expiry_date", event.target.value)
                   }
-                  className="w-full rounded-full border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
+                  className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#003C36]"
                 />
               </div>
             </div>
@@ -576,7 +576,7 @@ export default function RecordStaffPatientRecordsPage() {
               type="button"
               onClick={closeModal}
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-8 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 px-8 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
             >
               <RotateCcw size={16} />
               Cancel
@@ -584,7 +584,7 @@ export default function RecordStaffPatientRecordsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#003C36] px-8 py-3 text-sm font-semibold text-white hover:bg-[#002E29] disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-[#003C36] px-8 py-3 text-sm font-semibold text-white hover:bg-[#002E29] disabled:opacity-60"
             >
               <Save size={16} />
               {submitting ? "Creating..." : "Create patient records"}

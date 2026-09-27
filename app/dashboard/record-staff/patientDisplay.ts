@@ -49,7 +49,7 @@ export const mapRecordStaffPatient = (
 
   return {
     id: patient.id ?? "",
-    patientCode: patient.patient_code?.trim() || patient.id || "Not recorded",
+    patientCode: patient.patient_code?.trim() || "Not recorded",
     initials: `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase(),
     name,
     dateOfBirth: formatPatientDate(patient.dob ?? patient.date_of_birth),

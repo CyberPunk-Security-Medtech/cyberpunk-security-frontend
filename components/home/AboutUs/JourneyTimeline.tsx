@@ -114,7 +114,7 @@ className="hidden md:block absolute right-0 md:right-16 top-[57%] opacity-50 poi
               {/* Perfectly rounded badge */}
               <div
               className="flex items-center justify-center bg-[#00B8A8] text-white 
-                         font-semibold text-lg w-[87px] h-[80px] rounded-[64px] 
+                         font-semibold text-lg w-[87px] h-[80px] rounded-md 
                          shadow-md flex-shrink-0"
             >
               {m.year}

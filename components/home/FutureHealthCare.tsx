@@ -133,7 +133,7 @@ export default function FutureHealthCare() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="rounded-2xl border border-[#DCE8F2] bg-white shadow-sm p-6 sm:p-8 hover:shadow-md transition"
+              className="rounded-md border border-[#DCE8F2] bg-white shadow-sm p-6 sm:p-8 hover:shadow-md transition"
             >
               <Image
                 src={item.icon}
@@ -157,7 +157,7 @@ export default function FutureHealthCare() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mt-12 sm:mt-16 mx-auto max-w-lg bg-gradient-to-r from-[#0040C1] to-[#00A9B7] rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 text-left text-white relative overflow-hidden"
+          className="mt-12 sm:mt-16 mx-auto max-w-lg bg-gradient-to-r from-[#0040C1] to-[#00A9B7] rounded-md sm:rounded-md shadow-lg p-6 sm:p-8 text-left text-white relative overflow-hidden"
         >
           {/* dotted decorative in top-left of form */}
           <Image
@@ -179,7 +179,7 @@ export default function FutureHealthCare() {
               placeholder="Your name"
               value={formData.full_name}
               onChange={handleChange}
-              className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              className="w-full rounded-md px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
               required
             />
             <input
@@ -188,7 +188,7 @@ export default function FutureHealthCare() {
               placeholder="Work email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              className="w-full rounded-md px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
               required
             />
             <input
@@ -197,7 +197,7 @@ export default function FutureHealthCare() {
               placeholder="Organization name"
               value={formData.institution_name}
               onChange={handleChange}
-              className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              className="w-full rounded-md px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
               required
             />
             <input
@@ -206,14 +206,14 @@ export default function FutureHealthCare() {
               placeholder="Phone number"
               value={formData.phone_number}
               onChange={handleChange}
-              className="w-full rounded-[30px] px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
+              className="w-full rounded-md px-4 py-3 bg-white/15 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white text-sm sm:text-base"
               required
             />
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-white text-[#0040C1] font-semibold py-3 rounded-[30px] hover:opacity-90 transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-white text-[#0040C1] font-semibold py-3 rounded-md hover:opacity-90 transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Joining..." : "Join the waitlist"}
             </button>

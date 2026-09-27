@@ -5,8 +5,11 @@ import { ChevronLeft, ChevronRight, RotateCcw, Search } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import {
   auditService,
+  organizationService,
+  patientService,
   type CrossTenantAccessLog,
   type CrossTenantAccessParams,
+  type PatientListRecord,
 } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { TableSkeleton } from "@components/Skeletons";
@@ -38,8 +41,6 @@ const formatResourceType = (value: string) =>
     .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
 
-const shortId = (value: string) =>
-  value.length > 18 ? `${value.slice(0, 8)}…${value.slice(-6)}` : value;
 
 export default function AuditLogsTable() {
   const { activeWorkspace } = useAuth();
@@ -50,6 +51,43 @@ export default function AuditLogsTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const requestVersionRef = useRef(0);
+  const [organizationNames, setOrganizationNames] = useState<Map<string, string>>(new Map());
+  const [patientLabels, setPatientLabels] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    const orgId = activeWorkspace?.id;
+    if (!orgId) return;
+    let cancelled = false;
+
+    void Promise.all([
+      organizationService.getDirectory().catch(() => []),
+      patientService
+        .getPatients(orgId, { include_shared: true })
+        .catch(() => [] as PatientListRecord[]),
+    ]).then(([directoryRows, patientRows]) => {
+      if (cancelled) return;
+      const orgMap = new Map<string, string>();
+      (Array.isArray(directoryRows) ? directoryRows : []).forEach((organization) => {
+        if (organization.name) orgMap.set(organization.id, organization.name);
+      });
+      if (activeWorkspace?.name) orgMap.set(orgId, activeWorkspace.name);
+
+      const patientMap = new Map<string, string>();
+      (Array.isArray(patientRows) ? (patientRows as PatientListRecord[]) : []).forEach((patient) => {
+        const name = `${patient.first_name ?? ""} ${patient.last_name ?? ""}`.trim();
+        const code = patient.patient_code?.trim();
+        const label = name && code ? `${name} (${code})` : name || code;
+        if (label) patientMap.set(patient.id, label);
+      });
+
+      setOrganizationNames(orgMap);
+      setPatientLabels(patientMap);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeWorkspace?.id, activeWorkspace?.name]);
 
   const loadLogs = useCallback(async () => {
     const requestVersion = ++requestVersionRef.current;
@@ -151,7 +189,7 @@ export default function AuditLogsTable() {
                   }))
                 }
                 placeholder="Filter by patient ID"
-                className="min-h-11 w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20"
+                className="min-h-11 w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20"
               />
             </span>
           </label>
@@ -166,7 +204,7 @@ export default function AuditLogsTable() {
                   accessScope: event.target.value as AuditFilters["accessScope"],
                 }))
               }
-              className="min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20"
+              className="min-h-11 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20"
             >
               <option value="">All access</option>
               <option value="viewer">Access by this organization</option>
@@ -176,7 +214,7 @@ export default function AuditLogsTable() {
 
           <button
             type="submit"
-            className="min-h-11 rounded-lg bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
+            className="min-h-11 rounded-md bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
           >
             Apply filters
           </button>
@@ -184,7 +222,7 @@ export default function AuditLogsTable() {
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
+              className="min-h-11 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
             >
               Clear
             </button>
@@ -193,18 +231,18 @@ export default function AuditLogsTable() {
       </div>
 
       {!activeWorkspace?.id ? (
-        <div className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-600">
+        <div className="rounded-md border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-600">
           Select an organization workspace to view audit logs.
         </div>
       ) : (
         <>
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
             <ResponsiveTableRegion label="Activity log records">
               <table className="w-full min-w-[56rem] text-sm" aria-busy={loading}>
                 <thead className="border-b bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th scope="col" className="min-w-[190px] px-5 py-4">User ID</th>
-                    <th scope="col" className="min-w-[220px] px-5 py-4">Patient ID</th>
+                    <th scope="col" className="min-w-[190px] px-5 py-4">Accessed By</th>
+                    <th scope="col" className="min-w-[220px] px-5 py-4">Patient</th>
                     <th scope="col" className="min-w-[180px] px-5 py-4">Resource</th>
                     <th scope="col" className="min-w-[210px] px-5 py-4">Accessed</th>
                   </tr>
@@ -219,7 +257,7 @@ export default function AuditLogsTable() {
                         <button
                           type="button"
                           onClick={() => void loadLogs()}
-                          className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
+                          className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
                         >
                           <RotateCcw className="size-4" aria-hidden="true" />
                           Retry
@@ -235,19 +273,14 @@ export default function AuditLogsTable() {
                   ) : (
                     logs.map((log) => (
                       <tr key={log.id} className="border-b border-slate-100 last:border-b-0">
-                        <td className="px-5 py-4 font-medium text-slate-900" title={log.user_id}>
-                          {shortId(log.user_id)}
+                        <td className="px-5 py-4 font-medium text-slate-900">
+                          {organizationNames.get(log.viewer_org_id) ?? "Unknown organization"}
                         </td>
-                        <td className="px-5 py-4 font-mono text-xs text-slate-700" title={log.patient_id}>
-                          {shortId(log.patient_id)}
+                        <td className="px-5 py-4 text-slate-700">
+                          {patientLabels.get(log.patient_id) ?? "Unknown patient"}
                         </td>
                         <td className="px-5 py-4 text-slate-800">
                           <span className="font-medium">{formatResourceType(log.resource_type)}</span>
-                          {log.resource_id && (
-                            <span className="mt-1 block font-mono text-xs text-slate-500" title={log.resource_id}>
-                              {shortId(log.resource_id)}
-                            </span>
-                          )}
                         </td>
                         <td className="whitespace-nowrap px-5 py-4 text-slate-700">
                           {formatDateTime(log.accessed_at)}
@@ -269,7 +302,7 @@ export default function AuditLogsTable() {
                 type="button"
                 disabled={loading || page === 0}
                 onClick={() => setPage((current) => Math.max(0, current - 1))}
-                className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
+                className="inline-flex min-h-10 items-center gap-1 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
               >
                 <ChevronLeft className="size-4" aria-hidden="true" />
                 Previous
@@ -278,7 +311,7 @@ export default function AuditLogsTable() {
                 type="button"
                 disabled={loading || !hasNextPage}
                 onClick={() => setPage((current) => current + 1)}
-                className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
+                className="inline-flex min-h-10 items-center gap-1 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
               >
                 Next
                 <ChevronRight className="size-4" aria-hidden="true" />

@@ -59,7 +59,7 @@ export default function PatientDetails({
 
           <div className="flex gap-3">
             {activeTab !== "Overview" && (
-              <button className="inline-flex items-center gap-2 rounded border-2 border-[#211783] px-5 py-3 font-medium text-[#211783] hover:bg-[#F1F0FF]">
+              <button className="inline-flex items-center gap-2 rounded-md border-2 border-[#211783] px-5 py-3 font-medium text-[#211783] hover:bg-[#F1F0FF]">
                 <Printer size={20} />
                 Print
               </button>
@@ -67,7 +67,7 @@ export default function PatientDetails({
 
             <button
               onClick={onTransfer}
-              className="inline-flex items-center gap-2 rounded bg-[#211783] px-5 py-3 font-medium text-white hover:bg-[#18105f]"
+              className="inline-flex items-center gap-2 rounded-md bg-[#211783] px-5 py-3 font-medium text-white hover:bg-[#18105f]"
             >
               <Send size={20} />
               Transfer Patient

@@ -87,14 +87,14 @@ export function DiagnosisModal({
           />
         </div>
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="rounded-full border px-6 py-2.5 text-sm font-medium">
+          <button type="button" onClick={onClose} className="rounded-md border px-6 py-2.5 text-sm font-medium">
             Cancel
           </button>
           <Button
             type="button"
             onSubmitHandler={handleSubmit}
             disabled={loading || !consultationId || !orgId}
-            className="rounded-full bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
+            className="rounded-md bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Diagnosis"}
           </Button>

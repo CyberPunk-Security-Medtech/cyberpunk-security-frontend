@@ -35,7 +35,7 @@ export default function TwoFactorDialog({
       <DialogBackdrop className="fixed inset-0 bg-slate-950/55 backdrop-blur-[1px]" />
       <div className="fixed inset-0 overflow-y-auto p-4 sm:p-6">
         <div className="flex min-h-full items-center justify-center">
-          <DialogPanel className="relative w-full max-w-md rounded-2xl bg-white px-5 py-6 shadow-2xl sm:px-8 sm:py-8">
+          <DialogPanel className="relative w-full max-w-md rounded-md bg-white px-5 py-6 shadow-2xl sm:px-8 sm:py-8">
             {dismissible ? (
               <button
                 type="button"

@@ -209,7 +209,7 @@ export default function Sidebar({
                 ?.focus();
             }, 0);
           }}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white lg:hidden"
           aria-label="Close sidebar"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -244,7 +244,7 @@ export default function Sidebar({
                       [item.label]: !isOpen,
                     }))
                   }
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors motion-reduce:transition-none
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors motion-reduce:transition-none
                     ${
                       isActive
                         ? "bg-white text-[#051466] font-semibold"
@@ -265,7 +265,7 @@ export default function Sidebar({
                 <Link
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors motion-reduce:transition-none
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors motion-reduce:transition-none
                     ${
                       isActive
                         ? "bg-white text-[#051466] font-semibold"
@@ -287,7 +287,7 @@ export default function Sidebar({
                         key={child.label}
                         href={child.href}
                         aria-current={childActive ? "page" : undefined}
-                        className={`block rounded-lg px-3 py-2 text-sm transition-colors motion-reduce:transition-none ${
+                        className={`block rounded-md px-3 py-2 text-sm transition-colors motion-reduce:transition-none ${
                           childActive
                             ? "bg-white/20 text-white"
                             : "text-slate-300 hover:bg-white/10 hover:text-white"
@@ -310,7 +310,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-            className="w-full flex items-center gap-3 bg-white/5 rounded-2xl px-3 py-3 text-left"
+            className="w-full flex items-center gap-3 bg-white/5 rounded-md px-3 py-3 text-left"
             aria-haspopup="menu"
             aria-expanded={isProfileMenuOpen}
           >
@@ -347,7 +347,7 @@ export default function Sidebar({
           </button>
 
           {isProfileMenuOpen && (
-            <div className="absolute left-0 right-0 bottom-full mb-2 rounded-lg border border-white/20 bg-white py-1 shadow-lg">
+            <div className="absolute left-0 right-0 bottom-full mb-2 rounded-md border border-white/20 bg-white py-1 shadow-lg">
               <button
                 type="button"
                 onClick={handleLogout}

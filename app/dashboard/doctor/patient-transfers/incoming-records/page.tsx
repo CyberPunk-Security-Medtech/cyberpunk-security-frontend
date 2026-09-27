@@ -284,11 +284,10 @@ const mapReferralToRecord = (
     sharedContent?: IncomingRecordSharedContent;
   },
 ): IncomingRecord => {
-  // Prefer the human-readable patient code; fall back to the raw id.
-  const patientCode =
-    getStringField(options?.patient, "patient_code") ||
-    referral.patient_id;
-  const patientLabel = `Patient ${patientCode}`;
+  // Prefer the human-readable patient code; never fall back to the raw id.
+  const rawPatientCode = getStringField(options?.patient, "patient_code");
+  const patientCode = rawPatientCode || "Not recorded";
+  const patientLabel = rawPatientCode ? `Patient ${rawPatientCode}` : "Unknown patient";
   const patientName = formatPatientName(options?.patient, patientLabel);
   const vitals = getVitalsFromConsultation(options?.consultation);
   const statusMap: Record<string, IncomingRecordStatus> = {
@@ -308,7 +307,7 @@ const mapReferralToRecord = (
     condition: referral.reason,
     fromHospital:
       options?.sourceHospitalName ??
-      `Source org ${referral.source_org_id.slice(0, 8)}`,
+      "Unknown hospital",
     requestedAt: formatDate(referral.created_at),
     records: formatScopes(options?.grant),
     fileSize:
@@ -577,7 +576,7 @@ export default function IncomingRecordsPage({
             : "-mx-4 -my-4 min-h-full bg-[#F4FAFA] p-8 md:-mx-12"
         }
       >
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
           Please select a workspace before viewing incoming referrals.
         </div>
       </div>
@@ -618,7 +617,7 @@ export default function IncomingRecordsPage({
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-toast rounded-lg bg-[#211783] px-5 py-3 text-sm font-medium text-white shadow-lg"
+          className="fixed bottom-6 right-6 z-toast rounded-md bg-[#211783] px-5 py-3 text-sm font-medium text-white shadow-lg"
         >
           Updating referral...
         </div>

@@ -41,7 +41,7 @@ export default function IncomingRecordDetails({
         Back to Incoming Records
       </button>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <section className="rounded-md bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div className="flex gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#EFFFFC] font-semibold text-[#008C83]">
@@ -54,7 +54,7 @@ export default function IncomingRecordDetails({
                   {record.patientName}
                 </h1>
                 <span
-                  className={`rounded px-2 py-1 text-xs font-medium text-white ${
+                  className={`rounded-md px-2 py-1 text-xs font-medium text-white ${
                     record.priority === "Urgent" ? "bg-red-500" : "bg-[#211783]"
                   }`}
                 >
@@ -77,7 +77,7 @@ export default function IncomingRecordDetails({
               <>
                 <button
                   onClick={onAccept}
-                  className="inline-flex items-center gap-2 rounded bg-green-700 px-5 py-2 text-sm font-medium text-white hover:bg-green-800"
+                  className="inline-flex items-center gap-2 rounded-md bg-green-700 px-5 py-2 text-sm font-medium text-white hover:bg-green-800"
                 >
                   <Check size={18} />
                   Accept
@@ -85,7 +85,7 @@ export default function IncomingRecordDetails({
 
                 <button
                   onClick={onReject}
-                  className="inline-flex items-center gap-2 rounded border border-red-500 px-5 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
+                  className="inline-flex items-center gap-2 rounded-md border border-red-500 px-5 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
                 >
                   <X size={18} />
                   Decline
@@ -93,7 +93,7 @@ export default function IncomingRecordDetails({
               </>
             ) : (
               <span
-                className={`inline-flex items-center rounded px-5 py-2 text-sm font-medium ${
+                className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium ${
                   record.status === "Accepted"
                     ? "bg-green-100 text-green-700"
                     : "bg-red-100 text-red-600"
@@ -106,7 +106,7 @@ export default function IncomingRecordDetails({
         </div>
       </section>
 
-      <section className="mt-6 rounded-2xl bg-white p-5 shadow-sm">
+      <section className="mt-6 rounded-md bg-white p-5 shadow-sm">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#111827]">
           <p>
             <span className="font-semibold">Gender:</span> {record.gender}
@@ -157,7 +157,7 @@ export default function IncomingRecordDetails({
         </div>
 
         {record.vitals?.raw && (
-          <p className="mt-4 rounded-lg bg-[#F8FAFC] px-4 py-3 text-xs leading-5 text-gray-500">
+          <p className="mt-4 rounded-md bg-[#F8FAFC] px-4 py-3 text-xs leading-5 text-gray-500">
             Raw vitals note: {record.vitals.raw}
           </p>
         )}
@@ -184,7 +184,7 @@ export default function IncomingRecordDetails({
       <SharedMedicalContent record={record} />
 
       {record.clinicalSummary && (
-        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+        <section className="mt-6 rounded-md bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-[#111827]">
             Clinical Summary
           </h2>
@@ -386,7 +386,7 @@ function SharedMedicalContent({ record }: { record: IncomingRecord }) {
                 <p className="font-semibold text-[#111827]">
                   {getRecordValue(item, "test_name")}
                 </p>
-                <span className="rounded-full bg-[#EEF2FF] px-3 py-1 text-xs font-medium text-[#211783]">
+                <span className="rounded-md bg-[#EEF2FF] px-3 py-1 text-xs font-medium text-[#211783]">
                   {getRecordValue(item, "status")}
                 </span>
               </div>
@@ -436,7 +436,7 @@ function SharedMedicalContent({ record }: { record: IncomingRecord }) {
   };
 
   return (
-    <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+    <section className="mt-6 rounded-md bg-white p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-[#111827]">Records Shared</h2>
       <p className="mt-1 text-sm text-gray-500">
         {canOpenSharedRecords
@@ -445,7 +445,7 @@ function SharedMedicalContent({ record }: { record: IncomingRecord }) {
       </p>
 
       {!canOpenSharedRecords && (
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           For patient safety and audit control, accept the referral before
           opening the full medical record. The clinical summary remains visible
           below to help you decide.
@@ -459,7 +459,7 @@ function SharedMedicalContent({ record }: { record: IncomingRecord }) {
           return (
             <div
               key={item}
-              className="overflow-hidden rounded-xl border border-[#DDF5F2] bg-[#F8FEFD]"
+              className="overflow-hidden rounded-md border border-[#DDF5F2] bg-[#F8FEFD]"
             >
               <button
                 type="button"
@@ -468,7 +468,7 @@ function SharedMedicalContent({ record }: { record: IncomingRecord }) {
                 className="flex w-full items-center justify-between gap-4 p-4 text-left disabled:cursor-not-allowed"
               >
                 <div className="flex items-start gap-3">
-                  <span className="mt-0.5 rounded-lg bg-[#E7FAF7] p-2 text-[#008C83]">
+                  <span className="mt-0.5 rounded-md bg-[#E7FAF7] p-2 text-[#008C83]">
                     {canOpenSharedRecords ? (
                       <FileText size={16} />
                     ) : (
@@ -544,7 +544,7 @@ function InfoGrid({ items }: { items: Array<[string, unknown]> }) {
   return (
     <div className="grid gap-3 md:grid-cols-2">
       {items.map(([label, value]) => (
-        <div key={label} className="rounded-xl border border-gray-100 p-4">
+        <div key={label} className="rounded-md border border-gray-100 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
             {label}
           </p>
@@ -573,14 +573,14 @@ function RecordListSection({
           {records.map((item, index) => (
             <div
               key={String(item.id ?? index)}
-              className="rounded-xl border border-gray-100 p-4"
+              className="rounded-md border border-gray-100 p-4"
             >
               {renderItem(item)}
             </div>
           ))}
         </div>
       ) : (
-        <p className="rounded-xl border border-dashed p-4 text-sm text-gray-500">
+        <p className="rounded-md border border-dashed p-4 text-sm text-gray-500">
           {emptyMessage}
         </p>
       )}
@@ -590,7 +590,7 @@ function RecordListSection({
 
 function EmptyAccordionContent({ message }: { message: string }) {
   return (
-    <p className="rounded-xl border border-dashed p-4 text-sm text-gray-500">
+    <p className="rounded-md border border-dashed p-4 text-sm text-gray-500">
       {message}
     </p>
   );
@@ -598,7 +598,7 @@ function EmptyAccordionContent({ message }: { message: string }) {
 
 function EmptySharedSection({ message }: { message: string }) {
   return (
-    <section className="mt-6 rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-sm text-gray-500">
+    <section className="mt-6 rounded-md border border-dashed border-gray-200 bg-white p-6 text-sm text-gray-500">
       {message}
     </section>
   );
@@ -614,7 +614,7 @@ function InfoCard({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
+    <div className="rounded-md bg-white p-5 shadow-sm">
       <div className="mb-3 flex items-center gap-2 text-[#211783]">
         {icon}
         <p className="text-xs font-semibold uppercase text-gray-400">{label}</p>
@@ -638,7 +638,7 @@ function VitalCard({
   const displayValue = value || "N/A";
 
   return (
-    <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-md border border-gray-100 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-lg font-bold text-[#111827]">
@@ -647,7 +647,7 @@ function VitalCard({
           </p>
           <p className="mt-1 text-xs text-gray-500">{label}</p>
         </div>
-        <span className="rounded-lg bg-[#EEF2FF] p-2 text-[#211783]">
+        <span className="rounded-md bg-[#EEF2FF] p-2 text-[#211783]">
           {icon}
         </span>
       </div>

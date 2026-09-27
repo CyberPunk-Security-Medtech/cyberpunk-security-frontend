@@ -266,7 +266,7 @@
 //         <button
 //           type="button"
 //           onClick={() => setIsModalOpen(true)}
-//           className="inline-flex h-12 items-center justify-center rounded-full bg-[#007F73] px-6 text-base font-medium text-white hover:bg-[#006E64]"
+//           className="inline-flex h-12 items-center justify-center rounded-md bg-[#007F73] px-6 text-base font-medium text-white hover:bg-[#006E64]"
 //         >
 //           + New Test Order
 //         </button>
@@ -281,7 +281,7 @@
 //       <select
 //   value={selectedConsultationId}
 //   onChange={(e) => setSelectedConsultationId(e.target.value)}
-//   className="w-full border p-2 rounded"
+//   className="w-full border p-2 rounded-md"
 // >
 //   <option value="">Select Consultation</option>
 //   {consultations.map((c: any) => (
@@ -296,7 +296,7 @@
 //             onChange={(e) =>
 //               setForm({ ...form, patientId: e.target.value })
 //             }
-//             className="w-full border p-2 rounded"
+//             className="w-full border p-2 rounded-md"
 //           />
 //           <input
 //             placeholder="Test Type"
@@ -304,7 +304,7 @@
 //             onChange={(e) =>
 //               setForm({ ...form, test_type: e.target.value })
 //             }
-//             className="w-full border p-2 rounded"
+//             className="w-full border p-2 rounded-md"
 //           />
 //           <input
 //             placeholder="Test Name"
@@ -312,7 +312,7 @@
 //             onChange={(e) =>
 //               setForm({ ...form, test_name: e.target.value })
 //             }
-//             className="w-full border p-2 rounded"
+//             className="w-full border p-2 rounded-md"
 //           />
 //           <input
 //             placeholder="Doctor"
@@ -320,19 +320,19 @@
 //             onChange={(e) =>
 //               setForm({ ...form, doctor: e.target.value })
 //             }
-//             className="w-full border p-2 rounded"
+//             className="w-full border p-2 rounded-md"
 //           />
 
 //           <button
 //             onClick={handleCreateOrder}
-//             className="w-full bg-[#00B8A8] text-white py-2 rounded"
+//             className="w-full bg-[#00B8A8] text-white py-2 rounded-md"
 //           >
 //             Create Order
 //           </button>
 //         </div>
 //       </Modal>
 
-//       <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+//       <section className="space-y-3 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
 //         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 //           <div className="flex flex-wrap gap-2">
 //             {(Object.keys(TAB_LABELS) as TabFilter[]).map((key) => {
@@ -342,7 +342,7 @@
 //                   key={key}
 //                   type="button"
 //                   onClick={() => setTab(key)}
-//                   className={`rounded-full px-3 py-1.5 text-sm transition ${
+//                   className={`rounded-md px-3 py-1.5 text-sm transition ${
 //                     active
 //                       ? "bg-[#00B8A8] text-white"
 //                       : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
@@ -392,7 +392,7 @@
 //         {loading && <OrdersSkeleton />}
 
 //         {!loading && filteredOrders.length === 0 && (
-//           <div className="rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500">
+//           <div className="rounded-md border border-dashed border-gray-300 p-6 text-sm text-gray-500">
 //             No lab test orders matched your filter.
 //           </div>
 //         )}
@@ -402,7 +402,7 @@
 //             {filteredOrders.map((order) => (
 //               <div
 //                 key={order.id}
-//                 className="rounded-xl border border-gray-200 bg-white p-4"
+//                 className="rounded-md border border-gray-200 bg-white p-4"
 //               >
 //                 <div className="mb-3 flex items-start justify-between gap-3">
 //                   <div className="min-w-0">
@@ -444,14 +444,14 @@
 //                     type="button"
 //                     // onClick={(event) => handleStartProcessing(order, event)}
 //                     disabled={order.status !== "pending" || processingIds.has(order.id)}
-//                     className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+//                     className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
 //                   >
 //                     Start Processing
 //                   </button>
 //                   <button
 //                     type="button"
 //                     onClick={() => openOrder(order.id)}
-//                     className="w-full rounded-full bg-[#00B8A8] px-4 py-2 text-sm font-medium text-white hover:bg-[#00A899]"
+//                     className="w-full rounded-md bg-[#00B8A8] px-4 py-2 text-sm font-medium text-white hover:bg-[#00A899]"
 //                   >
 //                     View Test Report
 //                   </button>
@@ -533,169 +533,38 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutGrid, List, Search } from "lucide-react";
-import { StatusBadge } from "@components/StatusBadge";
-import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
+import { List, Rows3, Search } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
-import {
-  consultationService,
-  LabOrderStatusFilter,
-  labService,
-} from "@services/api";
-import {
-  LabOrder,
-  combineUniqueOrders,
-  formatDateTime,
-  normalizeLabOrders,
-  toStatusBadgeType,
-  RawConsultation,
-  getConsultationsArray,
-  buildPatientName,
-  buildPatientCode,
-  getPatientId,
-  buildDoctorName,
-} from "./labOrderUtils";
+import { LabOrder, combineUniqueOrders } from "./labOrderUtils";
 import CreateTestOrderModal from "./CreateTestOrderModal";
+import { LabOrderList, LabOrderQueueSkeleton, LabOrderTable, useLabOrders } from "./LabOrderQueue";
 
-type ViewMode = "cards" | "table";
+type ViewMode = "list" | "table";
 type TabFilter = "all" | "pending" | "in_progress" | "completed" | "critical";
 
-const FETCH_STATUSES: LabOrderStatusFilter[] = [
-  "pending",
-  "in_progress",
-  "completed",
-];
-
 const TAB_LABELS: Record<TabFilter, string> = {
-  all: "All Tests",
-  pending: "Pending Tests",
-  in_progress: "In-Progress Tests",
-  completed: "Completed Tests",
-  critical: "Critical",
+  all: "All",
+  pending: "Pending",
+  in_progress: "In progress",
+  completed: "Completed",
+  critical: "Urgent & emergency",
 };
 
-const isCriticalOrder = (order: LabOrder): boolean => {
-  const normalized = order.priority.toLowerCase();
-  return ["urgent", "emergency", "critical", "stat"].includes(normalized);
-};
-
-function OrdersSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <div
-          key={index}
-          className="h-52 animate-pulse rounded-xl border border-gray-200 bg-white"
-        />
-      ))}
-    </div>
-  );
-}
+const isCriticalOrder = (order: LabOrder): boolean =>
+  ["urgent", "emergency", "critical", "stat"].includes(order.priority.toLowerCase());
 
 export default function TestOrdersPageClient() {
   const router = useRouter();
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
 
-  const [orders, setOrders] = useState<LabOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const { orders, setOrders, loading, hasError, reload } = useLabOrders(orgId);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [tab, setTab] = useState<TabFilter>("all");
   const [query, setQuery] = useState("");
-  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!orgId) {
-      setOrders([]);
-      setLoading(false);
-      return;
-    }
-
-    let ignore = false;
-
-    const loadOrders = async () => {
-      setLoading(true);
-
-      try {
-        const [labTestsResponse, consultationsResponse] = await Promise.all([
-          labService.listOrganizationLabTests(orgId, {
-            statuses: FETCH_STATUSES,
-          }),
-          consultationService.listConsultations(orgId),
-        ]);
-
-        const rawLabTests = Array.isArray(labTestsResponse?.data)
-          ? labTestsResponse.data
-          : Array.isArray(labTestsResponse)
-            ? labTestsResponse
-            : [];
-        const normalizedOrders = normalizeLabOrders(rawLabTests);
-        const consultationList = getConsultationsArray(consultationsResponse);
-
-        const consultationMap = new Map<string, RawConsultation>(
-          consultationList
-            .filter((consultation) => consultation?.id)
-            .map((consultation) => [consultation.id, consultation])
-        );
-
-        const enrichedOrders = normalizedOrders.map((order) => {
-          const consultation = consultationMap.get(order.consultation_id!);
-
-          return {
-            ...order,
-            patientName: buildPatientName(consultation!, order.patientName),
-            patientId: getPatientId(consultation!, order.patientId),
-            patientCode:
-              buildPatientCode(consultation!, order.patientCode) || order.patientId,
-            patientGender:
-              consultation?.patient?.gender ||
-              (consultation as any)?.patient_gender ||
-              order.patientGender ||
-              "-",
-            patientAge:
-              String(
-                consultation?.patient?.age ??
-                  (consultation as any)?.patient_age ??
-                  order.patientAge ??
-                  "-"
-              ) || "-",
-            orderingDoctor: buildDoctorName(
-              consultation!,
-              order.orderingDoctor
-            ),
-            departmentName:
-              consultation?.department_name ||
-              consultation?.department?.name ||
-              order.departmentName ||
-              "-",
-          };
-        });
-
-        if (!ignore) {
-          setOrders(combineUniqueOrders(enrichedOrders));
-        }
-      } catch (error) {
-        console.error("Failed to load test orders", error);
-
-        if (!ignore) {
-          setOrders([]);
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadOrders();
-
-    return () => {
-      ignore = true;
-    };
-  }, [orgId]);
 
   const counts = useMemo(() => {
     const result: Record<TabFilter, number> = {
@@ -705,55 +574,31 @@ export default function TestOrdersPageClient() {
       completed: 0,
       critical: 0,
     };
-
     for (const order of orders) {
       if (order.status === "pending") result.pending += 1;
       if (order.status === "in_progress") result.in_progress += 1;
       if (order.status === "completed") result.completed += 1;
       if (isCriticalOrder(order)) result.critical += 1;
     }
-
     return result;
   }, [orders]);
 
   const filteredOrders = useMemo(() => {
     const text = query.trim().toLowerCase();
-
-    return orders.filter((order) => {
-      const tabMatch =
-        tab === "all"
-          ? true
-          : tab === "critical"
-          ? isCriticalOrder(order)
-          : order.status === tab;
-
-      const searchMatch =
-        text.length === 0 ||
-        order.patientName.toLowerCase().includes(text) ||
-        order.patientId.toLowerCase().includes(text) ||
-        order.test_type.toLowerCase().includes(text) ||
-        order.id.toLowerCase().includes(text);
-
-      return tabMatch && searchMatch;
-    });
+    return orders
+      .filter((order) => {
+        const tabMatch =
+          tab === "all" ? true : tab === "critical" ? isCriticalOrder(order) : order.status === tab;
+        const searchMatch =
+          text.length === 0 ||
+          (order.test_name || order.test_type).toLowerCase().includes(text) ||
+          order.testCategory.toLowerCase().includes(text);
+        return tabMatch && searchMatch;
+      })
+      .sort((a, b) => new Date(b.orderedAt ?? 0).getTime() - new Date(a.orderedAt ?? 0).getTime());
   }, [orders, query, tab]);
 
-  const openOrder = (id: string) => {
-    router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
-  };
-
-  const updateOrderStatus = (id: string, status: LabOrder["status"]) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === id
-          ? {
-              ...order,
-              status,
-            }
-          : order
-      )
-    );
-  };
+  const openOrder = (id: string) => router.push(`/dashboard/lab-scientist/lab-orders/${id}`);
 
   const handleOrderCreated = (order: LabOrder) => {
     setOrders((current) => combineUniqueOrders([order, ...current]));
@@ -763,20 +608,16 @@ export default function TestOrdersPageClient() {
     <div className="space-y-6 py-2 sm:py-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">
-            Test Orders
-          </h2>
-          <p className="text-sm text-gray-500">
-            Track and review all lab orders from doctors.
-          </p>
+          <h2 className="text-xl font-semibold text-[#1A2380] sm:text-2xl">Test Orders</h2>
+          <p className="text-sm text-gray-500">Every lab test ordered in this facility.</p>
         </div>
 
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex h-11 items-center justify-center rounded-full bg-[#007F73] px-5 text-sm font-medium text-white hover:bg-[#006E64]"
+          className="inline-flex h-11 items-center justify-center rounded-md bg-[#007F73] px-5 text-sm font-medium text-white hover:bg-[#006E64]"
         >
-          + Create lab test
+          + Order lab test
         </button>
       </div>
 
@@ -786,196 +627,85 @@ export default function TestOrdersPageClient() {
         onOrderCreated={handleOrderCreated}
       />
 
-      <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <section className="space-y-4 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter orders">
             {(Object.keys(TAB_LABELS) as TabFilter[]).map((key) => {
               const active = tab === key;
-
               return (
                 <button
                   key={key}
                   type="button"
+                  role="tab"
+                  aria-selected={active}
                   onClick={() => setTab(key)}
-                  className={`rounded-full px-3 py-1.5 text-sm transition ${
+                  className={`rounded-md px-3 py-1.5 text-sm transition ${
                     active
-                      ? "bg-[#00B8A8] text-white"
+                      ? "bg-[#007F73] text-white"
                       : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                   }`}
                 >
-                  {TAB_LABELS[key]} ({counts[key]})
+                  {TAB_LABELS[key]}{" "}
+                  <span className={active ? "text-white/80" : "text-gray-400"}>{counts[key]}</span>
                 </button>
               );
             })}
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-64">
-              <Search
-                size={16}
-                className="pointer-events-none absolute left-3 top-2.5 text-gray-400"
-              />
+            <label className="relative w-full sm:w-64">
+              <span className="sr-only">Search test orders</span>
+              <Search size={16} className="pointer-events-none absolute left-3 top-2.5 text-gray-400" aria-hidden="true" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search test order"
-                className="w-full rounded-full border border-gray-200 py-2 pl-9 pr-3 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8]"
+                placeholder="Search test name or category"
+                className="w-full rounded-md border border-gray-200 py-2 pl-9 pr-3 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8]"
               />
-            </div>
+            </label>
 
-            <div className="inline-flex overflow-hidden rounded-md border border-gray-200">
-              <button
-                type="button"
-                onClick={() => setViewMode("cards")}
-                className={`px-3 py-2 ${
-                  viewMode === "cards"
-                    ? "bg-[#1A2380] text-white"
-                    : "bg-white text-gray-600"
-                }`}
-                aria-label="Card view"
-              >
-                <LayoutGrid size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("table")}
-                className={`px-3 py-2 ${
-                  viewMode === "table"
-                    ? "bg-[#1A2380] text-white"
-                    : "bg-white text-gray-600"
-                }`}
-                aria-label="Table view"
-              >
-                <List size={16} />
-              </button>
+            <div className="inline-flex overflow-hidden rounded-md border border-gray-200" role="group" aria-label="Layout">
+              {(
+                [
+                  ["list", "List view", Rows3],
+                  ["table", "Table view", List],
+                ] as const
+              ).map(([value, label, Icon]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setViewMode(value)}
+                  aria-pressed={viewMode === value}
+                  aria-label={label}
+                  className={`px-3 py-2 ${viewMode === value ? "bg-[#1A2380] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                >
+                  <Icon size={16} aria-hidden="true" />
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {loading && <OrdersSkeleton />}
-
-        {!loading && filteredOrders.length === 0 && (
-          <div className="rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500">
-            No lab test orders matched your filter.
+        {loading ? (
+          <LabOrderQueueSkeleton />
+        ) : hasError ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Test orders couldn&apos;t be loaded.
+            <button type="button" onClick={() => void reload()} className="rounded-md px-2 py-1 font-medium hover:bg-amber-100">
+              Try again
+            </button>
+          </div>
+        ) : filteredOrders.length === 0 ? (
+          <div className="rounded-md border border-dashed border-gray-300 p-6 text-sm text-gray-500">
+            {orders.length === 0 ? "No lab tests have been ordered yet." : "No lab test orders match your filter."}
+          </div>
+        ) : viewMode === "list" ? (
+          <LabOrderList orders={filteredOrders} onOpen={openOrder} />
+        ) : (
+          <div className="rounded-md border border-gray-200">
+            <LabOrderTable orders={filteredOrders} onOpen={openOrder} />
           </div>
         )}
-
-        {!loading && filteredOrders.length > 0 && viewMode === "cards" && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredOrders.map((order) => (
-              <div
-                key={order.id}
-                className="rounded-xl border border-gray-200 bg-white p-4"
-              >
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="break-words text-sm font-semibold text-[#1A2380]">
-                      {order.patientName || "Unknown Patient"}
-                    </p>
-                    <p className="break-all text-xs text-gray-500">{order.id}</p>
-                  </div>
-                  <StatusBadge status={toStatusBadgeType(order.status)} />
-                </div>
-
-                <div className="space-y-1 text-xs text-gray-600">
-                  <p>
-                    Test Type:{" "}
-                    <span className="font-medium text-gray-800">
-                      {order.test_type || order.test_name || "-"}
-                    </span>
-                  </p>
-                  <p>
-                    Ordering Doctor:{" "}
-                    <span className="font-medium text-gray-800">
-                      {order.orderingDoctor || "Unknown Doctor"}
-                    </span>
-                  </p>
-                  <p>
-                    Ordered:{" "}
-                    <span className="font-medium text-gray-800">
-                      {formatDateTime(order.orderedAt)}
-                    </span>
-                  </p>
-                  <p>
-                    Priority:{" "}
-                    <span className="font-medium text-gray-800">
-                      {order.priority}
-                    </span>
-                  </p>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => openOrder(order.id)}
-                    className="w-full rounded-full bg-[#00B8A8] px-4 py-2 text-sm font-medium text-white hover:bg-[#00A899]"
-                  >
-                    View Test Report
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!loading && filteredOrders.length > 0 && viewMode === "table" && (
-          <ResponsiveTableRegion label="Lab test orders">
-            <table className="w-full min-w-[980px] border-collapse text-left text-sm">
-              <thead className="border-b bg-gray-50 text-gray-600">
-                <tr>
-                  <th scope="col" className="min-w-[220px] bg-gray-50 px-4 py-3 font-medium">Order ID</th>
-                  <th className="px-4 py-3 font-medium">Patient Name</th>
-                  <th className="px-4 py-3 font-medium">Test Type</th>
-                  <th className="px-4 py-3 font-medium">Ordering Doctor</th>
-                  <th className="px-4 py-3 font-medium">Order Date</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 text-right font-medium">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="cursor-pointer border-b hover:bg-gray-50"
-                    onClick={() => openOrder(order.id)}
-                  >
-                    <td className="bg-white px-4 py-3">{order.id}</td>
-                    <td className="px-4 py-3">
-                      {order.patientName || "Unknown Patient"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {order.test_type || order.test_name || "-"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {order.orderingDoctor || "Unknown Doctor"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {formatDateTime(order.orderedAt)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={toStatusBadgeType(order.status)} />
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            openOrder(order.id);
-                          }}
-                          className="rounded-md border border-gray-200 px-3 py-1.5 hover:bg-gray-50"
-                        >
-                          View
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </ResponsiveTableRegion>
-        )}
-
       </section>
     </div>
   );

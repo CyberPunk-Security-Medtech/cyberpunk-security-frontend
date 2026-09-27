@@ -45,7 +45,7 @@ export default function PatientPrescriptionTab() {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:gap-8">
-      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+      <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Prescription</h3>
           {!isCompletedConsultation && (
@@ -69,16 +69,16 @@ export default function PatientPrescriptionTab() {
 
         <div className="space-y-3">
           {filteredPrescriptions.length === 0 && (
-            <div className="rounded-xl border p-4 text-sm text-gray-500">
+            <div className="rounded-md border p-4 text-sm text-gray-500">
               No prescriptions recorded yet.
             </div>
           )}
 
           {filteredPrescriptions.map((item: any) => (
-            <div key={item.id} className="rounded-lg border border-gray-200 bg-white p-4">
+            <div key={item.id} className="rounded-md border border-gray-200 bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg border border-[#DADDFE] bg-[#EEF2FF] flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-md border border-[#DADDFE] bg-[#EEF2FF] flex items-center justify-center">
                     <div className="h-5 w-5 rounded-full border border-[#4F46E5] relative">
                       <div className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
                     </div>

@@ -10,7 +10,7 @@ export default function BookAppointmentSection() {
       {/* Decorative Dots (hidden on mobile) */}
       <div className="hidden md:block absolute right-16 top-40 w-24 h-24 grid grid-cols-4 gap-2 opacity-20">
         {[...Array(16)].map((_, i) => (
-          <div key={i} className="w-2 h-2 bg-[#A3BFFA] rounded-sm" />
+          <div key={i} className="w-2 h-2 bg-[#A3BFFA] rounded-md" />
         ))}
       </div>
 
@@ -40,7 +40,7 @@ export default function BookAppointmentSection() {
           className="
             relative z-20 
             w-full sm:w-[340px] md:w-[360px] 
-            rounded-2xl shadow-xl p-6 sm:p-8 
+            rounded-md shadow-xl p-6 sm:p-8 
             text-left backdrop-blur-md
           "
           style={{
@@ -54,7 +54,7 @@ export default function BookAppointmentSection() {
           <p className="text-sm sm:text-[15px] text-gray-700 mb-5">
             Available to 97% of our customers
           </p>
-          <Link href="/home/book-now" className="rounded-[30px] bg-black text-white px-6 py-2.5 text-sm sm:text-base font-medium hover:bg-[black] transition">
+          <Link href="/home/book-now" className="rounded-md bg-black text-white px-6 py-2.5 text-sm sm:text-base font-medium hover:bg-[black] transition">
             Book now
           </Link>
         </motion.div>
@@ -69,7 +69,7 @@ export default function BookAppointmentSection() {
             relative md:absolute 
             md:left-[-180px] md:top-[120px]
             w-full sm:w-[280px] md:w-[300px]
-            rounded-2xl bg-[#B7D4FE]/80 shadow-md 
+            rounded-md bg-[#B7D4FE]/80 shadow-md 
             border border-gray-100 p-5 z-10
             mt-6 md:mt-0
           "

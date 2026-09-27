@@ -77,7 +77,7 @@ export default function ConsultationNotesPanel() {
   };
 
   return (
-    <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+    <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <h3 className="text-lg font-semibold text-[#1A2380]">Doctor&apos;s Notes</h3>
       <p className="mt-1 text-sm text-gray-500">
         Notes are saved to this consultation and shown oldest first.
@@ -87,13 +87,13 @@ export default function ConsultationNotesPanel() {
         <h4 className="text-sm font-semibold text-gray-800">Saved notes</h4>
 
         {loading && (
-          <p className="mt-3 rounded-lg bg-gray-50 p-3 text-sm text-gray-500" aria-live="polite">
+          <p className="mt-3 rounded-md bg-gray-50 p-3 text-sm text-gray-500" aria-live="polite">
             Loading saved notes...
           </p>
         )}
 
         {!loading && error && (
-          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3" role="alert">
+          <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3" role="alert">
             <p className="text-sm text-red-700">{error}</p>
             <button
               type="button"
@@ -106,7 +106,7 @@ export default function ConsultationNotesPanel() {
         )}
 
         {!loading && !error && notes.length === 0 && (
-          <p className="mt-3 rounded-lg border border-dashed p-3 text-sm text-gray-500">
+          <p className="mt-3 rounded-md border border-dashed p-3 text-sm text-gray-500">
             No doctor&apos;s notes have been saved yet.
           </p>
         )}
@@ -114,7 +114,7 @@ export default function ConsultationNotesPanel() {
         {!loading && !error && notes.length > 0 && (
           <ul className="mt-3 max-h-80 space-y-3 overflow-y-auto pr-1">
             {notes.map((note, index) => (
-              <li key={note.id} className="rounded-lg border bg-gray-50 p-3">
+              <li key={note.id} className="rounded-md border bg-gray-50 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-semibold uppercase tracking-wide text-[#1A2380]">
                     Note {index + 1}

@@ -12,7 +12,7 @@ export default function HMOStatusCard({ status }: HMOStatusCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 border flex items-center justify-center">
+    <div className="bg-white rounded-md shadow-sm p-6 border flex items-center justify-center">
       <div className="text-center">
         <p className="text-sm mb-2">HMO's Status</p>
         <div

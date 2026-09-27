@@ -102,9 +102,9 @@ export default function RecordStaffDashboardPage() {
 
       <section className="grid gap-4 md:grid-cols-2">
         {stats.map(({ title, value, icon: Icon, iconClassName }) => (
-          <div key={title} className="rounded-xl bg-white p-5 shadow-sm">
+          <div key={title} className="rounded-md bg-white p-5 shadow-sm">
             <div
-              className={`mb-3 grid h-8 w-8 place-items-center rounded-lg ${iconClassName}`}
+              className={`mb-3 grid h-8 w-8 place-items-center rounded-md ${iconClassName}`}
             >
               <Icon size={17} />
             </div>
@@ -114,7 +114,7 @@ export default function RecordStaffDashboardPage() {
         ))}
       </section>
 
-      <section className="overflow-hidden rounded-xl bg-white shadow-sm">
+      <section className="overflow-hidden rounded-md bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <h2 className="font-semibold text-[#111827]">
             Active Patient Records
@@ -177,7 +177,7 @@ export default function RecordStaffDashboardPage() {
                     <td className="px-5 py-4 text-slate-700">{record.ward}</td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${statusClassName(
+                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-semibold ${statusClassName(
                           record.status,
                         )}`}
                       >

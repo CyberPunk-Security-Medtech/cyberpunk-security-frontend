@@ -50,7 +50,7 @@ export default function PatientsRecords() {
             aria-label="Search patients by name, phone number, email, or NIN"
             maxLength={100}
             placeholder="Search patient"
-            className="w-full border border-gray-200 rounded-full pl-10 pr-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8]"
+            className="w-full border border-gray-200 rounded-md pl-10 pr-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8]"
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"

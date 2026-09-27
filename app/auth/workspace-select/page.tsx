@@ -37,7 +37,7 @@
 //       </div>
 
 //       {/* Confirm Email Badge */}
-//       <div className="inline-flex items-center gap-2 bg-[#E9FFFB] px-4 py-2 rounded-full text-sm text-gray-700 mb-10">
+//       <div className="inline-flex items-center gap-2 bg-[#E9FFFB] px-4 py-2 rounded-md text-sm text-gray-700 mb-10">
 //         <span className="font-medium text-[#0A8377]">Confirm as</span>
 //         <span>{user?.email}</span>
 //         <button className="text-[#1E237E] text-xs underline ml-2">Change</button>
@@ -67,7 +67,7 @@
 //           <div
 //             key={ws.id}
 //             onClick={() => handleSelect(ws)}
-//             className="cursor-pointer bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-sm hover:shadow-md transition"
+//             className="cursor-pointer bg-white border border-[#E5E7EB] rounded-md p-6 shadow-sm hover:shadow-md transition"
 //           >
             
 //             {/* Title Row */}
@@ -190,7 +190,7 @@ export default function WorkspaceSelectPage() {
       </div>
 
       {/* Confirm Email Badge */}
-      <div className="inline-flex items-center gap-2 bg-[#E9FFFB] px-4 py-2 rounded-full text-sm text-gray-700 mb-10">
+      <div className="inline-flex items-center gap-2 bg-[#E9FFFB] px-4 py-2 rounded-md text-sm text-gray-700 mb-10">
         <span className="font-medium text-[#0A8377]">Confirm as</span>
         <span>{user?.email}</span>
         <button className="text-[#1E237E] text-xs underline ml-2">Change</button>
@@ -220,7 +220,7 @@ export default function WorkspaceSelectPage() {
           <div
             key={ws.id}
             onClick={() => handleSelect(ws)}
-            className="cursor-pointer bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-sm hover:shadow-md transition"
+            className="cursor-pointer bg-white border border-[#E5E7EB] rounded-md p-6 shadow-sm hover:shadow-md transition"
           >
             
             {/* Title Row */}

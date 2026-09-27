@@ -10,10 +10,10 @@ export default function StaffInvitationDeclined() {
           Staff invitation declined is currently pending, this might take some
           time, please exercise patience.
         </p>
-        <button className="bg-[#051466] text-white px-6 py-2 rounded-full hover:bg-[#020b44]">
+        <button className="bg-[#051466] text-white px-6 py-2 rounded-md hover:bg-[#020b44]">
           Resend Invitation Link
         </button>
-        <button className="border rounded-full px-6 py-2 mt-1 hover:bg-slate-50">
+        <button className="border rounded-md px-6 py-2 mt-1 hover:bg-slate-50">
           Back To Dashboard
         </button>
       </div>

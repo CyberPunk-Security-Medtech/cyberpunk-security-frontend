@@ -32,7 +32,7 @@ export default function ConsentVerificationStep({
             value={form.phoneNumber}
             readOnly
             placeholder="Enter Phone Number"
-            className={`w-full rounded-lg border px-4 py-3 outline-none ${
+            className={`w-full rounded-md border px-4 py-3 outline-none ${
               error
                 ? "border-red-500 bg-red-200 placeholder:text-red-200"
                 : "border-gray-300 bg-white"
@@ -43,7 +43,7 @@ export default function ConsentVerificationStep({
         <div className="mt-8 flex justify-center">
           <button
             onClick={() => setEmergencyOverride(!emergencyOverride)}
-            className={`flex items-center gap-3 rounded-lg border-2 px-6 py-4 ${
+            className={`flex items-center gap-3 rounded-md border-2 px-6 py-4 ${
               emergencyOverride
                 ? "border-red-500 bg-red-100 text-red-700"
                 : "border-red-500 bg-red-100 text-gray-700"
@@ -58,7 +58,7 @@ export default function ConsentVerificationStep({
           </button>
         </div>
 
-        <div className="mt-8 rounded-xl border border-[#00B8A8] bg-[#F0FFFF] px-8 py-4 text-center text-[#00B8A8]">
+        <div className="mt-8 rounded-md border border-[#00B8A8] bg-[#F0FFFF] px-8 py-4 text-center text-[#00B8A8]">
           “By continuing, an sms consent verification will be sent to the associated number above.
           click yes to authorize permission for transfer.”
         </div>
@@ -71,7 +71,7 @@ export default function ConsentVerificationStep({
 
         <button
           onClick={onNext}
-          className="rounded-full bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
+          className="rounded-md bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
         >
           Continue
         </button>

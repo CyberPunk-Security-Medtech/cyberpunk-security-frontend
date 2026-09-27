@@ -22,7 +22,7 @@ export default function Header({
   desktopPaddingClassName = "md:px-8",
   organizationNameClassName = "text-[#1A2380]",
 }: HeaderProps) {
-  const { activeWorkspace } = useAuth();
+  const { activeWorkspace, hydrated, authLoading } = useAuth();
 
   return (
     <header
@@ -41,11 +41,19 @@ export default function Header({
           </button>
         )}
         <WorkspaceAvatar workspace={activeWorkspace} size={36} />
-        <h2
-          className={`min-w-0 truncate text-base font-semibold sm:text-lg ${organizationNameClassName}`}
-        >
-          {activeWorkspace?.name || "Sisyphus Medical Center"}
-        </h2>
+        {activeWorkspace?.name ? (
+          <h2
+            className={`min-w-0 truncate text-base font-semibold sm:text-lg ${organizationNameClassName}`}
+          >
+            {activeWorkspace.name}
+          </h2>
+        ) : !hydrated || authLoading ? (
+          // Placeholder while the workspace loads — never a made-up name.
+          <span
+            aria-hidden="true"
+            className="h-5 w-40 animate-pulse rounded-md bg-gray-100 motion-reduce:animate-none"
+          />
+        ) : null}
       </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-5">

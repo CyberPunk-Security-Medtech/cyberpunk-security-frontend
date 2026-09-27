@@ -36,7 +36,7 @@ const formatDate = (value?: string | null) => {
 
 function DetailItem({ label, value }: { label: string; value?: string | number | null }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+    <div className="rounded-md border border-slate-200 bg-slate-50/60 p-4">
       <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</dt>
       <dd className="mt-2 break-words text-sm font-medium leading-6 text-slate-800">
         {displayValue(value)}
@@ -47,7 +47,7 @@ function DetailItem({ label, value }: { label: string; value?: string | number |
 
 function DetailsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
       <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</dl>
     </section>
@@ -64,7 +64,6 @@ export default function SharedPatientDetails({
   loading,
   onRetry,
   patient,
-  patientId,
 }: SharedPatientDetailsProps) {
   const patientName = patient
     ? `${patient.first_name ?? ""} ${patient.last_name ?? ""}`.trim() || "Patient"
@@ -78,7 +77,7 @@ export default function SharedPatientDetails({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href={backHref}
-          className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg px-2 text-sm font-medium text-[#051466] hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
+          className="inline-flex min-h-10 w-fit items-center gap-2 rounded-md px-2 text-sm font-medium text-[#051466] hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
         >
           <ArrowLeft size={17} aria-hidden="true" />
           {backLabel}
@@ -91,13 +90,13 @@ export default function SharedPatientDetails({
           <PageSkeleton />
         </section>
       ) : error ? (
-        <section className="rounded-2xl border border-red-200 bg-white p-6 shadow-sm" role="alert">
+        <section className="rounded-md border border-red-200 bg-white p-6 shadow-sm" role="alert">
           <p className="text-sm text-red-700">{error}</p>
           {onRetry && (
             <button
               type="button"
               onClick={onRetry}
-              className="mt-4 min-h-10 rounded-lg bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
+              className="mt-4 min-h-10 rounded-md bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
             >
               Retry
             </button>
@@ -105,7 +104,7 @@ export default function SharedPatientDetails({
         </section>
       ) : patient ? (
         <>
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-md border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-center gap-4">
                 <span className="grid size-14 shrink-0 place-items-center rounded-full bg-emerald-50 text-base font-semibold text-emerald-700">
@@ -116,11 +115,11 @@ export default function SharedPatientDetails({
                     {patientName}
                   </h1>
                   <p className="mt-1 break-all text-sm text-slate-500">
-                    Patient ID: {patient.patient_code?.trim() || patient.id || patientId}
+                    Patient ID: {patient.patient_code?.trim() || "Not recorded"}
                   </p>
                 </div>
               </div>
-              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+              <span className="inline-flex w-fit items-center gap-2 rounded-md bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
                 <ShieldPlus size={15} aria-hidden="true" />
                 Patient record
               </span>

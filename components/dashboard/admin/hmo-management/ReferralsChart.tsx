@@ -12,7 +12,7 @@ export default function ReferralsChart({
   pending,
 }: ReferralsChartProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 border">
+    <div className="bg-white rounded-md shadow-sm p-6 border">
       <h3 className="text-sm font-medium mb-2">Referrals</h3>
 
       <div className="flex items-center justify-between">

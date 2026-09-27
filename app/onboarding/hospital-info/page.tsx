@@ -336,7 +336,7 @@ export default function OnboardingPage() {
   return (
     <main className="flex min-h-[100dvh] w-full items-center justify-center overflow-x-hidden bg-gray-50 px-4 py-6 sm:py-10">
       <motion.div
-        className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white p-5 shadow-xl sm:p-8"
+        className="w-full max-w-2xl overflow-hidden rounded-md bg-white p-5 shadow-xl sm:p-8"
         initial={{
           opacity: 0,
           y: shouldReduceMotion ? 0 : 12,
@@ -362,7 +362,7 @@ export default function OnboardingPage() {
 
         {restorationError && !isSuccess ? (
           <div
-            className="mb-5 flex flex-col gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 sm:flex-row sm:items-center sm:justify-between"
+            className="mb-5 flex flex-col gap-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 sm:flex-row sm:items-center sm:justify-between"
             role="alert"
           >
             <span className="flex items-start gap-2">
@@ -375,7 +375,7 @@ export default function OnboardingPage() {
             <button
               type="button"
               onClick={() => void restoreDraft()}
-              className="min-h-11 shrink-0 rounded-lg border border-amber-500 px-4 py-2 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
+              className="min-h-11 shrink-0 rounded-md border border-amber-500 px-4 py-2 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
             >
               Retry
             </button>

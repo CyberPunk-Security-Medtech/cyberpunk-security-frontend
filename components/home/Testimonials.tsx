@@ -72,7 +72,7 @@ export default function TestimonialsSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="bg-[#F8FDFF] border border-[#D8ECF3] rounded-2xl shadow-sm p-6 flex items-start text-left"
+              className="bg-[#F8FDFF] border border-[#D8ECF3] rounded-md shadow-sm p-6 flex items-start text-left"
             >
               <Image
                 src={t.image}
@@ -118,7 +118,7 @@ export default function TestimonialsSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="bg-[#F8FDFF] border border-[#D8ECF3] rounded-2xl shadow-sm p-6 flex items-start text-left"
+              className="bg-[#F8FDFF] border border-[#D8ECF3] rounded-md shadow-sm p-6 flex items-start text-left"
             >
               <Image
                 src={t.image}

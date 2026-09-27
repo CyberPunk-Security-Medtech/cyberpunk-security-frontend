@@ -59,7 +59,7 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
         actions={
           <Link
             href={`/dashboard/admin/patient/${patientId}/edit`}
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
+            className="inline-flex min-h-10 items-center gap-2 rounded-md bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2"
           >
             <Pencil size={16} aria-hidden="true" />
             Edit patient

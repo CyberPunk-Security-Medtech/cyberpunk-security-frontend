@@ -8,7 +8,7 @@ export default function InviteSuccessPage() {
 
   return (
     <div className="flex justify-center items-center py-10 px-6">
-          <div className="w-full max-w-3xl rounded-2xl bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
+          <div className="w-full max-w-3xl rounded-md bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
 
             <Image
               src="/icons/staffOnboarding_successicon.svg" 
@@ -31,7 +31,7 @@ export default function InviteSuccessPage() {
               onClick={() =>
                 router.push("/dashboard/admin/staff-management")
               }
-              className="w-full py-3 rounded-full bg-[#1A2380] text-white font-medium hover:opacity-90"
+              className="w-full py-3 rounded-md bg-[#1A2380] text-white font-medium hover:opacity-90"
             >
               Go To Staff Management
             </button>

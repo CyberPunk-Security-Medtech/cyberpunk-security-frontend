@@ -64,13 +64,13 @@ export default function ComplianceAuthorization({
         </p>
       </header>
 
-      <div className="rounded-xl border border-[#C9E9E9] bg-[#E6F7F7] p-4 text-sm leading-6 text-gray-700">
+      <div className="rounded-md border border-[#C9E9E9] bg-[#E6F7F7] p-4 text-sm leading-6 text-gray-700">
         By proceeding, you confirm that your hospital complies with all
         applicable health data protection regulations and that you are
         authorized to register this institution on PrivaCure.
       </div>
 
-      <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border border-gray-300 p-3 text-sm text-gray-800 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none">
+      <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-md border border-gray-300 p-3 text-sm text-gray-800 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none">
         <input
           type="checkbox"
           checked={isAuthorized}
@@ -80,7 +80,7 @@ export default function ComplianceAuthorization({
         <span>I confirm that I am authorized to register this hospital.</span>
       </label>
 
-      <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border border-gray-300 p-3 text-sm text-gray-800 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none">
+      <label className="flex min-h-14 cursor-pointer items-start gap-3 rounded-md border border-gray-300 p-3 text-sm text-gray-800 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none">
         <input
           type="checkbox"
           checked={hasAcceptedTerms}
@@ -104,7 +104,7 @@ export default function ComplianceAuthorization({
           type="button"
           onClick={() => void handleRegister()}
           disabled={!canSubmit}
-          className="min-h-11 w-full rounded-full bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:bg-[#AAB0D6]"
+          className="min-h-11 w-full rounded-md bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:bg-[#AAB0D6]"
         >
           {isSubmitting ? "Submitting for review…" : "Register Hospital"}
         </button>
@@ -112,7 +112,7 @@ export default function ComplianceAuthorization({
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="min-h-11 w-full rounded-full px-6 py-2 text-sm font-medium text-[#1A2380] transition hover:bg-[#1A2380]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="min-h-11 w-full rounded-md px-6 py-2 text-sm font-medium text-[#1A2380] transition hover:bg-[#1A2380]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           Back to verification
         </button>

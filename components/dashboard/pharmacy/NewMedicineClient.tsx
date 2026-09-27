@@ -39,14 +39,14 @@
 
 //   return <section className="space-y-8"><BreadcrumbHeading items={["Inventory", "List of Medicines", "Add New Medicine"]} description="Create a medicine catalog entry, then optionally receive its first stock batch." />
 //     <form onSubmit={submit} className="max-w-[820px] space-y-6"><div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Medicine name *</span><input required value={form.name} onChange={(e) => update("name", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Dispensing unit *</span><input required value={form.unit} onChange={(e) => update("unit", e.target.value)} placeholder="tablet, vial, bottle" className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Medicine form</span><input value={form.form} onChange={(e) => update("form", e.target.value)} placeholder="tablet, capsule, syrup" className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Strength</span><input value={form.strength} onChange={(e) => update("strength", e.target.value)} placeholder="500 mg" className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Opening stock</span><input min="0" step="1" type="number" value={form.initial_quantity} onChange={(e) => update("initial_quantity", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Batch number</span><input value={form.batch_number} onChange={(e) => update("batch_number", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Expiry date</span><input type="date" value={form.expiry_date} onChange={(e) => update("expiry_date", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-//     </div><div className="flex gap-3"><button type="button" onClick={() => router.back()} className="rounded-full border border-[#CED7E3] px-7 py-3 text-xs font-medium text-[#2D3648]">Cancel</button><button disabled={saving} className="rounded-full bg-[#00796B] px-7 py-3 text-xs font-medium text-white disabled:opacity-60">{saving ? "Saving..." : "Save medicine"}</button></div></form>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Medicine name *</span><input required value={form.name} onChange={(e) => update("name", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Dispensing unit *</span><input required value={form.unit} onChange={(e) => update("unit", e.target.value)} placeholder="tablet, vial, bottle" className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Medicine form</span><input value={form.form} onChange={(e) => update("form", e.target.value)} placeholder="tablet, capsule, syrup" className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Strength</span><input value={form.strength} onChange={(e) => update("strength", e.target.value)} placeholder="500 mg" className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Opening stock</span><input min="0" step="1" type="number" value={form.initial_quantity} onChange={(e) => update("initial_quantity", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Batch number</span><input value={form.batch_number} onChange={(e) => update("batch_number", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//       <label className="space-y-2 text-sm text-[#2D3648]"><span>Expiry date</span><input type="date" value={form.expiry_date} onChange={(e) => update("expiry_date", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+//     </div><div className="flex gap-3"><button type="button" onClick={() => router.back()} className="rounded-md border border-[#CED7E3] px-7 py-3 text-xs font-medium text-[#2D3648]">Cancel</button><button disabled={saving} className="rounded-md bg-[#00796B] px-7 py-3 text-xs font-medium text-white disabled:opacity-60">{saving ? "Saving..." : "Save medicine"}</button></div></form>
 //   </section>;
 // }
 
@@ -105,22 +105,22 @@ export default function NewMedicineClient() {
 
   return <section className="space-y-8"><BreadcrumbHeading items={["Inventory", "List of Medicines", "Add New Medicine"]} description="Create a medicine catalog entry, then optionally receive its first stock batch." />
     <form onSubmit={submit} className="max-w-[820px] space-y-6"><div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-      <label className="space-y-2 text-sm text-[#2D3648]"><span>Medicine name *</span><input required value={form.name} onChange={(e) => update("name", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-      <label className="space-y-2 text-sm text-[#2D3648]"><span>Dispensing unit *</span><input required value={form.unit} onChange={(e) => update("unit", e.target.value)} placeholder="tablet, vial, bottle" className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
+      <label className="space-y-2 text-sm text-[#2D3648]"><span>Medicine name *</span><input required value={form.name} onChange={(e) => update("name", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+      <label className="space-y-2 text-sm text-[#2D3648]"><span>Dispensing unit *</span><input required value={form.unit} onChange={(e) => update("unit", e.target.value)} placeholder="tablet, vial, bottle" className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
       
       {/* Modified this field to include the datalist dropdown for groups */}
       <label className="space-y-2 text-sm text-[#2D3648]">
         <span>Medicine group (Form)</span>
-        <input list="group-options" value={form.form} onChange={(e) => update("form", e.target.value)} placeholder="Select or type a group..." className="h-11 w-full rounded border border-[#CED7E3] px-3" />
+        <input list="group-options" value={form.form} onChange={(e) => update("form", e.target.value)} placeholder="Select or type a group..." className="h-11 w-full rounded-md border border-[#CED7E3] px-3" />
         <datalist id="group-options">
           {existingGroups.map(group => <option key={group} value={group} />)}
         </datalist>
       </label>
 
-      <label className="space-y-2 text-sm text-[#2D3648]"><span>Strength</span><input value={form.strength} onChange={(e) => update("strength", e.target.value)} placeholder="500 mg" className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-      <label className="space-y-2 text-sm text-[#2D3648]"><span>Opening stock</span><input min="0" step="1" type="number" value={form.initial_quantity} onChange={(e) => update("initial_quantity", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-      <label className="space-y-2 text-sm text-[#2D3648]"><span>Batch number</span><input value={form.batch_number} onChange={(e) => update("batch_number", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-      <label className="space-y-2 text-sm text-[#2D3648]"><span>Expiry date</span><input type="date" value={form.expiry_date} onChange={(e) => update("expiry_date", e.target.value)} className="h-11 w-full rounded border border-[#CED7E3] px-3" /></label>
-    </div><div className="flex gap-3"><button type="button" onClick={() => router.back()} className="rounded-full border border-[#CED7E3] px-7 py-3 text-xs font-medium text-[#2D3648]">Cancel</button><button disabled={saving} className="rounded-full bg-[#00796B] px-7 py-3 text-xs font-medium text-white disabled:opacity-60">{saving ? "Saving..." : "Save medicine"}</button></div></form>
+      <label className="space-y-2 text-sm text-[#2D3648]"><span>Strength</span><input value={form.strength} onChange={(e) => update("strength", e.target.value)} placeholder="500 mg" className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+      <label className="space-y-2 text-sm text-[#2D3648]"><span>Opening stock</span><input min="0" step="1" type="number" value={form.initial_quantity} onChange={(e) => update("initial_quantity", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+      <label className="space-y-2 text-sm text-[#2D3648]"><span>Batch number</span><input value={form.batch_number} onChange={(e) => update("batch_number", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+      <label className="space-y-2 text-sm text-[#2D3648]"><span>Expiry date</span><input type="date" value={form.expiry_date} onChange={(e) => update("expiry_date", e.target.value)} className="h-11 w-full rounded-md border border-[#CED7E3] px-3" /></label>
+    </div><div className="flex gap-3"><button type="button" onClick={() => router.back()} className="rounded-md border border-[#CED7E3] px-7 py-3 text-xs font-medium text-[#2D3648]">Cancel</button><button disabled={saving} className="rounded-md bg-[#00796B] px-7 py-3 text-xs font-medium text-white disabled:opacity-60">{saving ? "Saving..." : "Save medicine"}</button></div></form>
   </section>;
 }

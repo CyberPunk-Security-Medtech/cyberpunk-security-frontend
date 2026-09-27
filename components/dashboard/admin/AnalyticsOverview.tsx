@@ -1,6 +1,6 @@
 export default function AnalyticsOverview() {
   return (
-    <section className="bg-white rounded-2xl shadow-sm border p-5">
+    <section className="bg-white rounded-md shadow-sm border p-5">
       <p className="text-xs font-medium text-emerald-600">Monthly Analytics Overview</p>
       <h2 className="text-lg font-semibold">Comprehensive insights for October 2025</h2>
 

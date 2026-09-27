@@ -1,10 +1,10 @@
 
 function ActivityChart() {
   return (
-    <div className="p-5 bg-white rounded-2xl shadow-sm col-span-1 md:col-span-2">
+    <div className="p-5 bg-white rounded-md shadow-sm col-span-1 md:col-span-2">
       <div className="flex justify-between mb-4">
         <p className="font-medium">Activity</p>
-        <select className="text-sm border rounded px-2 py-1">
+        <select className="text-sm border rounded-md px-2 py-1">
           <option>Month</option>
         </select>
       </div>

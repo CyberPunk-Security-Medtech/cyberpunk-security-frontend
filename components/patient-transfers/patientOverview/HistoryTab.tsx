@@ -10,7 +10,7 @@ export default function HistoryTab() {
       {historyItems.map((item, index) => (
         <div
           key={`${item.title}-${index}`}
-          className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white px-8 py-7 md:flex-row md:items-center md:justify-between"
+          className="flex flex-col gap-4 rounded-md border border-gray-200 bg-white px-8 py-7 md:flex-row md:items-center md:justify-between"
         >
           <div>
             <h3 className="text-2xl font-medium text-black">{item.title}</h3>
@@ -29,7 +29,7 @@ export default function HistoryTab() {
           <p className="text-lg text-gray-500">{item.date}</p>
 
           <span
-            className={`rounded-full border px-5 py-1 text-sm ${
+            className={`rounded-md border px-5 py-1 text-sm ${
               item.status === "Active"
                 ? "border-[#00B8A8] text-[#00B8A8]"
                 : "border-gray-400 text-gray-500"

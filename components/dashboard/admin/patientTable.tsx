@@ -47,7 +47,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
 
         const normalized: AdminPatient[] = ((result ?? []) as PatientListRecord[]).map((p) => ({
           id: p.id,
-          patientCode: p.patient_code?.trim() || p.id,
+          patientCode: p.patient_code?.trim() || "Not recorded",
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
           ageGender: `${resolvePatientAge(p.age, p.dob ?? p.date_of_birth)} / ${p.gender ?? "-"}`,
           hospital: activeWorkspace?.name ?? "Hospital",
@@ -70,7 +70,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
   }, [activeWorkspace?.id, activeWorkspace?.name, refreshVersion]);
 
   return (
-    <section className="rounded-2xl border bg-white p-4 shadow-sm sm:p-5">
+    <section className="rounded-md border bg-white p-4 shadow-sm sm:p-5">
       <h2 className="mb-4 border-b-2 border-[#051466] pb-1 text-sm font-semibold text-[#051466]">
         Patient Records
       </h2>
@@ -113,7 +113,7 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
                 <td className="whitespace-nowrap px-4 py-3">
                   <span
                     className={
-                      "rounded-full px-3 py-1 text-xs capitalize " +
+                      "rounded-md px-3 py-1 text-xs capitalize " +
                       (p.status === "active"
                         ? "bg-emerald-50 text-emerald-700"
                         : "bg-amber-50 text-amber-700")

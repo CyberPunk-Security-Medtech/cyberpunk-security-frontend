@@ -49,7 +49,7 @@ export default function ConsentResultStep({
         {isSuccess && (
           <button
             onClick={onContinue}
-            className="rounded-full bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
+            className="rounded-md bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
           >
             Continue
           </button>

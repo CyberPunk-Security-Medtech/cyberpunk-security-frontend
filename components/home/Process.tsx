@@ -106,7 +106,7 @@ export default function HowItWorks() {
               alt="Certified Team"
               width={400}
               height={400}
-              className="rounded-2xl shadow-lg relative z-20"
+              className="rounded-md shadow-lg relative z-20"
             />
             {/* Overlay Tag */}
             <div className="absolute bottom-4 right-4 z-20">

@@ -813,7 +813,7 @@
 
 // className="
 // border
-// rounded-full
+// rounded-md
 // px-5
 // py-2
 // "
@@ -1167,7 +1167,7 @@ export function PatientPrescriptionModal({
               resetForm();
               onClose();
             }}
-            className="border rounded-full px-5 py-2"
+            className="border rounded-md px-5 py-2"
           >
             Cancel
           </button>

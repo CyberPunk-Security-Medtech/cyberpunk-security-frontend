@@ -133,7 +133,7 @@ export default function TwoFactorChallenge({
                 setCode(event.target.value);
                 setError("");
               }}
-              className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 px-3 font-mono text-sm text-slate-900 outline-none focus:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20 disabled:cursor-not-allowed disabled:bg-slate-100"
+              className="mt-2 min-h-11 w-full rounded-md border border-slate-300 px-3 font-mono text-sm text-slate-900 outline-none focus:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20 disabled:cursor-not-allowed disabled:bg-slate-100"
             />
           </div>
         ) : (
@@ -159,7 +159,7 @@ export default function TwoFactorChallenge({
         <button
           type="submit"
           disabled={submitting}
-          className="min-h-11 w-full rounded-full bg-[#1E237E] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#171B65] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
+          className="min-h-11 w-full rounded-md bg-[#1E237E] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#171B65] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? "Verifying…" : "Continue"}
         </button>
@@ -171,7 +171,7 @@ export default function TwoFactorChallenge({
             type="button"
             onClick={() => void resendEmailCode()}
             disabled={resending}
-            className="min-h-11 rounded-lg px-3 font-semibold text-[#1E237E] hover:bg-[#1E237E]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-11 rounded-md px-3 font-semibold text-[#1E237E] hover:bg-[#1E237E]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {resending ? "Sending…" : "Resend email code"}
           </button>
@@ -179,7 +179,7 @@ export default function TwoFactorChallenge({
         <button
           type="button"
           onClick={switchCodeType}
-          className="min-h-11 rounded-lg px-3 font-semibold text-[#1E237E] hover:bg-[#1E237E]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E]"
+          className="min-h-11 rounded-md px-3 font-semibold text-[#1E237E] hover:bg-[#1E237E]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E]"
         >
           {usingBackupCode
             ? method === "email"
@@ -190,7 +190,7 @@ export default function TwoFactorChallenge({
         <button
           type="button"
           onClick={onCancel}
-          className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E]"
+          className="flex min-h-11 items-center gap-2 rounded-md px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E237E]"
         >
           <ArrowLeft aria-hidden="true" size={17} />
           Back to sign in

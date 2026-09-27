@@ -33,11 +33,11 @@ export default function PatientHeader() {
     `${patient?.first_name?.[0] ?? ""}${patient?.last_name?.[0] ?? ""}`.toUpperCase() || "NA";
 
   return (
-    <div className="mb-6 rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+    <div className="mb-6 rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <button
           onClick={() => history.back()}
-          className="text-sm w-fit bg-[#ECFDF8] font-medium rounded-full text-[#003C36] hover:underline px-4 py-1"
+          className="text-sm w-fit bg-[#ECFDF8] font-medium rounded-md text-[#003C36] hover:underline px-4 py-1"
         >
           Back to Patients List
         </button>
@@ -64,14 +64,14 @@ export default function PatientHeader() {
           </h3>
           <p className="text-sm">
             <span className="text-sm text-[#00B8A8]">Patient ID:</span>{" "}
-            <span className="break-all text-gray-700">{patient?.patient_code || patient?.id || "-"}</span>
+            <span className="break-all text-gray-700">{patient?.patient_code || "-"}</span>
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {vitals.map((v) => (
-          <div key={v.label} className="border rounded-lg p-4 text-center">
+          <div key={v.label} className="border rounded-md p-4 text-center">
             <p className="break-words font-semibold text-[#003C36]">{v.value}</p>
             <p className="text-sm text-gray-500">{v.label}</p>
             <div className="mt-2"><StatusBadge status={v.status} /></div>

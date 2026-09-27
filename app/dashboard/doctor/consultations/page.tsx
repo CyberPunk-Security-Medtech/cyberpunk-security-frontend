@@ -107,7 +107,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
         setRows(result.data.map((item) => ({
           id: item.id,
           patient_id: item.patient_id,
-          patient_code: item.patient?.patient_code?.trim() || item.patient_id,
+          patient_code: item.patient?.patient_code?.trim() || "-",
           patient_name:
             `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
             "Unknown Patient",
@@ -256,7 +256,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
                 onClick={() => {
                   if (tab !== activeTab) changeQueueQuery({ ...queueQuery, status: tab, page: 1 });
                 }}
-                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
+                className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition ${
                   isActive
                     ? "bg-[#1A2380] text-white"
                     : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
@@ -274,11 +274,11 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search this page by patient, reason or ID"
-          className="w-full rounded-full border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8] lg:max-w-sm"
+          className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8] lg:max-w-sm"
         />
       </div>
 
-      <div className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="min-w-0 rounded-md border border-gray-200 bg-white shadow-sm">
         <ResponsiveTableRegion label="Doctor consultations">
           <table className="w-full min-w-[980px] border-collapse text-left text-sm">
             <thead className="border-b bg-gray-50 text-gray-600">

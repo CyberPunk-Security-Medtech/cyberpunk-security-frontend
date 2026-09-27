@@ -91,12 +91,12 @@ export default function DepartmentManagementPage() {
           </section>
 
           {!orgId ? (
-            <div className="rounded-xl border bg-white p-5 text-sm text-slate-600">
+            <div className="rounded-md border bg-white p-5 text-sm text-slate-600">
               No active organization selected.
             </div>
           ) : (
             <>
-              <section className="rounded-xl border bg-white p-5">
+              <section className="rounded-md border bg-white p-5">
                 <h2 className="text-base font-semibold">Create Department</h2>
                 <form className="mt-4 flex flex-col gap-3 sm:flex-row" onSubmit={handleCreate}>
                   <input
@@ -104,12 +104,12 @@ export default function DepartmentManagementPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Department name (e.g., Cardiology)"
-                    className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#051466]"
+                    className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[#051466]"
                   />
                   <Button
                     type="submit"
                     disabled={!canCreate}
-                    className="rounded-lg !bg-[#051466] text-sm"
+                    className="rounded-md !bg-[#051466] text-sm"
                   >
                     {creating ? "Creating..." : "Create Department"}
                   </Button>
@@ -117,7 +117,7 @@ export default function DepartmentManagementPage() {
                 {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
               </section>
 
-              <section className="rounded-xl border bg-white overflow-hidden">
+              <section className="rounded-md border bg-white overflow-hidden">
                 <div className="border-b px-5 py-3">
                   <h2 className="text-base font-semibold">Departments</h2>
                 </div>
@@ -143,7 +143,7 @@ export default function DepartmentManagementPage() {
                         departments.map((department) => (
                           <tr key={department.id} className="border-t">
                             <td className="bg-white px-5 py-4">{department.name}</td>
-                            <td className="px-5 py-4 font-mono text-xs">{department.department_code?.trim() || department.id}</td>
+                            <td className="px-5 py-4 font-mono text-xs">{department.department_code?.trim() || "-"}</td>
                             <td className="px-5 py-4">{formatDateTime(department.created_at)}</td>
                           </tr>
                         ))

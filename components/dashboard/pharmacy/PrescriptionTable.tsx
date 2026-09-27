@@ -142,7 +142,7 @@ Patient
                   </td>
 
                   <td className="px-4 py-3">
-                    <span className="inline-flex rounded-full bg-[#F3F4F6] px-2 py-1 text-[11px] font-semibold text-[#374151]">
+                    <span className="inline-flex rounded-md bg-[#F3F4F6] px-2 py-1 text-[11px] font-semibold text-[#374151]">
                       {item.status ?? "Unknown"}
                     </span>
                   </td>
@@ -161,11 +161,11 @@ Patient
 
                   <td className="px-4 py-3 text-right">
                     {isDispensed(item.status) && onCorrectDispense ? (
-                      <button type="button" className="rounded-full border border-[#D1D5DB] bg-white px-3 py-1 text-xs font-medium text-[#1F2937] hover:bg-[#F9FAFB]" onClick={() => onCorrectDispense(item.id)}>Correct dispense</button>
+                      <button type="button" className="rounded-md border border-[#D1D5DB] bg-white px-3 py-1 text-xs font-medium text-[#1F2937] hover:bg-[#F9FAFB]" onClick={() => onCorrectDispense(item.id)}>Correct dispense</button>
                     ) : onDispense && (
                       <button
                         type="button"
-                        className="rounded-full border border-[#D1D5DB] bg-white px-3 py-1 text-xs font-medium text-[#1F2937] transition hover:bg-[#F9FAFB]"
+                        className="rounded-md border border-[#D1D5DB] bg-white px-3 py-1 text-xs font-medium text-[#1F2937] transition hover:bg-[#F9FAFB]"
                         onClick={(event) => {
                           event.stopPropagation();
                           onDispense(item.id);

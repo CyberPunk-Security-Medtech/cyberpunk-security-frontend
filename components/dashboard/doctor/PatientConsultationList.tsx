@@ -28,7 +28,7 @@ export default function PatientConsultationList() {
   } = useConsultation();
 
   return (
-    <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
+    <section className="rounded-md border bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-[#1A2380]">Consultations</h3>
         <p className="text-sm text-gray-500">
@@ -44,7 +44,7 @@ export default function PatientConsultationList() {
       )}
 
       {!consultationLoading && consultations.length === 0 && (
-        <div className="rounded-lg border p-4 text-sm text-gray-500">
+        <div className="rounded-md border p-4 text-sm text-gray-500">
           No consultation found for this patient yet.
         </div>
       )}
@@ -58,7 +58,7 @@ export default function PatientConsultationList() {
             return (
               <div
                 key={consultation.id}
-                className={`rounded-lg border p-4 transition ${
+                className={`rounded-md border p-4 transition ${
                   isSelected ? "border-[#1A2380] bg-[#F8F9FF]" : "border-gray-200 bg-white"
                 }`}
               >
@@ -80,7 +80,7 @@ export default function PatientConsultationList() {
 
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge status={toBadgeStatus(String(consultation.status || ""))} />
-                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
+                      <span className="rounded-md bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
                         {consultation.priority || "-"}
                       </span>
                       <span className="inline-block text-xs text-gray-500">
@@ -97,7 +97,7 @@ export default function PatientConsultationList() {
                 >
                   <div className="overflow-hidden">
                     <div className="border-t pt-4">
-                      <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-gray-700 xl:grid-cols-3">
+                      <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-gray-700 xl:grid-cols-2">
                         <div className="rounded-md bg-gray-50 p-3">
                           <p className="text-xs text-gray-500">Created</p>
                           <p className="font-medium">{formatDate(consultation.created_at)}</p>
@@ -107,10 +107,6 @@ export default function PatientConsultationList() {
                           <p className="font-medium">
                             {formatDate(consultation.updated_at || consultation.created_at)}
                           </p>
-                        </div>
-                        <div className="rounded-md bg-gray-50 p-3">
-                          <p className="text-xs text-gray-500">Consultation ID</p>
-                          <p className="break-all font-medium">{consultation.id}</p>
                         </div>
                       </div>
 

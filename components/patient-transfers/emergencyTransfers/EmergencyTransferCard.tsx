@@ -19,7 +19,7 @@ export default function EmergencyTransferCard({
 
   return (
     <div className="flex min-h-[calc(100vh-72px)] items-center justify-center bg-[#F3FAFA] px-6 py-10">
-      <div className="w-full max-w-5xl rounded-2xl bg-white px-12 py-8 shadow-2xl">
+      <div className="w-full max-w-5xl rounded-md bg-white px-12 py-8 shadow-2xl">
         <div className="flex flex-col items-center">
           <Image
             src="/sidebar_logo.svg"

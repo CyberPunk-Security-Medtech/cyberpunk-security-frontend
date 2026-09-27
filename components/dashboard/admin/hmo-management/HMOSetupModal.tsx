@@ -45,7 +45,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <input
               type="text"
               placeholder="Add Name"
-              className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               required
             />
           </div>
@@ -57,7 +57,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <input
               type="text"
               placeholder="Enter ID"
-              className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               required
             />
           </div>
@@ -69,7 +69,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <input
               type="text"
               placeholder="Enter Name"
-              className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
@@ -80,7 +80,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <input
               type="email"
               placeholder="Enter Email"
-              className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
@@ -91,7 +91,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <input
               type="text"
               placeholder="Enter Direct Line"
-              className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
@@ -102,7 +102,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <input
               type="url"
               placeholder="Enter Url..."
-              className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
@@ -110,13 +110,13 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
             <button
               type="button"
               onClick={handleClose}
-              className="px-5 py-2 rounded-full border text-gray-700"
+              className="px-5 py-2 rounded-md border text-gray-700"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-full bg-[#1A2380] text-white"
+              className="px-5 py-2 rounded-md bg-[#1A2380] text-white"
             >
               Continue
             </button>
@@ -158,7 +158,7 @@ export default function HMOSetupModal({ isOpen, onClose }: HMOSetupModalProps) {
           </p>
           <button
             onClick={handleClose}
-            className="bg-[#1A2380] text-white px-6 py-2 rounded-full"
+            className="bg-[#1A2380] text-white px-6 py-2 rounded-md"
           >
             Go to HMO Dashboard
           </button>

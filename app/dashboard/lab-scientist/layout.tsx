@@ -43,7 +43,6 @@ export default function LabScientistLayout({
   const profile: UserProfile = {
     name: buildDisplayName(user as User),
     role: activeWorkspace?.role ?? "Lab Scientist",
-    avatar: "/avatars/eleanor.png",
   };
 
   return (

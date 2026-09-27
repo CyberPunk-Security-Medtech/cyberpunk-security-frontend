@@ -108,7 +108,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
         setRows(result.data.map((item) => ({
           id: item.id,
           patient_id: item.patient_id,
-          patient_code: item.patient?.patient_code?.trim() || item.patient_id,
+          patient_code: item.patient?.patient_code?.trim() || "-",
           patient_name:
             `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
             "Unknown Patient",
@@ -185,7 +185,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
                 onClick={() => {
                   if (tab !== activeTab) changeQuery({ ...query, status: tab, page: 1 });
                 }}
-                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
+                className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition ${
                   isActive
                     ? "bg-[#006B5F] text-white"
                     : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
@@ -198,7 +198,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
         </div>
       </div>
 
-      <div className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="min-w-0 rounded-md border border-gray-200 bg-white shadow-sm">
         <ResponsiveTableRegion label="Nurse consultations">
           <table className="w-full min-w-[980px] border-collapse text-left text-sm">
             <thead className="border-b bg-gray-50 text-gray-600">

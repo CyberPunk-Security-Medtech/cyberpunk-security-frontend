@@ -6,6 +6,7 @@ import { ArrowUpDown, Plus, Search, Trash2 } from "lucide-react";
 import { inventoryService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
+import { useConfirm } from "@components/ConfirmDialog";
 import BreadcrumbHeading from "./BreadcrumbHeading";
 import AddGroupModal from "./AddGroupModal";
 import { collectionFromResponse, getInventoryGroup, InventoryItem } from "./pharmacyUtils";
@@ -14,6 +15,7 @@ type MedicineGroup = { name: string; medicineCount: number };
 
 export default function MedicineGroupsClient() {
   const { activeWorkspace } = useAuth();
+  const { confirm, confirmDialog } = useConfirm();
   const orgId = activeWorkspace?.id;
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,14 @@ const groups = useMemo<MedicineGroup[]>(() => {
   }, [items, query]);
 
   const removeGroup = async (group: MedicineGroup) => {
-    if (!orgId || !confirm(`Remove ${group.name} from all ${group.medicineCount} medicine(s)?`)) return;
+    if (!orgId) return;
+    const confirmed = await confirm({
+      title: `Remove the ${group.name} group?`,
+      message: `${group.medicineCount} medicine(s) will no longer belong to this group. The medicines themselves are not deleted.`,
+      confirmLabel: "Remove group",
+      destructive: true,
+    });
+    if (!confirmed) return;
     
     const affectedIds = new Set(items.filter((item) => getInventoryGroup(item) === group.name).map((item) => item.id));
     
@@ -88,10 +97,11 @@ const groups = useMemo<MedicineGroup[]>(() => {
 
   return (
     <>
+      {confirmDialog}
       <section className="min-w-0 space-y-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <BreadcrumbHeading items={["Inventory", "Medicine Groups"]} description="Groups are saved as a category on inventory items." />
-          <button onClick={() => setIsModalOpen(true)} disabled={!items.length} className="inline-flex items-center gap-1 self-start rounded-sm bg-[#00796B] px-5 py-2 text-xs font-medium text-white disabled:opacity-60">
+          <button onClick={() => setIsModalOpen(true)} disabled={!items.length} className="inline-flex items-center gap-1 self-start rounded-md bg-[#00796B] px-5 py-2 text-xs font-medium text-white disabled:opacity-60">
             <Plus size={12} />Create group
           </button>
         </div>
@@ -102,15 +112,15 @@ const groups = useMemo<MedicineGroup[]>(() => {
         
         <div className="relative w-full max-w-[320px]">
           <Search size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA3B2]" />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for group" className="h-10 w-full rounded border border-[#CED7E3] bg-white px-3 pr-9 text-xs outline-none" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for group" className="h-10 w-full rounded-md border border-[#CED7E3] bg-white px-3 pr-9 text-xs outline-none" />
         </div>
         
         {loading ? (
-          <div className="h-64 animate-pulse rounded border border-[#D8DEE8] bg-gray-100" />
+          <div className="h-64 animate-pulse rounded-md border border-[#D8DEE8] bg-gray-100" />
         ) : groups.length === 0 ? (
-          <div className="rounded border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">No medicine groups found.</div>
+          <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">No medicine groups found.</div>
         ) : (
-          <div className="overflow-x-auto rounded border border-[#D8DEE8] bg-white">
+          <div className="overflow-x-auto rounded-md border border-[#D8DEE8] bg-white">
             <table className="min-w-[700px] w-full text-left">
               <thead className="border-b border-[#D8DEE8]">
                 <tr className="text-sm font-medium text-[#2D3648]">

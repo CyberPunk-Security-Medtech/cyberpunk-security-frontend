@@ -41,7 +41,7 @@ export default function AdminMembersSettings({
         {hasWorkspace ? (
           <Link
             href="/dashboard/admin/staff-management/StaffOnboarding"
-            className="dashboard-button min-h-11 rounded-lg bg-[#1A2380] px-5 text-sm font-semibold text-white hover:bg-[#11185F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2 sm:min-h-10"
+            className="dashboard-button min-h-11 rounded-md bg-[#1A2380] px-5 text-sm font-semibold text-white hover:bg-[#11185F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] focus-visible:ring-offset-2 sm:min-h-10"
           >
             + Invite Member
           </Link>
@@ -49,7 +49,7 @@ export default function AdminMembersSettings({
           <button
             type="button"
             disabled
-            className="dashboard-button min-h-11 rounded-lg bg-[#1A2380] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10"
+            className="dashboard-button min-h-11 rounded-md bg-[#1A2380] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-10"
           >
             + Invite Member
           </button>
@@ -57,7 +57,7 @@ export default function AdminMembersSettings({
       </div>
 
       {!hasWorkspace && (
-        <p role="status" className="mt-5 rounded-lg bg-amber-50 px-3 py-3 text-sm text-amber-800">
+        <p role="status" className="mt-5 rounded-md bg-amber-50 px-3 py-3 text-sm text-amber-800">
           Select an organization workspace to view and invite members.
         </p>
       )}
@@ -68,8 +68,8 @@ export default function AdminMembersSettings({
             <div key={item} className="flex animate-pulse items-center gap-4 border-t border-slate-200 py-5 first:border-t-0">
               <div className="h-12 w-12 rounded-full bg-slate-200" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-40 rounded bg-slate-200" />
-                <div className="h-3 w-28 rounded bg-slate-100" />
+                <div className="h-4 w-40 rounded-md bg-slate-200" />
+                <div className="h-3 w-28 rounded-md bg-slate-100" />
               </div>
             </div>
           ))}
@@ -77,12 +77,12 @@ export default function AdminMembersSettings({
       )}
 
       {hasWorkspace && !loading && error && (
-        <div role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4">
+        <div role="alert" className="mt-5 rounded-md border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-800">{error}</p>
           <button
             type="button"
             onClick={onRetry}
-            className="dashboard-button mt-3 min-h-10 rounded-lg border border-red-300 px-4 text-sm font-medium text-red-700 hover:bg-red-100"
+            className="dashboard-button mt-3 min-h-10 rounded-md border border-red-300 px-4 text-sm font-medium text-red-700 hover:bg-red-100"
           >
             Try again
           </button>
@@ -90,7 +90,7 @@ export default function AdminMembersSettings({
       )}
 
       {hasWorkspace && !loading && !error && members.length === 0 && (
-        <p className="mt-5 rounded-lg bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+        <p className="mt-5 rounded-md bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
           No organization members were found.
         </p>
       )}
@@ -117,17 +117,17 @@ export default function AdminMembersSettings({
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                  <span className="rounded-full border border-slate-300 bg-slate-100 px-4 py-1 text-xs text-slate-700">
+                  <span className="rounded-md border border-slate-300 bg-slate-100 px-4 py-1 text-xs text-slate-700">
                     {formatRole(member.role)}
                   </span>
-                  <span className="rounded-full border border-[#00B8A8] bg-cyan-50 px-4 py-1 text-xs text-[#00796B]">
+                  <span className="rounded-md border border-[#00B8A8] bg-cyan-50 px-4 py-1 text-xs text-[#00796B]">
                     Active
                   </span>
                   <button
                     type="button"
                     disabled
                     aria-describedby="member-removal-unavailable"
-                    className="min-h-11 rounded-full border border-red-300 bg-red-100 px-4 text-xs text-red-600 disabled:cursor-not-allowed disabled:opacity-70 sm:min-h-10"
+                    className="min-h-11 rounded-md border border-red-300 bg-red-100 px-4 text-xs text-red-600 disabled:cursor-not-allowed disabled:opacity-70 sm:min-h-10"
                   >
                     Remove
                   </button>

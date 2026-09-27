@@ -57,7 +57,7 @@ export default function TeamValues() {
         {values.map((v, i) => (
           <div
             key={i}
-            className="bg-white shadow-md rounded-2xl p-8 max-w-xs flex flex-col items-center text-center 
+            className="bg-white shadow-md rounded-md p-8 max-w-xs flex flex-col items-center text-center 
                        transition-transform duration-300 hover:scale-105"
           >
             {/* Icon */}

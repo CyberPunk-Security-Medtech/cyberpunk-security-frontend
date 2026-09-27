@@ -200,7 +200,7 @@ export default function VerifyHospitalStep({
 
       {status === "rejected" ? (
         <div
-          className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"
+          className="mb-4 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"
           role="alert"
         >
           <p className="font-medium">Verification needs an update.</p>
@@ -213,7 +213,7 @@ export default function VerifyHospitalStep({
 
       {isLocked ? (
         <div
-          className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950"
+          className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950"
           role="status"
         >
           {status === "verified"
@@ -235,7 +235,7 @@ export default function VerifyHospitalStep({
           return (
             <div key={requirement.type}>
               <div
-                className={`flex min-h-14 items-center gap-3 rounded-2xl border px-4 py-2.5 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none ${
+                className={`flex min-h-14 items-center gap-3 rounded-md border px-4 py-2.5 transition focus-within:border-[#1A2380] focus-within:ring-2 focus-within:ring-[#1A2380]/20 motion-reduce:transition-none ${
                   error ? "border-red-500" : "border-gray-400"
                 }`}
               >
@@ -322,7 +322,7 @@ export default function VerifyHospitalStep({
           disabled={
             !isLocked && (!hasAllDocuments || busyType !== null)
           }
-          className="min-h-11 w-full rounded-full bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="min-h-11 w-full rounded-md bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLocked ? "Continue to workspaces" : "Continue"}
         </button>
@@ -331,7 +331,7 @@ export default function VerifyHospitalStep({
             type="button"
             onClick={onBack}
             disabled={busyType !== null}
-            className="min-h-11 w-full rounded-full px-6 py-2 text-sm font-medium text-[#1A2380] transition hover:bg-[#1A2380]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-11 w-full rounded-md px-6 py-2 text-sm font-medium text-[#1A2380] transition hover:bg-[#1A2380]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             Back to hospital information
           </button>

@@ -7,7 +7,7 @@ import { ConsentStatus } from "./PatientTransferTypes";
 export function ConsentStatusBadge({ status }: { status: ConsentStatus }) {
   return (
     <span
-      className={`inline-flex rounded px-3 py-1 text-sm font-medium ${
+      className={`inline-flex rounded-md px-3 py-1 text-sm font-medium ${
         status === "Granted"
           ? "bg-green-100 text-green-700"
           : "bg-red-200 text-red-600"
@@ -27,7 +27,7 @@ export function LabStatusBadge({ status }: { status: string }) {
         : "border-[#7C83E8] text-[#4F56B3]";
 
   return (
-    <span className={`inline-flex rounded-full border px-4 py-1 text-sm ${styles}`}>
+    <span className={`inline-flex rounded-md border px-4 py-1 text-sm ${styles}`}>
       {status}
     </span>
   );
@@ -38,7 +38,7 @@ export function MedicationStatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs ${
         isCompleted
           ? "bg-green-100 text-green-700"
           : "bg-orange-100 text-orange-500"

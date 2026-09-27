@@ -49,7 +49,6 @@ export default function DashboardLayout({
   const doctorProfile: UserProfile = {
     name: formatDisplayName(user),
     role: activeWorkspace?.role ?? "Doctor",
-    avatar: "/avatars/eleanor.png",
   };
 
   return (

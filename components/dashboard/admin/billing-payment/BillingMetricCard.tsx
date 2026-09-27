@@ -40,7 +40,7 @@ export default function BillingMetricCard({
   const classes = toneClasses[metric.tone];
 
   return (
-    <article className={`rounded-2xl p-6 ${classes.card}`}>
+    <article className={`rounded-md p-6 ${classes.card}`}>
       <p className={`text-sm tracking-[0.14em] ${classes.label}`}>
         {metric.label}
       </p>

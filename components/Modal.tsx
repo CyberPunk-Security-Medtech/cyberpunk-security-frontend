@@ -29,7 +29,7 @@ export default function Modal({
       isOpen={isOpen}
       onClose={onClose}
       backdropClassName="bg-black/50"
-      panelClassName={`flex max-h-[calc(100dvh-2rem)] w-[95%] max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-lg ${className ?? ""}`}
+      panelClassName={`flex max-h-[calc(100dvh-2rem)] w-[95%] max-w-3xl flex-col overflow-hidden rounded-md bg-white shadow-lg ${className ?? ""}`}
     >
       <div
         className={`flex shrink-0 items-center justify-between px-6 py-4 text-white ${headerClassName || "bg-[#1A2380]"}`}

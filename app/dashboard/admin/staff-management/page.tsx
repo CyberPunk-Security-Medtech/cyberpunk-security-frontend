@@ -12,7 +12,7 @@ export default function StaffManagementPage() {
 
           <StaffActions />
 
-          <div className="overflow-hidden rounded-xl border bg-white">
+          <div className="overflow-hidden rounded-md border bg-white">
             <StaffTable />
           </div>
     </div>

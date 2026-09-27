@@ -14,11 +14,13 @@ import {
 import { useConsultation } from "./ConsultationContext";
 import { toast } from "react-toastify";
 import { ClinicalListThumbnail } from "@components/dashboard/consultations/ClinicalListPresentation";
+import LabReportModal from "@components/dashboard/consultations/LabReportModal";
 
 export default function LabTestTab() {
   const [open, setOpen] = useState(false);
   const [tests, setTests] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [reportTest, setReportTest] = useState<{ id: string; test_name?: string } | null>(null);
 
   const {
     orgId,
@@ -75,6 +77,19 @@ export default function LabTestTab() {
         priority: form.priority,
         clinical_notes: form.clinical_notes || null,
       });
+      // Lab tests don't store notes; the consultation's notes are their home.
+      if (form.clinical_notes.trim()) {
+        try {
+          await consultationService.addConsultationNote(
+            orgId,
+            selectedConsultationId,
+            `Lab order (${form.test_name}): ${form.clinical_notes.trim()}`,
+          );
+        } catch (noteError) {
+          console.warn("Failed to save lab order note", noteError);
+          toast.warn("Test ordered, but the clinical notes couldn't be saved.");
+        }
+      }
       toast.success("Lab test ordered");
       setOpen(false);
       setForm({
@@ -93,7 +108,7 @@ export default function LabTestTab() {
   };
 
   return (
-    <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+    <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-semibold text-[#003C36]">Lab Test</h3>
         <button
@@ -109,12 +124,12 @@ export default function LabTestTab() {
       )}
       <div className="space-y-3">
         {filteredTests.length === 0 && (
-          <div className="rounded-xl border px-4 py-4 text-sm text-gray-500">
+          <div className="rounded-md border px-4 py-4 text-sm text-gray-500">
             No lab tests recorded.
           </div>
         )}
         {filteredTests.map((t: any) => (
-          <div key={t.id} className="flex flex-col gap-3 rounded-xl border px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div key={t.id} className="flex flex-col gap-3 rounded-md border px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <ClinicalListThumbnail kind="lab-test" tone="nurse" />
               <div className="min-w-0">
@@ -124,15 +139,25 @@ export default function LabTestTab() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               {t.priority && (
-                <span className="rounded-full bg-[#FFEBEC] px-2.5 py-1 text-xs font-medium text-[#CC1820]">
+                <span className="rounded-md bg-[#FFEBEC] px-2.5 py-1 text-xs font-medium text-[#CC1820]">
                   {t.priority}
                 </span>
               )}
               <StatusBadge status={String(t.status).toLowerCase() === "completed" ? "Completed" : "Pending"} />
+              {String(t.status).toLowerCase() === "completed" && (
+                <button
+                  type="button"
+                  onClick={() => setReportTest({ id: t.id, test_name: t.test_name })}
+                  className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  View report
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
+      <LabReportModal orgId={orgId} labTest={reportTest} onClose={() => setReportTest(null)} headerClassName="bg-[#003C36]" />
       <Modal
         title="Order New Test"
         isOpen={open}
@@ -188,12 +213,12 @@ export default function LabTestTab() {
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setOpen(false)} className="rounded-full border px-6 py-2.5 text-sm font-medium">
+            <button type="button" onClick={() => setOpen(false)} className="rounded-md border px-6 py-2.5 text-sm font-medium">
               Cancel
             </button>
             <button
               disabled={submitting || !orgId || !selectedConsultationId}
-              className="rounded-full bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
+              className="rounded-md bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
               type="submit"
             >
               {submitting ? "Submitting..." : "Submit Test Request"}

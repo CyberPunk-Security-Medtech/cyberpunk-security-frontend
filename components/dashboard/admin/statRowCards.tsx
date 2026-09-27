@@ -16,7 +16,7 @@ export default function StatCardsRow() {
         const deltaColor = item.positive ? "text-emerald-600" : "text-rose-600";
 
         return (
-          <div key={item.title} className="bg-white rounded-2xl p-4 border flex flex-col gap-2">
+          <div key={item.title} className="bg-white rounded-md p-4 border flex flex-col gap-2">
             <div className="flex justify-between text-xs text-slate-500">
               <span>{item.title}</span>
               <Icon className="w-4 h-4 text-slate-400" />

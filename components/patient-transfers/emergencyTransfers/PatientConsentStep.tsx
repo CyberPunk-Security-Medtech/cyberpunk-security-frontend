@@ -45,7 +45,7 @@ export default function PatientContactStep({
 
         <label className="block">
           <span className="mb-2 block text-sm text-gray-700">Email Info</span>
-          <div className="flex items-center rounded-full border border-gray-300 px-5 py-3 focus-within:border-[#211783]">
+          <div className="flex items-center rounded-md border border-gray-300 px-5 py-3 focus-within:border-[#211783]">
             <input
               value={form.email}
               onChange={(event) =>
@@ -66,7 +66,7 @@ export default function PatientContactStep({
 
         <button
           onClick={onNext}
-          className="rounded-full bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
+          className="rounded-md bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
         >
           Continue
         </button>
@@ -93,7 +93,7 @@ function InputField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-full border border-gray-300 px-5 py-3 outline-none focus:border-[#211783]"
+        className="w-full rounded-md border border-gray-300 px-5 py-3 outline-none focus:border-[#211783]"
       />
     </label>
   );

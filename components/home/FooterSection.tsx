@@ -102,7 +102,7 @@ export default function Footer() {
       <div
         className="
           relative z-10 mx-auto w-[92%] max-w-6xl
-          rounded-[24px] border border-white/30 bg-white/35
+          rounded-md border border-white/30 bg-white/35
           backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.06)]
           px-6 py-10 md:px-10 md:py-12
         "
@@ -184,7 +184,7 @@ export default function Footer() {
               type="email"
               placeholder="Enter your mail..."
               className="
-                w-full rounded-full border border-black/20 bg-white/50
+                w-full rounded-md border border-black/20 bg-white/50
                 px-5 py-3 text-sm text-[#0F1C2E]
                 placeholder:text-[#0F1C2E]/50
                 backdrop-blur-md outline-none
@@ -195,7 +195,7 @@ export default function Footer() {
               type="submit"
               className="
                 absolute right-1 top-1/2 -translate-y-1/2
-                rounded-full bg-[#00A9B7] px-4 py-2 text-sm font-medium text-white
+                rounded-md bg-[#00A9B7] px-4 py-2 text-sm font-medium text-white
                 hover:bg-[#0096A4] transition
               "
             >

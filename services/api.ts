@@ -20,6 +20,16 @@ let refreshPromise: Promise<unknown> | null = null;
 const isAuthEndpoint = (url?: string) =>
   typeof url === "string" && url.includes("/api/v1/auth/");
 
+// Pages anyone may view signed out. A failed session check here is expected
+// and must not bounce the visitor to the login page.
+const PUBLIC_ROUTE_PREFIXES = ["/auth", "/onboarding", "/home", "/invitations", "/consent", "/share-consent"];
+
+const isPublicRoute = () => {
+  if (typeof window === "undefined") return true;
+  const path = window.location.pathname;
+  return path === "/" || PUBLIC_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+};
+
 const isInvitationRoute = () =>
   typeof window !== "undefined" &&
   window.location.pathname.startsWith("/invitations");
@@ -62,11 +72,7 @@ api.interceptors.response.use(
       localStorage.removeItem("user");
       localStorage.removeItem("workspaces");
       localStorage.removeItem("activeWorkspace");
-      if (
-        typeof window !== "undefined" &&
-        !window.location.pathname.startsWith("/auth") &&
-        !window.location.pathname.startsWith("/onboarding")
-      ) {
+      if (!isPublicRoute()) {
         window.location.assign("/auth/login");
       }
       return Promise.reject(error);
@@ -1076,7 +1082,7 @@ export type ConsultationRecord = {
   updated_at: string;
 };
 
-export const LAB_TEST_PRIORITIES = ["Routine", "Urgent", "Stat"] as const;
+export const LAB_TEST_PRIORITIES = ["Routine", "Urgent", "Emergency"] as const;
 
 export type LabTestPriority = (typeof LAB_TEST_PRIORITIES)[number];
 
@@ -1499,11 +1505,14 @@ export const labService = {
     return unwrap(res.data);
   },
 
-  async listOrganizationLabTests(orgId: string, params?: { statuses?: string[] }) {
+  // The backend filters by a single `status_filter` (it ignores anything
+  // else). Omit it to get every status in one request and filter client-side.
+  async listOrganizationLabTests(
+    orgId: string,
+    params?: { status_filter?: "Pending" | "In Progress" | "Completed" | "Cancelled" },
+  ) {
     const res = await api.get(`/api/v1/organizations/${orgId}/lab-tests`, {
-      params: {
-        statuses: params?.statuses?.join(","),
-      },
+      params: params?.status_filter ? { status_filter: params.status_filter } : undefined,
     });
     return unwrap(res.data);
   },
@@ -1565,20 +1574,28 @@ export const labService = {
     return unwrap(res.data);
   },
 
-  async uploadLabReportAttachment(orgId: string, labTestId: string, file: File) {
+  // Uploads an image or PDF as (part of) the lab report. The first upload
+  // creates the report and marks the test Completed; later uploads append.
+  // There is no list endpoint — attachments come back on getLabReport and
+  // on this call's response (the updated report).
+  async uploadLabReportAttachment(
+    orgId: string,
+    labTestId: string,
+    file: File,
+    onProgress?: (percent: number) => void,
+  ) {
     const form = new FormData();
     form.append("file", file);
     const res = await api.post(
       `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
       form,
-    );
-    return unwrap(res.data);
-  },
-
-  
-  async listLabReportAttachments(orgId: string, labTestId: string) {
-    const res = await api.get(
-      `/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments`,
+      {
+        onUploadProgress: (event) => {
+          if (onProgress && event.total) {
+            onProgress(Math.round((event.loaded / event.total) * 100));
+          }
+        },
+      },
     );
     return unwrap(res.data);
   },

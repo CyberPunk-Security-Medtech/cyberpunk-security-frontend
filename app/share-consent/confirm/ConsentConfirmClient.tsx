@@ -71,7 +71,7 @@ export default function ConsentConfirmClient() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f7fbfb] px-4">
-      <section className="w-full max-w-lg rounded-3xl bg-white p-8 text-center shadow-sm">
+      <section className="w-full max-w-lg rounded-md bg-white p-8 text-center shadow-sm">
         <div
           className={`mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full ${
             isSubmitting
@@ -112,7 +112,7 @@ export default function ConsentConfirmClient() {
         </h1>
 
         {state === "choice" && (
-          <div className="mt-5 rounded-2xl bg-[#F8FAFC] p-5 text-left">
+          <div className="mt-5 rounded-md bg-[#F8FAFC] p-5 text-left">
             <p className="text-sm font-semibold text-gray-900">
               Do you consent to share your selected medical records with the
               receiving hospital for this referral?
@@ -131,13 +131,13 @@ export default function ConsentConfirmClient() {
           <div className="mt-7 grid gap-3 md:grid-cols-2">
             <button
               onClick={declineConsent}
-              className="rounded-xl border border-red-200 px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+              className="rounded-md border border-red-200 px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
             >
               No, I Do Not Consent
             </button>
             <button
               onClick={approveConsent}
-              className="rounded-xl bg-[#211783] px-5 py-3 text-sm font-semibold text-white hover:bg-[#18105f]"
+              className="rounded-md bg-[#211783] px-5 py-3 text-sm font-semibold text-white hover:bg-[#18105f]"
             >
               Yes, I Consent
             </button>

@@ -252,7 +252,7 @@ export default function AddNewPatientRecordModal({
       headerClassName="bg-[#003C36]"
     >
       <div className="w-full space-y-6 py-2 font-sans md:space-y-8 md:py-4">
-          <section className="rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6">
+          <section className="rounded-md border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6">
 
             {/* STEP 1 */}
             <div className="space-y-4">
@@ -276,7 +276,7 @@ export default function AddNewPatientRecordModal({
                     value={formData.firstName}
                     onChange={handleChange}
                     placeholder="Enter First Name"
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
 
@@ -287,7 +287,7 @@ export default function AddNewPatientRecordModal({
                     value={formData.lastName}
                     onChange={handleChange}
                     placeholder="Enter Last Name"
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
 
@@ -300,7 +300,7 @@ export default function AddNewPatientRecordModal({
                     required
                     value={formData.dob}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
 
@@ -310,7 +310,7 @@ export default function AddNewPatientRecordModal({
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
                   >
                     <option value="">Select Gender</option>
                     <option value="Male">Male</option>
@@ -326,7 +326,7 @@ export default function AddNewPatientRecordModal({
                     name="maritalStatus"
                     value={formData.maritalStatus}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
                   >
                     <option value="">Select Marital Status</option>
                     <option value="Single">Single</option>
@@ -343,7 +343,7 @@ export default function AddNewPatientRecordModal({
                     name="bloodGroup"
                     value={formData.bloodGroup}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
                   >
                     <option value="">Select Blood Group</option>
                     <option>A+</option>
@@ -365,7 +365,7 @@ export default function AddNewPatientRecordModal({
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter Email Address"
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
 
@@ -376,7 +376,7 @@ export default function AddNewPatientRecordModal({
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+234 801 234 5678"
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
               </div>
@@ -409,7 +409,7 @@ export default function AddNewPatientRecordModal({
                       value={formData[name as keyof FormState]}
                       onChange={handleChange}
                       placeholder={placeholder}
-                      className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+                      className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
                     />
                   </div>
                 ))}
@@ -421,7 +421,7 @@ export default function AddNewPatientRecordModal({
                     value={formData.lifestyleInfo}
                     onChange={handleChange}
                     placeholder="Non smoker, occassional alcohol consumption"
-                    className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+                    className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
                   />
                 </div>
               </div>
@@ -447,7 +447,7 @@ export default function AddNewPatientRecordModal({
                   {(["hmo", "self_pay"] as const).map((option) => (
                     <label
                       key={option}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#006B5F] bg-emerald-50 text-[#003C36]" : "border-gray-200 text-gray-700"}`}
+                      className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#006B5F] bg-emerald-50 text-[#003C36]" : "border-gray-200 text-gray-700"}`}
                     >
                       <input
                         required
@@ -490,7 +490,7 @@ export default function AddNewPatientRecordModal({
                       value={formData[name as keyof FormState]}
                       onChange={handleChange}
                       required={name === "hmoProvider" || name === "hmoPlan"}
-                      className="w-full h-10 rounded-full border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
+                      className="w-full h-10 rounded-md border border-gray-200 px-4 pr-10 text-xs md:text-sm text-gray-400 outline-none appearance-none"
                     >
                       <option value="">Select</option>
                       {(options as string[]).map((opt: string) => (
@@ -509,7 +509,7 @@ export default function AddNewPatientRecordModal({
                     value={formData.hmoNumber}
                     onChange={handleChange}
                     placeholder="Enter HMO ID / Enrollee Number"
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
 
@@ -520,7 +520,7 @@ export default function AddNewPatientRecordModal({
                     name="policyStartDate"
                     value={formData.policyStartDate}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
 
@@ -531,7 +531,7 @@ export default function AddNewPatientRecordModal({
                     name="policyExpiryDate"
                     value={formData.policyExpiryDate}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+                    className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
                   />
                 </div>
               </div>
@@ -542,7 +542,7 @@ export default function AddNewPatientRecordModal({
                 <button
                   onClick={onClose}
                   type="button"
-                  className="rounded-full border border-gray-200 px-4 py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-50 transition"
+                  className="rounded-md border border-gray-200 px-4 py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-50 transition"
                 >
                   Cancel
                 </button>
@@ -551,7 +551,7 @@ export default function AddNewPatientRecordModal({
                   onClick={handleSubmit}
                   disabled={submitting}
                   type="button"
-                  className="rounded-full bg-[#006B5F] text-white px-4 py-2 text-xs md:text-sm font-medium transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
+                  className="rounded-md bg-[#006B5F] text-white px-4 py-2 text-xs md:text-sm font-medium transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
                 >
                   {submitting ? "Creating..." : "Create patient record"}
                 </button>

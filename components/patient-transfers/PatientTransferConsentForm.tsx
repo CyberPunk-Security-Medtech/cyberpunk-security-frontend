@@ -37,7 +37,7 @@ export default function PatientTransferConsentForm({ onSubmitConsent }: { onSubm
 
         <div className="relative">
           <Bell className="h-6 w-6 text-gray-500" />
-          <span className="absolute -right-3 -top-3 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+          <span className="absolute -right-3 -top-3 rounded-md bg-red-500 px-1.5 text-[10px] font-bold text-white">
             99+
           </span>
         </div>
@@ -63,7 +63,7 @@ export default function PatientTransferConsentForm({ onSubmitConsent }: { onSubm
           setIsGuardian={setIsGuardian}
         />
 
-        <section className="rounded-xl bg-white px-8 py-9 shadow-sm">
+        <section className="rounded-md bg-white px-8 py-9 shadow-sm">
           <IdentityVerification
             voiceVerified={voiceVerified}
             fingerprintVerified={fingerprintVerified}

@@ -28,10 +28,10 @@ const data = [
 export default function MedicalsChart() {
   return (
  <div>
- <div className="bg-white rounded-xl shadow-sm p-6 border">
+ <div className="bg-white rounded-md shadow-sm p-6 border">
       <div className="flex justify-between items-center mb-2">
         <h2 className="font-medium">Medicals</h2>
-        <button className="border rounded-full px-4 py-1 text-xs hover:bg-gray-50">
+        <button className="border rounded-md px-4 py-1 text-xs hover:bg-gray-50">
           Year
         </button>
       </div>

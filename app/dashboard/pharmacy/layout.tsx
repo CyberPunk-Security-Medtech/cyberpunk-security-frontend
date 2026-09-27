@@ -29,7 +29,6 @@ export default function PharmacyDashboardLayout({
   const profile: UserProfile = {
     name: buildDisplayName(user as User),
     role: activeWorkspace?.role ?? "Pharmacist",
-    avatar: "/avatars/eleanor.png",
   };
 
   return (

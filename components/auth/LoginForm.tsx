@@ -159,7 +159,7 @@ export default function LoginForm() {
         <p
           id="login-error"
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
         >
           {formError}
         </p>
@@ -179,7 +179,7 @@ export default function LoginForm() {
         }}
         aria-invalid={Boolean(formError)}
         aria-describedby={formError ? "login-error" : undefined}
-        className="min-h-11 w-full rounded-full border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
+        className="min-h-11 w-full rounded-md border px-4 py-2 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
         placeholder="Email Address"
       />
 
@@ -198,7 +198,7 @@ export default function LoginForm() {
             setFormError("");
           }}
           aria-invalid={Boolean(formError)}
-          className="min-h-11 w-full rounded-full border px-4 py-2 pr-12 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
+          className="min-h-11 w-full rounded-md border px-4 py-2 pr-12 outline-none focus-visible:border-[#1E237E] focus-visible:ring-2 focus-visible:ring-[#1E237E]/20"
           placeholder="Password"
         />
         <button
@@ -225,13 +225,13 @@ export default function LoginForm() {
           <input
             type="checkbox"
             name="remember"
-            className="rounded border-gray-300 text-blue-600"
+            className="rounded-md border-gray-300 text-blue-600"
           />
           <span>Remember for 30 days</span>
         </label>
         <Link
           href="/auth/forgot_password"
-          className="rounded-sm text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+          className="rounded-md text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
         >
           Forgot password
         </Link>

@@ -101,7 +101,7 @@ export default function HospitalInfoStep({
           autoComplete="organization"
           value={name}
           onChange={(event) => setName(event.target.value)}
-          className="min-h-11 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#1A2380] focus:ring-2 focus:ring-[#1A2380]/20 motion-reduce:transition-none"
+          className="min-h-11 w-full rounded-md border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-[#1A2380] focus:ring-2 focus:ring-[#1A2380]/20 motion-reduce:transition-none"
           placeholder="Enter organization name"
           aria-describedby={error ? "hospital-information-error" : undefined}
           required
@@ -119,18 +119,18 @@ export default function HospitalInfoStep({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoPreview}
-              className="h-20 w-20 rounded-xl border border-gray-200 object-cover"
+              className="h-20 w-20 rounded-md border border-gray-200 object-cover"
               alt="Selected organization logo preview"
             />
           ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-xl border border-gray-300 text-xs text-gray-500">
+            <div className="flex h-20 w-20 items-center justify-center rounded-md border border-gray-300 text-xs text-gray-500">
               No logo
             </div>
           )}
 
           <label
             htmlFor="organization-logo"
-            className="inline-flex min-h-11 cursor-pointer items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-50 focus-within:ring-2 focus-within:ring-[#1A2380] focus-within:ring-offset-2 motion-reduce:transition-none"
+            className="inline-flex min-h-11 cursor-pointer items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-50 focus-within:ring-2 focus-within:ring-[#1A2380] focus-within:ring-offset-2 motion-reduce:transition-none"
           >
             Choose logo
             <input
@@ -159,7 +159,7 @@ export default function HospitalInfoStep({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="min-h-11 w-full rounded-full bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
+          className="min-h-11 w-full rounded-md bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Saving hospital…" : "Continue"}
         </button>

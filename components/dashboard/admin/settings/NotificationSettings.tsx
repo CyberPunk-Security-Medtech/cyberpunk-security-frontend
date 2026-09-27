@@ -63,7 +63,7 @@ function PreferenceGroup({ title, preferences }: { title: string; preferences: P
 export default function NotificationSettings() {
   return (
     <SettingsSection id="notification-settings" title="Notification">
-      <p id="notification-preview-note" className="mb-5 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">
+      <p id="notification-preview-note" className="mb-5 rounded-md bg-slate-100 px-3 py-2 text-sm text-slate-600">
         Preview only. Notification preferences are not connected to the server yet.
       </p>
       <div className="space-y-4">

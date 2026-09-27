@@ -91,7 +91,7 @@ export default function VisionSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.15, duration: 0.6 }}
               viewport={{ once: true }}
-              className="relative z-20 bg-white shadow-md rounded-2xl p-6 sm:p-8 text-center w-full max-w-[300px] md:max-w-[280px]"
+              className="relative z-20 bg-white shadow-md rounded-md p-6 sm:p-8 text-center w-full max-w-[300px] md:max-w-[280px]"
             >
               <Image
                 src={item.icon}

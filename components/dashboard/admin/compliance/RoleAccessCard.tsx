@@ -59,7 +59,7 @@ export function RoleAccessCard() {
         {filteredRoles.map(({ role, users, permissions }) => (
           <article
             key={role}
-            className="rounded border border-slate-200 bg-white p-4 sm:p-5"
+            className="rounded-md border border-slate-200 bg-white p-4 sm:p-5"
           >
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -80,7 +80,7 @@ export function RoleAccessCard() {
               {permissions.map((permission) => (
                 <span
                   key={permission}
-                  className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-700"
+                  className="rounded-md border border-slate-200 px-3 py-1 text-xs text-slate-700"
                 >
                   {permission}
                 </span>
@@ -90,7 +90,7 @@ export function RoleAccessCard() {
         ))}
 
         {filteredRoles.length === 0 && (
-          <div className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-500">
+          <div className="rounded-md border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-500">
             No roles match your search.
           </div>
         )}

@@ -77,7 +77,7 @@ export default function WhatsPrivaCure() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="relative rounded-2xl bg-white border border-gray-100 p-6 sm:p-8 hover:shadow-lg transition-shadow text-center flex flex-col items-center"
+            className="relative rounded-md bg-white border border-gray-100 p-6 sm:p-8 hover:shadow-lg transition-shadow text-center flex flex-col items-center"
           >
             <Image
               src={f.icon}

@@ -6,7 +6,7 @@ import { medications } from "./PatientTransferData";
 
 export default function MedicationsTab() {
   return (
-    <div className="rounded-lg border border-gray-300 bg-white p-8 shadow-md">
+    <div className="rounded-md border border-gray-300 bg-white p-8 shadow-md">
       <h2 className="mb-8 text-3xl font-medium text-black">Medications</h2>
 
       <div className="overflow-x-auto">

@@ -184,7 +184,7 @@ export default function PatientTransferDashboard({
             normalizeIdentifier(patient.patient_code) ||
             normalizeIdentifier(patient.hmo_number) ||
             normalizeIdentifier(patient.nin) ||
-            patient.id.slice(0, 8);
+            "Not recorded";
 
           return {
             id: patient.id,
@@ -306,7 +306,7 @@ export default function PatientTransferDashboard({
   if (hydrated && !orgId) {
     return (
       <main className="min-h-screen bg-[#f7fbfb] px-6 py-8">
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
           Please select a workspace before managing patient transfers.
         </div>
       </main>
@@ -338,8 +338,8 @@ export default function PatientTransferDashboard({
         <StatCard title="Completed Transfers" value={String(completedCount)} />
       </div>
 
-      <div className="mb-5 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
-        <div className="flex w-full items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 md:max-w-md">
+      <div className="mb-5 flex flex-col gap-3 rounded-md bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div className="flex w-full items-center gap-2 rounded-md border border-gray-200 px-3 py-2 md:max-w-md">
           <Search size={18} className="text-gray-400" />
           <input
             value={searchTerm}
@@ -351,13 +351,13 @@ export default function PatientTransferDashboard({
 
         <button
           onClick={() => openTransferModal()}
-          className="rounded-xl bg-[#24128f] px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-md bg-[#24128f] px-5 py-2.5 text-sm font-semibold text-white"
         >
           New Referral
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+      <div className="overflow-hidden rounded-md bg-white shadow-sm">
         <div className="border-b border-gray-100 p-4">
           <h2 className="font-semibold text-gray-900">Patient Overview</h2>
           <p className="text-sm text-gray-500">
@@ -404,7 +404,7 @@ export default function PatientTransferDashboard({
                     <td className="px-4 py-4 text-right">
                       <button
                         onClick={() => openTransferModal(patient)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[#19c7b6] px-3 py-2 text-xs font-semibold text-white"
+                        className="inline-flex items-center gap-2 rounded-md bg-[#19c7b6] px-3 py-2 text-xs font-semibold text-white"
                       >
                         <Send size={14} />
                         Refer Patient
@@ -445,7 +445,7 @@ export default function PatientTransferDashboard({
 
 function StatCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
+    <div className="rounded-md bg-white p-5 shadow-sm">
       <p className="text-sm text-gray-500">{title}</p>
       <h3 className="mt-2 text-3xl font-bold text-[#111827]">{value}</h3>
     </div>
@@ -489,7 +489,7 @@ function TransferRequestModal({
       title="Send Patient Referral"
       isOpen
       onClose={onClose}
-      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl"
+      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-3xl overflow-y-auto rounded-md bg-white p-6 shadow-xl"
     >
         <div className="mb-5 flex items-center justify-between">
           <div>
@@ -503,21 +503,21 @@ function TransferRequestModal({
             type="button"
             onClick={onClose}
             aria-label="Close referral modal"
-            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+            className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
           >
             <X size={22} aria-hidden="true" />
           </button>
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-2xl border border-gray-100 p-4">
+          <section className="rounded-md border border-gray-100 p-4">
             <p className="mb-3 text-xs font-semibold uppercase text-[#211783]">
               Step 1 - Patient
             </p>
             <select
               value={form.patientId}
               onChange={(event) => handlePatientChange(event.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
+              className="w-full rounded-md border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
             >
               <option value="">Select patient</option>
               {patients.map((patient) => (
@@ -528,7 +528,7 @@ function TransferRequestModal({
             </select>
 
             {selectedPatient && (
-              <div className="mt-3 grid gap-3 rounded-xl bg-[#f7fbfb] p-3 text-xs text-gray-600 md:grid-cols-4">
+              <div className="mt-3 grid gap-3 rounded-md bg-[#f7fbfb] p-3 text-xs text-gray-600 md:grid-cols-4">
                 <span>Patient ID: {selectedPatient.patientCode}</span>
                 <span>Age: {selectedPatient.age}</span>
                 <span>Gender: {selectedPatient.gender}</span>
@@ -537,14 +537,14 @@ function TransferRequestModal({
             )}
           </section>
 
-          <section className="rounded-2xl border border-gray-100 p-4">
+          <section className="rounded-md border border-gray-100 p-4">
             <p className="mb-3 text-xs font-semibold uppercase text-[#211783]">
               Step 2 - Receiving Hospital
             </p>
             <select
               value={form.recipientOrgId}
               onChange={(event) => onUpdate("recipientOrgId", event.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
+              className="w-full rounded-md border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
             >
               <option value="">Select receiving hospital</option>
               {organizations.map((organization) => (
@@ -555,7 +555,7 @@ function TransferRequestModal({
             </select>
           </section>
 
-          <section className="rounded-2xl border border-gray-100 p-4">
+          <section className="rounded-md border border-gray-100 p-4">
             <p className="mb-3 text-xs font-semibold uppercase text-[#211783]">
               Step 3 - Referral Details
             </p>
@@ -568,7 +568,7 @@ function TransferRequestModal({
                   value={form.reason}
                   onChange={(event) => onUpdate("reason", event.target.value)}
                   placeholder="Cardiology evaluation"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
+                  className="w-full rounded-md border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
                 />
               </label>
 
@@ -581,7 +581,7 @@ function TransferRequestModal({
                   onChange={(event) =>
                     onUpdate("priority", event.target.value as ReferralPriority)
                   }
-                  className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
+                  className="w-full rounded-md border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
                 >
                   <option value="routine">Routine</option>
                   <option value="urgent">Urgent</option>
@@ -598,12 +598,12 @@ function TransferRequestModal({
                 value={form.clinicalSummary}
                 onChange={(event) => onUpdate("clinicalSummary", event.target.value)}
                 placeholder="Summarize why this patient is being referred."
-                className="h-24 w-full resize-none rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
+                className="h-24 w-full resize-none rounded-md border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
               />
             </label>
           </section>
 
-          <section className="rounded-2xl border border-gray-100 p-4">
+          <section className="rounded-md border border-gray-100 p-4">
             <p className="mb-3 text-xs font-semibold uppercase text-[#211783]">
               Step 4 - Records To Share
             </p>
@@ -613,7 +613,7 @@ function TransferRequestModal({
                   key={scope.value}
                   type="button"
                   onClick={() => onToggleScope(scope.value)}
-                  className={`rounded-xl border p-3 text-left text-sm transition ${
+                  className={`rounded-md border p-3 text-left text-sm transition ${
                     form.scopes.includes(scope.value)
                       ? "border-[#19c7b6] bg-[#effafa]"
                       : "border-gray-200 hover:border-[#19c7b6]"
@@ -636,12 +636,12 @@ function TransferRequestModal({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-gray-100 p-4">
+          <section className="rounded-md border border-gray-100 p-4">
             <p className="mb-3 text-xs font-semibold uppercase text-[#211783]">
               Step 5 - Patient Consent
             </p>
             {hasPriorConsent ? (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
                 This patient already gave in-person onboarding consent for all
                 selected record categories. No extra consent step is needed for
                 this demo referral.
@@ -672,13 +672,13 @@ function TransferRequestModal({
                       value={form.patientEmail}
                       onChange={(event) => onUpdate("patientEmail", event.target.value)}
                       placeholder="patient@example.com"
-                      className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
+                      className="w-full rounded-md border border-gray-200 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-[#19c7b6]"
                     />
                   </label>
                 )}
 
                 {form.consentMethod === "in_person_attestation" && (
-                  <label className="mt-4 flex items-start gap-3 rounded-xl bg-[#effafa] p-3 text-sm text-gray-600">
+                  <label className="mt-4 flex items-start gap-3 rounded-md bg-[#effafa] p-3 text-sm text-gray-600">
                     <input
                       type="checkbox"
                       checked={form.attestationConfirmed}
@@ -700,7 +700,7 @@ function TransferRequestModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600"
+            className="rounded-md border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600"
           >
             Cancel
           </button>
@@ -709,7 +709,7 @@ function TransferRequestModal({
             type="button"
             onClick={onSubmit}
             disabled={submitting}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#24128f] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-[#9088c7]"
+            className="inline-flex items-center gap-2 rounded-md bg-[#24128f] px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-[#9088c7]"
           >
             {submitting && <Loader2 size={16} className="animate-spin" />}
             Send Referral
@@ -734,7 +734,7 @@ function ConsentChoice({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border p-4 text-left transition ${
+      className={`rounded-md border p-4 text-left transition ${
         checked ? "border-[#19c7b6] bg-[#effafa]" : "border-gray-200 hover:border-[#19c7b6]"
       }`}
     >

@@ -52,7 +52,7 @@ export default function MissionVisionSection() {
           initial={{ opacity: 0, x: -80 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex items-start gap-6 bg-[white] shadow-lg rounded-2xl p-10 relative z-10"
+          className="flex items-start gap-6 bg-[white] shadow-lg rounded-md p-10 relative z-10"
         >
           <Image
             src="/icons/mission.svg"
@@ -76,7 +76,7 @@ export default function MissionVisionSection() {
           initial={{ opacity: 0, x: 80 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex items-start gap-6 bg-[white] shadow-lg rounded-2xl p-10 relative z-10"
+          className="flex items-start gap-6 bg-[white] shadow-lg rounded-md p-10 relative z-10"
         >
           <Image
             src="/icons/vision.svg"

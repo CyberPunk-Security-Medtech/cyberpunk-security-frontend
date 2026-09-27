@@ -33,7 +33,7 @@ export default function DoctorPatientDetails() {
   };
 
   const consultationAction = isConsultationActive ? (
-    <span className="inline-flex w-fit items-center gap-2 rounded-full bg-green-100 px-3 py-1.5 text-sm font-medium text-green-700">
+    <span className="inline-flex w-fit items-center gap-2 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-700">
       <span className="size-2 rounded-full bg-green-500 motion-safe:animate-pulse" />
       In Consultation
     </span>

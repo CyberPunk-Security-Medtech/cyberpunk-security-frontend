@@ -24,7 +24,7 @@ export function ConsultationStartNotice({
 }: ConsultationStartNoticeProps) {
   return (
     <div
-      className={`mb-4 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm leading-5 ${roleStyles[role]}`}
+      className={`mb-4 flex items-start gap-3 rounded-md border px-4 py-3 text-sm leading-5 ${roleStyles[role]}`}
       role="note"
     >
       <Info aria-hidden="true" className="mt-0.5 size-5 shrink-0" />

@@ -200,7 +200,7 @@ export default function ConsultationActivityLog({
 
   return (
     <section
-      className="rounded-lg border bg-white p-4 shadow-sm sm:p-6"
+      className="rounded-md border bg-white p-4 shadow-sm sm:p-6"
       aria-labelledby="consultation-activity-title"
     >
       <h3
@@ -211,7 +211,7 @@ export default function ConsultationActivityLog({
       </h3>
 
       {!orgId || !consultationId ? (
-        <p className="rounded-xl border p-4 text-sm text-gray-500">
+        <p className="rounded-md border p-4 text-sm text-gray-500">
           Select a consultation to view its activity.
         </p>
       ) : loading ? (
@@ -219,7 +219,7 @@ export default function ConsultationActivityLog({
           <LoaderIcon />
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4" role="alert">
+        <div className="rounded-md border border-red-200 bg-red-50 p-4" role="alert">
           <p className="text-sm text-red-700">{error}</p>
           <button
             type="button"
@@ -230,7 +230,7 @@ export default function ConsultationActivityLog({
           </button>
         </div>
       ) : entries.length === 0 ? (
-        <p className="rounded-xl border p-4 text-sm text-gray-500">
+        <p className="rounded-md border p-4 text-sm text-gray-500">
           No activity has been recorded for this consultation yet.
         </p>
       ) : (

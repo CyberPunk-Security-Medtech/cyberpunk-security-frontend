@@ -16,9 +16,11 @@ import DialogPortal from "@components/DialogPortal";
 import {
   dataSharingService,
   organizationService,
+  patientService,
   type DataShareGrant,
   type GrantStatus,
   type OrganizationDirectoryEntry,
+  type PatientListRecord,
 } from "@services/api";
 import { TableSkeleton } from "@components/Skeletons";
 
@@ -96,6 +98,7 @@ export default function SharingPermissionsPage({
   const { activeWorkspace, hydrated } = useAuth();
   const [grants, setGrants] = useState<DataShareGrant[]>([]);
   const [organizations, setOrganizations] = useState<OrganizationDirectoryEntry[]>([]);
+  const [patients, setPatients] = useState<PatientListRecord[]>([]);
   const [filter, setFilter] = useState<PermissionFilter>("all");
   const [selectedGrant, setSelectedGrant] = useState<DataShareGrant | null>(null);
   const [grantToRevoke, setGrantToRevoke] = useState<DataShareGrant | null>(null);
@@ -130,22 +133,40 @@ export default function SharingPermissionsPage({
   );
 
   const getOrganizationName = (organizationId: string) =>
-    organizationNameMap.get(organizationId) ?? organizationId.slice(0, 8);
+    organizationNameMap.get(organizationId) ?? "Unknown organization";
+
+  const patientLabelMap = useMemo(() => {
+    const map = new Map<string, string>();
+    patients.forEach((patient) => {
+      const name = `${patient.first_name ?? ""} ${patient.last_name ?? ""}`.trim();
+      const code = patient.patient_code?.trim();
+      const label = name && code ? `${name} (${code})` : name || code;
+      if (label) map.set(patient.id, label);
+    });
+    return map;
+  }, [patients]);
+
+  const getPatientLabel = (patientId: string) =>
+    patientLabelMap.get(patientId) ?? "Unknown patient";
 
   const loadGrants = async () => {
     if (!orgId) return;
     setLoading(true);
 
     try {
-      const [grantRows, directoryRows] = await Promise.all([
+      const [grantRows, directoryRows, patientRows] = await Promise.all([
         dataSharingService.listShareGrants(orgId, {
           role: "either",
         }),
         organizationService.getDirectory(),
+        patientService
+          .getPatients(orgId, { include_shared: true })
+          .catch(() => [] as PatientListRecord[]),
       ]);
 
       setGrants(grantRows);
       setOrganizations(directoryRows);
+      setPatients(Array.isArray(patientRows) ? patientRows : []);
       setSelectedGrant((current) =>
         current
           ? grantRows.find((grant) => grant.id === current.id) ?? null
@@ -199,7 +220,7 @@ export default function SharingPermissionsPage({
             : "-mx-4 -my-4 min-h-full bg-[#F4FAFA] p-8 md:-mx-12"
         }
       >
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
           Please select a workspace before viewing sharing permissions.
         </div>
       </div>
@@ -233,7 +254,7 @@ export default function SharingPermissionsPage({
         <SummaryCard title="Granted" value={counts.granted} icon="granted" />
       </div>
 
-      <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
         <div className="flex flex-col gap-4 border-b border-gray-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="font-semibold text-gray-900">Permission Register</h2>
@@ -254,7 +275,7 @@ export default function SharingPermissionsPage({
               <button
                 key={value}
                 onClick={() => setFilter(value as PermissionFilter)}
-                className={`rounded-lg px-3 py-2 text-xs font-medium transition ${
+                className={`rounded-md px-3 py-2 text-xs font-medium transition ${
                   filter === value
                     ? "bg-[#211783] text-white"
                     : "bg-[#EEF0FF] text-gray-600 hover:bg-[#dfe2f3]"
@@ -270,7 +291,7 @@ export default function SharingPermissionsPage({
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-[#effafa] text-gray-600">
               <tr>
-                <th className="px-5 py-3">Patient ID</th>
+                <th className="px-5 py-3">Patient</th>
                 <th className="px-5 py-3">Recipient Org</th>
                 <th className="px-5 py-3">Records Shared</th>
                 <th className="px-5 py-3">Consent Method</th>
@@ -287,7 +308,7 @@ export default function SharingPermissionsPage({
                 filteredGrants.map((grant) => (
                   <tr key={grant.id} className="border-t border-gray-100">
                     <td className="px-5 py-4 font-medium text-gray-900">
-                      {grant.patient_id.slice(0, 8)}
+                      {getPatientLabel(grant.patient_id)}
                     </td>
                     <td className="px-5 py-4 text-gray-600">
                       {getOrganizationName(grant.recipient_org_id)}
@@ -312,7 +333,7 @@ export default function SharingPermissionsPage({
                     <td className="px-5 py-4 text-right">
                       <button
                         onClick={() => setSelectedGrant(grant)}
-                        className="inline-flex items-center gap-2 rounded-lg border border-[#211783] px-3 py-2 text-xs font-semibold text-[#211783] hover:bg-[#F1F0FF]"
+                        className="inline-flex items-center gap-2 rounded-md border border-[#211783] px-3 py-2 text-xs font-semibold text-[#211783] hover:bg-[#F1F0FF]"
                       >
                         <Eye size={14} />
                         View Permission
@@ -339,6 +360,7 @@ export default function SharingPermissionsPage({
           grant={selectedGrant}
           currentOrgId={orgId}
           getOrganizationName={getOrganizationName}
+          getPatientLabel={getPatientLabel}
           onClose={() => setSelectedGrant(null)}
           onRevoke={() => setGrantToRevoke(selectedGrant)}
         />
@@ -373,7 +395,7 @@ function SummaryCard({
         : "bg-[#EEF0FF] text-[#211783]";
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
+    <div className="rounded-md bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">{title}</p>
         <span className={`rounded-full p-2 ${iconStyle}`}>
@@ -394,7 +416,7 @@ function SummaryCard({
 function StatusBadge({ status }: { status: string }) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+      className={`inline-flex rounded-md px-3 py-1 text-xs font-semibold ${
         statusStyles[status] ?? "bg-slate-100 text-slate-600"
       }`}
     >
@@ -407,12 +429,14 @@ function PermissionDetailsModal({
   grant,
   currentOrgId,
   getOrganizationName,
+  getPatientLabel,
   onClose,
   onRevoke,
 }: {
   grant: DataShareGrant;
   currentOrgId?: string;
   getOrganizationName: (organizationId: string) => string;
+  getPatientLabel: (patientId: string) => string;
   onClose: () => void;
   onRevoke: () => void;
 }) {
@@ -424,27 +448,24 @@ function PermissionDetailsModal({
       title="Permission Details"
       isOpen
       onClose={onClose}
-      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-2xl overflow-y-auto rounded-md bg-white shadow-2xl"
     >
         <div className="flex items-start justify-between border-b border-gray-100 px-6 py-5">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Permission Details</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Grant ID: {grant.id}
-            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close Permission Details"
-            className="rounded text-gray-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+            className="rounded-md text-gray-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
           >
             <X size={22} aria-hidden="true" />
           </button>
         </div>
 
         <div className="grid gap-4 px-6 py-6 md:grid-cols-2">
-          <DetailItem label="Patient ID" value={grant.patient_id} />
+          <DetailItem label="Patient" value={getPatientLabel(grant.patient_id)} />
           <DetailItem
             label="Source Org"
             value={getOrganizationName(grant.source_org_id)}
@@ -482,7 +503,7 @@ function PermissionDetailsModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
+            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
           >
             Close
           </button>
@@ -490,7 +511,7 @@ function PermissionDetailsModal({
             <button
               type="button"
               onClick={onRevoke}
-              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             >
               Revoke Access
             </button>
@@ -502,7 +523,7 @@ function PermissionDetailsModal({
 
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-[#F8FAFC] p-4">
+    <div className="rounded-md bg-[#F8FAFC] p-4">
       <p className="text-xs font-semibold uppercase text-gray-400">{label}</p>
       <p className="mt-2 break-words text-sm font-medium text-gray-800">
         {value || "N/A"}
@@ -527,7 +548,7 @@ function RevokeConfirmModal({
       title="Revoke access?"
       isOpen
       onClose={onClose}
-      panelClassName="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+      panelClassName="w-full max-w-md rounded-md bg-white p-6 shadow-2xl"
       dismissible={!revoking}
     >
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
@@ -536,8 +557,8 @@ function RevokeConfirmModal({
         <h2 className="text-xl font-bold text-gray-900">Revoke access?</h2>
         <p className="mt-2 text-sm leading-6 text-gray-500">
           This will stop the receiving hospital from using this permission to
-          access the selected patient records. Grant {grant.id.slice(0, 8)} will
-          be marked as Revoked.
+          access the selected patient records. This permission will be marked as
+          Revoked.
         </p>
 
         <div className="mt-6 flex justify-end gap-3">
@@ -545,7 +566,7 @@ function RevokeConfirmModal({
             type="button"
             onClick={onClose}
             disabled={revoking}
-            className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
+            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600"
           >
             Cancel
           </button>
@@ -553,7 +574,7 @@ function RevokeConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={revoking}
-            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:bg-red-300"
+            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:bg-red-300"
           >
             {revoking && <Loader2 size={16} className="animate-spin" />}
             Revoke Access

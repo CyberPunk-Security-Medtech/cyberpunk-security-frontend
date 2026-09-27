@@ -29,7 +29,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed left-1/2 top-4 z-header flex w-[92%] max-w-6xl -translate-x-1/2 items-center justify-between rounded-[45px] px-6 py-3 transition-all duration-300 ${
+      className={`fixed left-1/2 top-4 z-header flex w-[92%] max-w-6xl -translate-x-1/2 items-center justify-between rounded-full px-6 py-3 transition-all duration-300 ${
         scrolled
           ? "bg-gradient-to-r from-[#859DBD]/70 via-[#859DBD]/25 to-[#859DBD]/100 shadow-lg backdrop-blur-md"
           : "bg-white/70 backdrop-blur-md"
@@ -65,7 +65,7 @@ export default function Navbar() {
         </button>
 
         {/* Main CTA */}
-        <button className="rounded-full bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md hover:opacity-90 transition">
+        <button className="rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md hover:opacity-90 transition">
           {buttonText}
         </button>
       </div>
@@ -86,7 +86,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}
-            className="absolute top-[70px] left-0 w-full rounded-b-2xl bg-white/95 shadow-md p-6 md:hidden"
+            className="absolute top-[70px] left-0 w-full rounded-b-md bg-white/95 shadow-md p-6 md:hidden"
           >
             <div className="flex flex-col gap-4 text-gray-800 font-medium">
               {navLinks.map((link) => (
@@ -107,7 +107,7 @@ export default function Navbar() {
           <Image src="/icons/search.svg" alt="search" width={42} height={42} />
         </button>
               </div>
-              <button className="mt-4 rounded-full bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md">
+              <button className="mt-4 rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md">
                 {buttonText}
               </button>
             </div>
@@ -128,8 +128,8 @@ export default function Navbar() {
 
 //   return (
 //     <header className="flex justify-center mt-6 z-50 relative">
-//       <nav className="flex w-[92%] max-w-6xl items-center justify-between rounded-full bg-gradient-to-r from-[#E6F2FF] to-[#DDF9F2] px-6 py-3 shadow-md">
-//         <div className="flex items-center gap-2 rounded-full bg-[#E3EDF6] px-3 py-1.5">
+//       <nav className="flex w-[92%] max-w-6xl items-center justify-between rounded-md bg-gradient-to-r from-[#E6F2FF] to-[#DDF9F2] px-6 py-3 shadow-md">
+//         <div className="flex items-center gap-2 rounded-md bg-[#E3EDF6] px-3 py-1.5">
 //           <Image src="/icons/logo.svg" alt="PrivaCure" width={28} height={28} />
 //           <span className="font-semibold text-gray-800">PrivaCure</span>
 //         </div>
@@ -156,7 +156,7 @@ export default function Navbar() {
 //           <button className="h-9 w-9 flex items-center justify-center rounded-full bg-[#E3EDF6]">
 //             <Image src="/icons/user.svg" alt="user" width={15} height={15} />
 //           </button>
-//           <button className="rounded-full bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2 text-white font-semibold text-sm">
+//           <button className="rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2 text-white font-semibold text-sm">
 //             Request Early Access
 //           </button>
 //         </div>

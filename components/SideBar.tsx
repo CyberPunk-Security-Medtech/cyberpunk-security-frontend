@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -8,6 +7,8 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { MenuItem, UserProfile } from "@/types/index";
 import { authService } from "@services/api";
 import OrganizationLogo from "@components/shared/OrganizationLogo";
+
+const DEFAULT_AVATAR = "/images/default-avatar.svg";
 
 interface SidebarProps {
   sidebarMinimize: boolean;
@@ -339,7 +340,7 @@ export default function SideBar({
                   aria-current={isChildActive ? "page" : undefined}
                 >
                   <div
-                    className={`ml-6 mr-3 flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm cursor-pointer transition-colors motion-reduce:transition-none ${
+                    className={`ml-6 mr-3 flex items-center gap-3 rounded-md px-4 py-2.5 text-sm cursor-pointer transition-colors motion-reduce:transition-none ${
                       isChildActive
                         ? "bg-[var(--sidebar-active-bg)] text-white"
                         : "text-gray-400 hover:bg-[var(--sidebar-hover-bg)] hover:text-white"
@@ -369,12 +370,18 @@ export default function SideBar({
               onClick={() => !sidebarMinimize && setIsProfileMenuOpen((prev) => !prev)}
               className="w-full flex items-center gap-3 text-left"
             >
-              <Image
-                src={user.avatar || "/avatars/eleanor.png"}
-                alt={user.name}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={user.avatar || DEFAULT_AVATAR}
+                alt=""
                 width={40}
                 height={40}
-                className="rounded-full"
+                onError={(event) => {
+                  if (!event.currentTarget.src.endsWith(DEFAULT_AVATAR)) {
+                    event.currentTarget.src = DEFAULT_AVATAR;
+                  }
+                }}
+                className="h-10 w-10 shrink-0 rounded-full object-cover"
               />
               {!sidebarMinimize && (
                 <>
@@ -402,7 +409,7 @@ export default function SideBar({
             </button>
 
             {!sidebarMinimize && isProfileMenuOpen && (
-              <div className="absolute left-0 right-0 bottom-full mb-2 rounded-lg border border-white/20 bg-white py-1 shadow-lg">
+              <div className="absolute left-0 right-0 bottom-full mb-2 rounded-md border border-white/20 bg-white py-1 shadow-lg">
                 <button
                   type="button"
                   onClick={handleLogout}

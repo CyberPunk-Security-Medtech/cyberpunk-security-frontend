@@ -70,7 +70,7 @@ export default function ComplianceTabs() {
                   selectTab(TABS.length - 1);
                 }
               }}
-              className={`min-h-8 rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] motion-reduce:transition-none ${
+              className={`min-h-8 rounded-md px-4 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] motion-reduce:transition-none ${
                 activeTab === tab
                   ? "bg-white font-medium text-slate-900 shadow-sm"
                   : "text-slate-700 hover:bg-white/60"

@@ -125,14 +125,14 @@
 //           </h1>
 //           <p className="mt-1 text-sm text-[#737791]">Review prescriptions, dispense medicines, and monitor stock.</p>
 //         </div>
-//         <Link href="/dashboard/pharmacy/inventory/new" className="self-start rounded-full bg-[#00796B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#00695F]">
+//         <Link href="/dashboard/pharmacy/inventory/new" className="self-start rounded-md bg-[#00796B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#00695F]">
 //           Add inventory item
 //         </Link>
 //       </div>
 
 //       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 //         {cards.map(({ label, value, detail, icon: Icon, color, bg }) => (
-//           <article key={label} className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+//           <article key={label} className="rounded-md border border-[#ECEFF5] bg-white p-5">
 //             <div className="flex items-center justify-between">
 //               <p className="text-sm text-[#737791]">{label}</p>
 //               <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${bg}`}><Icon size={18} className={color} /></span>
@@ -143,7 +143,7 @@
 //         ))}
 //       </div>
 
-//       <article className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+//       <article className="rounded-md border border-[#ECEFF5] bg-white p-5">
 //         <div className="mb-5 flex items-center justify-between gap-4">
 //           <div>
 //             <h2 className="text-xl font-semibold text-[#151D48]">Prescription queue</h2>
@@ -291,14 +291,14 @@ export default function PharmacyDashboardPage() {
           </h1>
           <p className="mt-1 text-sm text-[#737791]">Review prescriptions, dispense medicines, and monitor stock.</p>
         </div>
-        <Link href="/dashboard/pharmacy/inventory/new" className="self-start rounded-full bg-[#00796B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#00695F]">
+        <Link href="/dashboard/pharmacy/inventory/new" className="self-start rounded-md bg-[#00796B] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#00695F]">
           Add inventory item
         </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map(({ label, value, detail, icon: Icon, color, bg }) => (
-          <article key={label} className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+          <article key={label} className="rounded-md border border-[#ECEFF5] bg-white p-5">
             <div className="flex items-center justify-between">
               <p className="text-sm text-[#737791]">{label}</p>
               <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${bg}`}><Icon size={18} className={color} /></span>
@@ -309,7 +309,7 @@ export default function PharmacyDashboardPage() {
         ))}
       </div>
 
-      <article className="rounded-xl border border-[#ECEFF5] bg-white p-5">
+      <article className="rounded-md border border-[#ECEFF5] bg-white p-5">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#151D48]">Prescription queue</h2>

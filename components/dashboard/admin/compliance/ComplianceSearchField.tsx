@@ -19,7 +19,7 @@ export default function ComplianceSearchField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="min-h-10 w-full rounded-xl border border-transparent bg-[#EFEFF1] px-4 text-sm text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20"
+        className="min-h-10 w-full rounded-md border border-transparent bg-[#EFEFF1] px-4 text-sm text-slate-900 outline-none placeholder:text-slate-500 focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20"
       />
     </label>
   );

@@ -393,7 +393,7 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
               {(["hmo", "self_pay"] as const).map((option) => (
                 <label
                   key={option}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}
+                  className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}
                 >
                   <input
                     type="radio"

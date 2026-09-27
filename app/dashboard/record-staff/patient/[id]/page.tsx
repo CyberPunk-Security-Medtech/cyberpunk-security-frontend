@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   CalendarDays,
   ClipboardList,
-  FileText,
   HeartPulse,
   Mail,
   Phone,
@@ -73,7 +72,7 @@ const DetailItem = ({
   label: string;
   value?: string | number | null;
 }) => (
-  <div className="rounded-xl border border-slate-100 bg-white p-4">
+  <div className="rounded-md border border-slate-100 bg-white p-4">
     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
       {label}
     </p>
@@ -93,7 +92,7 @@ const SectionHeader = ({
   description: string;
 }) => (
   <div className="mb-4 flex items-start gap-3">
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal-50 text-[#003C36]">
+    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-teal-50 text-[#003C36]">
       <Icon size={18} />
     </span>
     <div>
@@ -182,7 +181,7 @@ export default function RecordStaffPatientDetailsPage() {
           <ArrowLeft size={16} />
           Back to Patient Records
         </Link>
-        <div className="rounded-xl border border-red-100 bg-red-50 p-5 text-sm text-red-700">
+        <div className="rounded-md border border-red-100 bg-red-50 p-5 text-sm text-red-700">
           {error}
         </div>
       </div>
@@ -199,7 +198,7 @@ export default function RecordStaffPatientDetailsPage() {
         Back to Patient Records
       </Link>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-md bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-teal-50 text-lg font-bold text-[#003C36]">
@@ -208,17 +207,17 @@ export default function RecordStaffPatientDetailsPage() {
             <div>
               <h1 className="dashboard-page-title text-[#111827]">{patientName}</h1>
               <p className="mt-1 break-all text-sm text-slate-500">
-                Patient Code: {formatValue(patient?.patient_code ?? patient?.id)}
+                Patient Code: {formatValue(patient?.patient_code)}
               </p>
             </div>
           </div>
-          <span className="w-fit rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+          <span className="w-fit rounded-md bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
             Record Staff View
           </span>
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-md bg-white p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={UserRound}
           title="Patient Biodata"
@@ -236,7 +235,7 @@ export default function RecordStaffPatientDetailsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-md bg-white p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={HeartPulse}
           title="Medical Information"
@@ -253,7 +252,7 @@ export default function RecordStaffPatientDetailsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-md bg-white p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={ShieldCheck}
           title="HMO & Insurance"
@@ -269,7 +268,7 @@ export default function RecordStaffPatientDetailsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-md bg-white p-5 shadow-sm sm:p-6">
         <SectionHeader
           icon={ClipboardList}
           title="Consultation History"
@@ -277,7 +276,7 @@ export default function RecordStaffPatientDetailsPage() {
         />
 
         {consultations.length === 0 ? (
-          <div className="rounded-xl border border-slate-100 bg-slate-50 p-5 text-sm text-slate-500">
+          <div className="rounded-md border border-slate-100 bg-slate-50 p-5 text-sm text-slate-500">
             No consultation has been recorded for this patient yet.
           </div>
         ) : (
@@ -285,7 +284,7 @@ export default function RecordStaffPatientDetailsPage() {
             {consultations.map((consultation) => (
               <article
                 key={consultation.id}
-                className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm"
+                className="rounded-md border border-slate-100 bg-white p-4 shadow-sm"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
@@ -298,20 +297,20 @@ export default function RecordStaffPatientDetailsPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusClassName(
+                      className={`rounded-md px-3 py-1 text-xs font-semibold ${getStatusClassName(
                         consultation.status,
                       )}`}
                     >
                       {consultation.status || "Pending"}
                     </span>
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    <span className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                       {consultation.priority || "Routine"}
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 text-sm md:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-lg bg-slate-50 p-3">
+                <div className="mt-4 grid gap-3 text-sm md:grid-cols-2 xl:grid-cols-3">
+                  <div className="rounded-md bg-slate-50 p-3">
                     <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
                       <CalendarDays size={14} />
                       Created
@@ -320,7 +319,7 @@ export default function RecordStaffPatientDetailsPage() {
                       {formatDateTime(consultation.created_at)}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-slate-50 p-3">
+                  <div className="rounded-md bg-slate-50 p-3">
                     <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
                       <CalendarDays size={14} />
                       Updated
@@ -329,7 +328,7 @@ export default function RecordStaffPatientDetailsPage() {
                       {formatDateTime(consultation.updated_at)}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-slate-50 p-3">
+                  <div className="rounded-md bg-slate-50 p-3">
                     <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
                       <HeartPulse size={14} />
                       Vitals
@@ -338,19 +337,10 @@ export default function RecordStaffPatientDetailsPage() {
                       {formatValue(consultation.vitals)}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-slate-50 p-3">
-                    <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                      <FileText size={14} />
-                      Consultation ID
-                    </p>
-                    <p className="mt-2 break-all text-slate-700">
-                      {formatValue(consultation.id)}
-                    </p>
-                  </div>
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-lg border border-slate-100 p-3">
+                  <div className="rounded-md border border-slate-100 p-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                       Clinical Notes
                     </p>
@@ -358,7 +348,7 @@ export default function RecordStaffPatientDetailsPage() {
                       {formatValue(consultation.clinical_notes ?? consultation.notes)}
                     </p>
                   </div>
-                  <div className="rounded-lg border border-slate-100 p-3">
+                  <div className="rounded-md border border-slate-100 p-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                       Contact Snapshot
                     </p>

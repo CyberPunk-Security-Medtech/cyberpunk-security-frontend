@@ -66,7 +66,7 @@ export default function EmergencyTransferPage() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed right-6 top-24 z-toast rounded-lg bg-[#F0F1FF] px-7 py-6 font-semibold text-[#211783] shadow-lg"
+          className="fixed right-6 top-24 z-toast rounded-md bg-[#F0F1FF] px-7 py-6 font-semibold text-[#211783] shadow-lg"
         >
           <button
             onClick={() => setToast(null)}

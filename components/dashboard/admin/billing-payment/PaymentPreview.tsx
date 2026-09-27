@@ -3,7 +3,7 @@ import { CreditCard } from "lucide-react";
 export default function PaymentPreview() {
   return (
     <section
-      className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"
+      className="rounded-md border border-slate-200 bg-white p-5 sm:p-7"
       aria-labelledby="make-payment-title"
     >
       <h2
@@ -13,8 +13,8 @@ export default function PaymentPreview() {
         Make Payment
       </h2>
 
-      <div className="mt-5 flex items-center gap-4 rounded-2xl border border-cyan-300 bg-cyan-50 px-5 py-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-cyan-500 text-white">
+      <div className="mt-5 flex items-center gap-4 rounded-md border border-cyan-300 bg-cyan-50 px-5 py-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-cyan-500 text-white">
           <CreditCard className="h-7 w-7" aria-hidden="true" />
         </span>
         <div>

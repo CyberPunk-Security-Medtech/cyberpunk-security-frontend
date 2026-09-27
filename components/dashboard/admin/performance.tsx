@@ -6,7 +6,7 @@ export default function Performance() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border p-4 flex flex-col justify-between">
+    <div className="bg-white rounded-md shadow-sm border p-4 flex flex-col justify-between">
       <div>
         <p className="text-xs font-semibold text-emerald-600">Performance</p>
         <p className="text-xs text-slate-500 mb-4">Monthly metrics</p>
@@ -20,7 +20,7 @@ export default function Performance() {
       </div>
 
       <div>
-        <button className="mt-2 text-xs bg-[#051466] text-white rounded-full px-3 py-1 hover:bg-[#020b44]">
+        <button className="mt-2 text-xs bg-[#051466] text-white rounded-md px-3 py-1 hover:bg-[#020b44]">
           View Analytics
         </button>
       </div>

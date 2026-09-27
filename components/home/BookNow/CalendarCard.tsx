@@ -62,7 +62,7 @@ export default function CalendarCard() {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative w-full rounded-[10px] p-6 md:p-8 text-white
+      className="relative w-full rounded-md p-6 md:p-8 text-white
                  bg-gradient-to-br from-[#0b6fc5] to-[#00b7aa] shadow-lg"
     >
       {/* Heading */}
@@ -135,7 +135,7 @@ export default function CalendarCard() {
         transition={{ delay: 0.15, duration: 0.5 }}
         className="mt-6 flex justify-center"
       >
-        <button className="rounded-full bg-white text-[#0b6fc5] px-5 py-2 text-sm font-semibold shadow-md">
+        <button className="rounded-md bg-white text-[#0b6fc5] px-5 py-2 text-sm font-semibold shadow-md">
           One slot available in {months[viewMonth].toLowerCase()}
         </button>
       </motion.div>

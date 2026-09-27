@@ -11,13 +11,12 @@ interface PatientTableProps {
 
 export default function PatientTable({ data, onRowClick }: PatientTableProps) {
     return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 overflow-x-auto">
+        <div className="bg-white rounded-md border border-gray-200 shadow-sm p-4 overflow-x-auto">
             {/* Desktop Table View */}
             <table className="w-full text-sm text-left border-collapse hidden md:table">
                 <thead className="text-gray-600 border-b bg-gray-50">
                     <tr>
                         <th className="py-3 px-4 font-medium">Patient Name</th>
-                        <th className="py-3 px-4 font-medium">Patient ID</th>
                         <th className="py-3 px-4 font-medium">Age</th>
                         <th className="py-3 px-4 font-medium">Gender</th>
                         <th className="py-3 px-4 font-medium">Condition</th>
@@ -39,7 +38,6 @@ export default function PatientTable({ data, onRowClick }: PatientTableProps) {
                                 </div>
                                 {p.name}
                             </td>
-                            <td className="px-4">{p.id}</td>
                             <td className="px-4">{p.age}</td>
                             <td className="px-4">{p.gender}</td>
                             <td className="px-4">{p.condition}</td>
@@ -58,7 +56,7 @@ export default function PatientTable({ data, onRowClick }: PatientTableProps) {
                 {data.map((p, index) => (
                     <div
                         key={`${p.name}-${p.id}-${p.condition}-mobile-${index}`}
-                        className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer"
+                        className="bg-white p-4 rounded-md border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer"
                         onClick={() => onRowClick && onRowClick(p.id)}
                     >
                         <div className="flex items-center justify-between mb-3">
@@ -68,7 +66,6 @@ export default function PatientTable({ data, onRowClick }: PatientTableProps) {
                                 </div>
                                 <div>
                                     <h3 className="font-medium text-[#1A2380] text-sm">{p.name}</h3>
-                                    <p className="text-xs text-gray-500">{p.id}</p>
                                 </div>
                             </div>
                             <button className="text-gray-400">⋯</button>
@@ -100,10 +97,10 @@ export default function PatientTable({ data, onRowClick }: PatientTableProps) {
             <div className="flex items-center justify-between text-xs text-gray-500 mt-4">
                 <span>Showing 1–{Math.min(data.length, 9)} from {data.length}</span>
                 <div className="flex items-center gap-2">
-                    <button className="p-1.5 rounded border border-gray-200 hover:bg-gray-100">‹</button>
-                    <span className="px-3 py-1.5 rounded bg-[#1A2380] text-white">1</span>
-                    <span className="px-3 py-1.5 rounded hover:bg-gray-100 cursor-pointer">2</span>
-                    <button className="p-1.5 rounded border border-gray-200 hover:bg-gray-100">›</button>
+                    <button className="p-1.5 rounded-md border border-gray-200 hover:bg-gray-100">‹</button>
+                    <span className="px-3 py-1.5 rounded-md bg-[#1A2380] text-white">1</span>
+                    <span className="px-3 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer">2</span>
+                    <button className="p-1.5 rounded-md border border-gray-200 hover:bg-gray-100">›</button>
                 </div>
             </div>
         </div>

@@ -47,21 +47,21 @@ export default function AddGroupModal({ isOpen, onClose, orgId, onGroupAdded }: 
           <input 
             value={name} 
             onChange={(e) => setName(e.target.value)} 
-            className="mt-1 h-10 w-full rounded border p-2" 
+            className="mt-1 h-10 w-full rounded-md border p-2" 
             placeholder="e.g. Antibiotics"
             autoFocus 
           />
         </label>
         
         <div className="flex justify-end gap-3 pt-2">
-          <button type="button" onClick={onClose} className="rounded border px-4 py-2 text-sm">
+          <button type="button" onClick={onClose} className="rounded-md border px-4 py-2 text-sm">
             Cancel
           </button>
           <button 
             type="button" 
             onClick={() => void save()} 
             disabled={saving} 
-            className="rounded bg-[#00796B] px-4 py-2 text-sm text-white disabled:opacity-60"
+            className="rounded-md bg-[#00796B] px-4 py-2 text-sm text-white disabled:opacity-60"
           >
             {saving ? "Creating..." : "Create group"}
           </button>

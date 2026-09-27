@@ -13,7 +13,7 @@ export default function HMOViewStatsCards() {
       {stats.map((item) => (
         <div
           key={item.label}
-          className="flex flex-col items-center justify-center bg-white rounded-xl shadow-sm p-6"
+          className="flex flex-col items-center justify-center bg-white rounded-md shadow-sm p-6"
         >
           <div className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full mb-3">
             {item.icon}

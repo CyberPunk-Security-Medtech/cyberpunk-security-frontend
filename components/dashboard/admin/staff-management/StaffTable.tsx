@@ -115,7 +115,7 @@ const handleResend = async (inv: Invitation) => {
 
             <td className="px-4 py-3 text-right">
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium
+                className={`px-3 py-1 rounded-md text-xs font-medium
                   ${
                     inv.status === "accepted"
                       ? "bg-emerald-50 text-emerald-700"
@@ -129,12 +129,12 @@ const handleResend = async (inv: Invitation) => {
             {/* ACTIONS */}
             <td className="px-4 py-3 text-right">
               <Menu>
-                <MenuButton className="min-h-10 rounded-full border px-4 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">
+                <MenuButton className="min-h-10 rounded-md border px-4 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]">
                   Actions
                 </MenuButton>
                 <MenuItems
                   anchor="bottom end"
-                  className="z-dropdown mt-2 w-40 rounded-lg border bg-white p-1 shadow-lg focus:outline-none"
+                  className="z-dropdown mt-2 w-40 rounded-md border bg-white p-1 shadow-lg focus:outline-none"
                 >
                   <MenuItem>
                     <button

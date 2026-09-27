@@ -46,7 +46,7 @@ const mapPatient = (patient: PatientListRecord): PatientRow => {
 
   return {
     id: patient?.id ?? "",
-    patientCode: patient.patient_code?.trim() || patient?.id || "Not recorded",
+    patientCode: patient.patient_code?.trim() || "Not recorded",
     initials: `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "NA",
     name: `${firstName} ${lastName}`.trim() || "Unknown Patient",
     gender: patient?.gender || "-",
@@ -139,7 +139,7 @@ export default function NewPatientsAwaitingTriage() {
   const visiblePatients = useMemo(() => patients.slice(0, 8), [patients]);
 
   return (
-    <section className="mb-8 rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+    <section className="mb-8 rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="font-semibold text-[#003C36]">
@@ -164,7 +164,7 @@ export default function NewPatientsAwaitingTriage() {
       )}
 
       {!loading && visiblePatients.length === 0 && (
-        <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
+        <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
           No newly onboarded patient is awaiting triage right now.
         </div>
       )}

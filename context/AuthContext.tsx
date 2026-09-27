@@ -922,6 +922,8 @@ interface AuthContextType {
   refreshWorkspaces: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   completeTwoFactorLogin: () => Promise<void>;
+  /** Reload the signed-in user and workspaces after the server set auth cookies (e.g. invited-user registration). */
+  refreshSession: () => Promise<void>;
   workspace: Workspace | null;
   setWorkspace: (ws: Workspace) => void;
   logout: () => void;
@@ -1099,6 +1101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshWorkspaces: loadWorkspaces,
         login,
         completeTwoFactorLogin,
+        refreshSession: completeTwoFactorLogin,
         workspace,
         setWorkspace,
         logout,

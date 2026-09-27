@@ -232,12 +232,13 @@ export type LabOrder = {
   consultation_id: string | null;
   patientName: string;
   patientId: string;
-  // Human-readable patient code (falls back to patientId when missing).
+  // Human-readable patient code (empty when missing; never the raw patientId).
   patientCode: string;
   patientGender: string;
   patientAge: string;
   test_type: string;
   test_name: string;
+  testCategory: string;
   orderedTests: string[];
   orderingDoctor: string;
   orderedAt: string | null;
@@ -294,11 +295,14 @@ export interface RawConsultation {
   clinical_notes?: string;
 }
 
+// Mirrors the backend's LabReportAttachmentResponse. file_url is a signed,
+// short-lived link, so it is refreshed whenever the report is re-fetched.
 export interface Attachment {
   id: string;
-  url: string;
-  mimetype?: string;
-  original_filename?: string;
+  file_name?: string | null;
+  content_type?: string | null;
+  file_url?: string;
+  created_at?: string;
 }
 
 export const statusFilters: LabOrderStatus[] = ["pending", "in_progress"];
@@ -399,7 +403,7 @@ export const mapLabOrder = (value: unknown): LabOrder => {
   const patientCode =
     firstNonEmpty(patient, ["patient_code"]) ||
     firstNonEmpty(raw, ["patient_code"]) ||
-    patientId;
+    "";
 
   const doctorFirstName = firstNonEmpty(doctor, [
     "first_name",
@@ -459,6 +463,7 @@ export const mapLabOrder = (value: unknown): LabOrder => {
     test_name:
       firstNonEmpty(raw, ["test_name", "name", "test_type", "lab_test_type"]) ||
       "Unknown Test",
+    testCategory: firstNonEmpty(raw, ["test_category", "category"]) || "",
     orderedTests,
     orderingDoctor,
     orderedAt,
@@ -574,7 +579,7 @@ export function getPatientId(consultation: RawConsultation, fallback = "") {
   );
 }
 
-// Human-readable patient code, falling back to the raw patient id.
+// Human-readable patient code; never falls back to the raw patient id.
 export function buildPatientCode(consultation: RawConsultation, fallback = "") {
   return (
     consultation?.patient?.patient_code ||

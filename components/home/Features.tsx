@@ -17,23 +17,24 @@ export default function FeaturesCard() {
       transition={{ duration: 0.6 }}
       className="
         mx-auto -mt-12 w-[92%] max-w-4xl
-        rounded-3xl bg-white/90 backdrop-blur shadow-md border border-gray-100
-        px-4 sm:px-8 py-6 flex items-center justify-between gap-4
-        overflow-x-auto scrollbar-hide
+        rounded-md bg-white/90 backdrop-blur shadow-md border border-gray-100
+        px-3 sm:px-8 py-5 sm:py-6
+        grid grid-cols-4 gap-2 sm:gap-4
         relative z-20
       "
     >
+      {/* Four equal columns that shrink with the card — never wider than the screen. */}
       {items.map((it) => (
         <div
           key={it.label}
-          className="flex flex-col items-center flex-shrink-0 min-w-[70px] sm:min-w-[80px]"
+          className="flex min-w-0 flex-col items-center"
         >
           <div
-            className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center ${it.bg}`}
+            className={`h-11 w-11 sm:h-14 sm:w-14 rounded-full flex items-center justify-center ${it.bg}`}
           >
-            <Image src={it.icon} alt={it.label} width={26} height={26} />
+            <Image src={it.icon} alt="" width={26} height={26} className="h-5 w-5 sm:h-[26px] sm:w-[26px]" />
           </div>
-          <p className="mt-2 text-xs sm:text-sm font-medium text-gray-800 text-center">
+          <p className="mt-2 w-full truncate text-[11px] sm:text-sm font-medium text-gray-800 text-center">
             {it.label}
           </p>
         </div>

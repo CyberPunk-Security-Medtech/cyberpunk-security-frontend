@@ -32,13 +32,13 @@ export default function HeroSection() {
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-6 w-full sm:w-auto items-center justify-center md:justify-start">
             <button
               onClick={() => router.push("/#waitlist")}
-              className="w-full sm:w-auto rounded-[15px] bg-gradient-to-l from-[#00B8A8] to-[#1A2380] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base"
+              className="w-full sm:w-auto rounded-md bg-gradient-to-l from-[#00B8A8] to-[#1A2380] px-6 py-3 text-white font-semibold shadow hover:opacity-90 transition text-sm sm:text-base"
             >
               Join the Waitlist
             </button>
             <button
               onClick={() => router.push("/")}
-              className="w-full sm:w-auto rounded-[15px] border border-[#00A9B7] px-6 py-3 font-semibold text-black hover:bg-[#00A9B710] transition text-sm sm:text-base"
+              className="w-full sm:w-auto rounded-md border border-[#00A9B7] px-6 py-3 font-semibold text-black hover:bg-[#00A9B710] transition text-sm sm:text-base"
             >
               Request Early Access
             </button>

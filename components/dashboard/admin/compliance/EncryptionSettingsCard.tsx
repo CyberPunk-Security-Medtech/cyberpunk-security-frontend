@@ -23,7 +23,7 @@ export default function EncryptionSettingsCard() {
   ];
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="encryption-settings-title">
+    <section className="rounded-md border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="encryption-settings-title">
       <h2 id="encryption-settings-title" className="text-lg font-medium text-slate-900">
         Encryption Settings
       </h2>
@@ -34,7 +34,7 @@ export default function EncryptionSettingsCard() {
             <p className="text-sm font-medium">{item.title}</p>
             <p className="mt-1 text-xs text-slate-500">{item.desc}</p>
           </div>
-          <span className="min-w-16 rounded-full border border-teal-400 px-3 py-0.5 text-center text-xs font-medium text-[#00796F]">
+          <span className="min-w-16 rounded-md border border-teal-400 px-3 py-0.5 text-center text-xs font-medium text-[#00796F]">
             Active
           </span>
         </div>

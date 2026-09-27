@@ -6,7 +6,7 @@ import { labResults } from "./PatientTransferData";
 
 export default function LabsTab() {
   return (
-    <div className="rounded-lg border border-gray-300 bg-white p-8 shadow-md">
+    <div className="rounded-md border border-gray-300 bg-white p-8 shadow-md">
       <h2 className="mb-8 text-3xl font-medium text-black">Laboratory Results</h2>
 
       <div className="overflow-x-auto">

@@ -70,7 +70,7 @@ function TypingIndicator() {
       <p className="mb-1 text-xs font-semibold text-teal-700">AI</p>
       <div
         aria-label="AI is typing"
-        className="inline-flex items-center gap-1 rounded-2xl rounded-bl-sm bg-white px-4 py-3 shadow-sm"
+        className="inline-flex items-center gap-1 rounded-md rounded-bl-md bg-white px-4 py-3 shadow-sm"
       >
         <span className="h-2 w-2 animate-bounce rounded-full bg-teal-500 [animation-delay:-0.3s]" />
         <span className="h-2 w-2 animate-bounce rounded-full bg-teal-500 [animation-delay:-0.15s]" />
@@ -300,11 +300,11 @@ export default function SharedAiAssistant() {
   return (
     <main className="h-full min-h-0 overflow-hidden bg-[#f8fcfb] p-0">
       <div className="mx-auto grid h-full min-h-0 w-full max-w-6xl gap-3 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-4">
-        <aside className="flex min-h-0 flex-col rounded-xl border border-slate-200 bg-white p-3 shadow-sm lg:rounded-2xl">
+        <aside className="flex min-h-0 flex-col rounded-md border border-slate-200 bg-white p-3 shadow-sm lg:rounded-md">
           <button
             type="button"
             onClick={newChat}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#1A2380] px-4 text-sm font-medium text-white hover:bg-[#11185f]"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-[#1A2380] px-4 text-sm font-medium text-white hover:bg-[#11185f]"
           >
             <Plus size={17} />
             New chat
@@ -329,7 +329,7 @@ export default function SharedAiAssistant() {
                 chats.map((chat) => (
                   <div
                     key={chat.session_id}
-                    className={`group flex min-w-44 items-center gap-1 rounded-lg ${
+                    className={`group flex min-w-44 items-center gap-1 rounded-md ${
                       activeSessionId === chat.session_id
                         ? "bg-teal-50 text-teal-900"
                         : "hover:bg-slate-50"
@@ -365,7 +365,7 @@ export default function SharedAiAssistant() {
                             setRenameValue(chat.title);
                           }}
                           aria-label={`Rename chat ${chat.title}`}
-                          className="rounded p-1.5 text-slate-400 opacity-100 hover:bg-teal-50 hover:text-teal-600 lg:opacity-0 lg:group-hover:opacity-100"
+                          className="rounded-md p-1.5 text-slate-400 opacity-100 hover:bg-teal-50 hover:text-teal-600 lg:opacity-0 lg:group-hover:opacity-100"
                         >
                           <Pencil size={14} />
                         </button>
@@ -373,7 +373,7 @@ export default function SharedAiAssistant() {
                           type="button"
                           onClick={() => void removeChat(chat)}
                           aria-label={`Delete chat ${chat.title}`}
-                          className="mr-1 rounded p-1.5 text-slate-400 opacity-100 hover:bg-red-50 hover:text-red-600 lg:opacity-0 lg:group-hover:opacity-100"
+                          className="mr-1 rounded-md p-1.5 text-slate-400 opacity-100 hover:bg-red-50 hover:text-red-600 lg:opacity-0 lg:group-hover:opacity-100"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -385,7 +385,7 @@ export default function SharedAiAssistant() {
             </nav>
           </div>
         </aside>
-        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-[#f8fcfb] shadow-sm lg:rounded-2xl">
+        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-md border border-slate-200 bg-[#f8fcfb] shadow-sm lg:rounded-md">
           <header className="shrink-0 border-b bg-white px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full">
@@ -405,7 +405,7 @@ export default function SharedAiAssistant() {
               </div>
               {usage && (
                 <p
-                  className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium ${
+                  className={`shrink-0 rounded-md px-3 py-1 text-[11px] font-medium ${
                     limitReached
                       ? "bg-red-50 text-red-600"
                       : "bg-teal-50 text-teal-700"
@@ -464,16 +464,16 @@ export default function SharedAiAssistant() {
                       {message.sender === "worker" ? workerName : "AI"}
                     </p>
                     <div
-                      className={`rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[85%] ${
+                      className={`rounded-md px-4 py-3 text-sm shadow-sm sm:max-w-[85%] ${
                         message.sender === "worker"
-                          ? "max-w-[90%] whitespace-pre-wrap rounded-br-sm bg-[#1A2380] text-white"
-                          : "max-w-[90%] rounded-bl-sm bg-white text-gray-700"
+                          ? "max-w-[90%] whitespace-pre-wrap rounded-br-md bg-[#1A2380] text-white"
+                          : "max-w-[90%] rounded-bl-md bg-white text-gray-700"
                       }`}
                     >
                       {message.sender === "ai" ? (
                         // AI replies arrive as markdown (headings, lists,
                         // tables, code) — render them formatted.
-                        <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-headings:mb-1 prose-headings:mt-2 prose-headings:font-semibold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-pre:my-2 prose-code:rounded prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none prose-table:my-2 prose-blockquote:border-teal-400">
+                        <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-headings:mb-1 prose-headings:mt-2 prose-headings:font-semibold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-pre:my-2 prose-code:rounded-md prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none prose-table:my-2 prose-blockquote:border-teal-400">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
@@ -524,7 +524,7 @@ export default function SharedAiAssistant() {
               {attachments.map((attachment) => (
                 <span
                   key={attachment.id}
-                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border bg-slate-50 px-3 py-1 text-xs text-gray-600"
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-md border bg-slate-50 px-3 py-1 text-xs text-gray-600"
                 >
                   <FileIcon size={13} className="shrink-0 text-teal-600" />
                   <span className="max-w-32 truncate">{attachment.name}</span>
@@ -539,7 +539,7 @@ export default function SharedAiAssistant() {
                         current.filter((item) => item.id !== attachment.id),
                       )
                     }
-                    className="rounded text-gray-400 hover:text-red-600"
+                    className="rounded-md text-gray-400 hover:text-red-600"
                   >
                     <X size={13} />
                   </button>
@@ -553,7 +553,7 @@ export default function SharedAiAssistant() {
           >
             <label
               htmlFor="assistant-files"
-              className="cursor-pointer rounded p-1 text-gray-400 hover:text-teal-600"
+              className="cursor-pointer rounded-md p-1 text-gray-400 hover:text-teal-600"
               aria-label="Attach files"
             >
               <Paperclip className="w-5" />
@@ -581,7 +581,7 @@ export default function SharedAiAssistant() {
                     ? `Daily token limit reached — resets in ${usage?.resets_in ?? "24h"}`
                     : `Message as ${workerName}`
               }
-              className="min-h-10 flex-1 rounded-full bg-slate-100 px-4 text-sm text-gray-700 outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-teal-600/30 disabled:cursor-not-allowed"
+              className="min-h-10 flex-1 rounded-md bg-slate-100 px-4 text-sm text-gray-700 outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-teal-600/30 disabled:cursor-not-allowed"
             />
             <button
               type="submit"

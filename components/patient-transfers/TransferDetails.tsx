@@ -2,7 +2,7 @@ import { Building2 } from "lucide-react";
 
 export default function TransferDetails() {
   return (
-    <section className="mb-8 rounded-xl bg-white px-8 py-9 shadow-sm">
+    <section className="mb-8 rounded-md bg-white px-8 py-9 shadow-sm">
       <div className="flex items-center gap-4">
         <Building2 className="h-6 w-6 text-gray-900" />
         <h3 className="text-2xl font-bold text-gray-900">Transfer Details</h3>

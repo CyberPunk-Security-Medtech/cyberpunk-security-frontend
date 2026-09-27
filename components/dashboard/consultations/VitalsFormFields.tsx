@@ -182,7 +182,7 @@ export default function VitalsFormFields({
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <fieldset className="space-y-4 rounded-xl border border-gray-200 bg-gray-50/60 p-4">
+    <fieldset className="space-y-4 rounded-md border border-gray-200 bg-gray-50/60 p-4">
       <legend className="text-sm font-semibold text-[#0B1227]">
         Vitals <span className="font-normal text-gray-500">(optional)</span>
       </legend>
@@ -191,7 +191,7 @@ export default function VitalsFormFields({
       </p>
 
       {hasErrors && (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
           Review the highlighted vitals before creating the consultation.
         </p>
       )}

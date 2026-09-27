@@ -101,7 +101,7 @@ export default function TwoFactorCodeInput({
           aria-invalid={invalid}
           onChange={(event) => updateDigit(index, event.target.value)}
           onKeyDown={(event) => handleKeyDown(event, index)}
-          className="h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white text-center text-lg font-semibold text-slate-900 outline-none focus:border-[#1A2380] focus-visible:ring-2 focus-visible:ring-[#1A2380]/25 disabled:cursor-not-allowed disabled:bg-slate-100 sm:h-12 sm:max-w-12"
+          className="h-11 min-w-0 flex-1 rounded-md border border-slate-300 bg-white text-center text-lg font-semibold text-slate-900 outline-none focus:border-[#1A2380] focus-visible:ring-2 focus-visible:ring-[#1A2380]/25 disabled:cursor-not-allowed disabled:bg-slate-100 sm:h-12 sm:max-w-12"
         />
       ))}
     </div>

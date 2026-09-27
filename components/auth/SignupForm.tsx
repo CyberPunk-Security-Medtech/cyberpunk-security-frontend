@@ -186,7 +186,7 @@ export default function SignupForm() {
       onSubmit={handleSubmit}
       className="space-y-3 sm:space-y-5"
     >
-      {formError && <p id="signup-error" role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
+      {formError && <p id="signup-error" role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
       <div>
         <label htmlFor="signup-email" className="mb-1 block text-sm font-medium text-gray-700">
           Email Address
@@ -197,7 +197,7 @@ export default function SignupForm() {
           name="email"
           autoComplete="email"
           placeholder="Enter Email Address"
-          className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.email}
           onChange={(event) => { handleChange(event); setFormError(""); }}
           aria-invalid={Boolean(formError)}
@@ -215,7 +215,7 @@ export default function SignupForm() {
           name="firstName"
           autoComplete="given-name"
           placeholder="First Name"
-          className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-1.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.firstName}
           onChange={(event) => { handleChange(event); setFormError(""); }}
         />
@@ -231,7 +231,7 @@ export default function SignupForm() {
           name="lastName"
           autoComplete="family-name"
           placeholder="Last Name"
-          className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-1.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={formData.lastName}
           onChange={(event) => { handleChange(event); setFormError(""); }}
         />
@@ -247,7 +247,7 @@ export default function SignupForm() {
           name="password"
           autoComplete="new-password"
           placeholder="Enter Password"
-          className="w-full px-4 py-1.5 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+          className="w-full px-4 py-1.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           value={formData.password}
           onChange={(event) => { handleChange(event); setFormError(""); }}
           onBlur={() => setPasswordTouched(true)}
@@ -292,7 +292,7 @@ export default function SignupForm() {
             name="remember"
             checked={formData.remember}
             onChange={handleChange}
-            className="rounded border-gray-300 text-blue-600"
+            className="rounded-md border-gray-300 text-blue-600"
           />
           <span>Remember for 30 days</span>
         </label>
@@ -313,7 +313,7 @@ export default function SignupForm() {
         {loading ? "Creating..." : "Create account"}
       </button>
 
-      <div className="mt-4 p-3 border border-teal-400 text-sm text-gray-700 rounded-lg bg-teal-50">
+      <div className="mt-4 p-3 border border-teal-400 text-sm text-gray-700 rounded-md bg-teal-50">
         Admins can register new hospitals. Staff accounts are created by Admins.
         Patients cannot log in.
       </div>
@@ -343,7 +343,7 @@ export default function SignupForm() {
 //           type="email"
 //           name="email"
 //           placeholder="Enter Email Address"
-//           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 //           value={formData.email}
 //           onChange={handleChange}
 //           required
@@ -358,7 +358,7 @@ export default function SignupForm() {
 //           type="text"
 //           name="firstName"
 //           placeholder="First Name"
-//           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 //           value={formData.firstName}
 //           onChange={handleChange}
 //           required
@@ -372,7 +372,7 @@ export default function SignupForm() {
 //           type="text"
 //           name="lastName"
 //           placeholder="Last Name"
-//           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 //           value={formData.lastName}
 //           onChange={handleChange}
 //           required
@@ -388,7 +388,7 @@ export default function SignupForm() {
 //           type={showPassword ? "text" : "password"}
 //           name="password"
 //           placeholder="Enter Password"
-//           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 //           value={formData.password}
 //           onChange={handleChange}
 //           required
@@ -411,7 +411,7 @@ export default function SignupForm() {
 //           type={showConfirmPassword ? "text" : "password"}
 //           name="confirmPassword"
 //           placeholder="Enter Confirm Password"
-//           className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+//           className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 //           value={formData.confirmPassword}
 //           onChange={handleChange}
 //           required
@@ -435,7 +435,7 @@ export default function SignupForm() {
 //             name="remember"
 //             checked={formData.remember}
 //             onChange={handleChange}
-//             className="rounded border-gray-300 text-blue-600"
+//             className="rounded-md border-gray-300 text-blue-600"
 //           />
 //           <span>Remember for 30 days</span>
 //         </label>
@@ -454,7 +454,7 @@ export default function SignupForm() {
 //       </button>
 
 //       {/* Info Box */}
-//       <div className="mt-6 p-3 border border-teal-400 text-sm text-gray-700 rounded-lg bg-teal-50">
+//       <div className="mt-6 p-3 border border-teal-400 text-sm text-gray-700 rounded-md bg-teal-50">
 //         Admins can register new hospitals. Staff accounts are created by
 //         Admins. Patients cannot log in.
 //       </div>

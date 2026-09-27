@@ -41,7 +41,7 @@ export default function OTPInput({ otp, setOtp }: OTPInputProps) {
           value={digit}
           onChange={(e) => handleChange(e.target.value, i)}
           onKeyDown={(e) => handleKeyDown(e, i)}
-          className="w-14 h-14 text-center border-2 border-gray-300 rounded-lg text-2xl font-semibold text-gray-700 focus:border-blue-700 focus:outline-none"
+          className="w-14 h-14 text-center border-2 border-gray-300 rounded-md text-2xl font-semibold text-gray-700 focus:border-blue-700 focus:outline-none"
         />
       ))}
     </div>

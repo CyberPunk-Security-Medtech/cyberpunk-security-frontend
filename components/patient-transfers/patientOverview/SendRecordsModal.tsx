@@ -40,7 +40,7 @@ export default function SendRecordsModal({
       isOpen
       onClose={onClose}
       backdropClassName="bg-black/50"
-      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-white shadow-2xl"
+      panelClassName="max-h-[calc(100dvh-3rem)] w-full max-w-3xl overflow-y-auto rounded-md bg-white shadow-2xl"
     >
         <div className="flex items-center justify-between border-b border-gray-200 px-10 py-7">
           <h2 className="text-3xl font-medium text-black">Send Records</h2>
@@ -49,7 +49,7 @@ export default function SendRecordsModal({
             type="button"
             onClick={onClose}
             aria-label="Close Send Records"
-            className="rounded text-gray-600 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+            className="rounded-md text-gray-600 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
           >
             <X size={28} aria-hidden="true" />
           </button>
@@ -64,7 +64,7 @@ export default function SendRecordsModal({
             <input
               value={patient.name}
               readOnly
-              className="w-full rounded-lg border border-gray-300 bg-[#F1FFFF] px-6 py-4 text-2xl text-gray-500 outline-none"
+              className="w-full rounded-md border border-gray-300 bg-[#F1FFFF] px-6 py-4 text-2xl text-gray-500 outline-none"
             />
           </div>
 
@@ -114,7 +114,7 @@ export default function SendRecordsModal({
                 Destination Hospital
               </h3>
 
-              <div className="flex items-center gap-3 rounded-full border border-gray-300 px-6 py-4">
+              <div className="flex items-center gap-3 rounded-md border border-gray-300 px-6 py-4">
                 <Search size={24} className="text-gray-400" />
 
                 {isSpecificTransfer ? (
@@ -176,7 +176,7 @@ export default function SendRecordsModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border-2 border-gray-500 px-6 py-4 text-2xl text-gray-600 hover:bg-gray-50"
+              className="rounded-md border-2 border-gray-500 px-6 py-4 text-2xl text-gray-600 hover:bg-gray-50"
             >
               Cancel
             </button>
@@ -185,7 +185,7 @@ export default function SendRecordsModal({
               type="button"
               onClick={onSuccess}
               disabled={!canTransfer}
-              className={`rounded-lg px-6 py-4 text-2xl text-white transition ${
+              className={`rounded-md px-6 py-4 text-2xl text-white transition ${
                 canTransfer
                   ? "bg-[#211783] hover:bg-[#18105f]"
                   : "cursor-not-allowed bg-[#9590C7]"

@@ -15,7 +15,7 @@ export default function DataRetentionPoliciesCard() {
   ];
 
   return (
-    <section className="w-full rounded-xl border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="retention-policies-title">
+    <section className="w-full rounded-md border border-slate-200 bg-white p-4 sm:p-5" aria-labelledby="retention-policies-title">
       <h2 id="retention-policies-title" className="text-lg font-medium text-slate-900">
         Data Retention Policies
       </h2>

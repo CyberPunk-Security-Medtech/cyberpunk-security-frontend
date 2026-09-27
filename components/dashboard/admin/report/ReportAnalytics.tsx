@@ -19,7 +19,7 @@ export default function ReportsAnalytics() {
           Reports / Analytics
         </h1>
 
-        <button className="flex items-center gap-2 px-4 py-2 text-sm bg-white border rounded-lg hover:bg-slate-100">
+        <button className="flex items-center gap-2 px-4 py-2 text-sm bg-white border rounded-md hover:bg-slate-100">
           <Download size={16} />
           Download
         </button>
@@ -34,7 +34,7 @@ export default function ReportsAnalytics() {
         ].map((filter) => (
           <select
             key={filter}
-            className="px-4 py-2 text-sm bg-white border rounded-full outline-none"
+            className="px-4 py-2 text-sm bg-white border rounded-md outline-none"
           >
             <option>{filter}</option>
           </select>

@@ -10,7 +10,7 @@ const summaryRows = [
 export default function BillingSummary() {
   return (
     <section
-      className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"
+      className="rounded-md border border-slate-200 bg-white p-5 sm:p-7"
       aria-labelledby="bill-summary-title"
     >
       <h1
@@ -39,7 +39,7 @@ export default function BillingSummary() {
         <span className="text-2xl font-semibold text-[#21178C]">$100</span>
       </div>
 
-      <div className="mt-2 flex items-start gap-3 rounded-2xl bg-[#D4F3F0] px-5 py-4 text-sm text-slate-800">
+      <div className="mt-2 flex items-start gap-3 rounded-md bg-[#D4F3F0] px-5 py-4 text-sm text-slate-800">
         <ShieldCheck
           className="mt-0.5 h-5 w-5 shrink-0 text-[#009B82]"
           aria-hidden="true"

@@ -220,7 +220,7 @@ export function PatientPrescriptionModal({
         <div>
           <button
             type="button"
-            className="flex items-center justify-center gap-2 w-full md:w-auto border border-[#1A2380] text-[#1A2380] font-medium rounded-full px-5 py-2.5 text-sm hover:bg-[#F4F5FF]"
+            className="flex items-center justify-center gap-2 w-full md:w-auto border border-[#1A2380] text-[#1A2380] font-medium rounded-md px-5 py-2.5 text-sm hover:bg-[#F4F5FF]"
           >
             <Plus size={16} />
             Add Another Medication
@@ -231,14 +231,14 @@ export function PatientPrescriptionModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+            className="rounded-md border px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
           >
             Cancel
           </button>
           <Button
             type="submit"
             disabled={loading || !consultationId || !orgId}
-            className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#00B8A8] transition disabled:opacity-50"
+            className="rounded-md bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#00B8A8] transition disabled:opacity-50"
           >
             {loading ? "Sending..." : "Save & Send to Pharmacist"}
           </Button>

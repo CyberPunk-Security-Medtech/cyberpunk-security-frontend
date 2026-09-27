@@ -67,7 +67,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
         <button
           type="button"
           onClick={() => router.push("/dashboard/nurse/consultations")}
-          className="rounded-full bg-[#ECFDF8] px-4 py-1 text-sm font-medium text-[#003C36] hover:underline"
+          className="rounded-md bg-[#ECFDF8] px-4 py-1 text-sm font-medium text-[#003C36] hover:underline"
         >
           Back to Consultation Queue
         </button>
@@ -77,13 +77,13 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
             router.push(`/dashboard/nurse/patient/${patient?.id ?? ""}`)
           }
           disabled={!patient?.id}
-          className="rounded-full border border-gray-200 px-4 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          className="rounded-md border border-gray-200 px-4 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
         >
           Open Patient Overview
         </button>
       </div>
 
-      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
+      <section className="rounded-md border bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <h2 className="break-words text-xl font-semibold text-[#003C36]">
@@ -101,7 +101,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
             {selectedConsultation?.status && (
               <StatusBadge status={toBadgeStatus(String(selectedConsultation.status))} />
             )}
-            <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
+            <span className="rounded-md bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
               {selectedConsultation?.priority || "-"}
             </span>
           </div>
@@ -121,7 +121,7 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
         </div>
       </section>
 
-      <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-5">
+      <section className="rounded-md border bg-white p-4 shadow-sm sm:p-5">
         {!consultationLoading && !selectedConsultation && (
           <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
             Consultation summary is unavailable from list response, but full tabs are still loaded
@@ -198,7 +198,7 @@ export default function ConsultationDetailsClient({
 
   if (resolving) {
     return (
-      <section className="rounded-lg border bg-white p-5 text-sm text-gray-500 shadow-sm">
+      <section className="rounded-md border bg-white p-5 text-sm text-gray-500 shadow-sm">
         Resolving consultation details...
       </section>
     );
@@ -206,7 +206,7 @@ export default function ConsultationDetailsClient({
 
   if (!resolvedPatientId) {
     return (
-      <section className="rounded-lg border bg-white p-5 text-sm text-gray-500 shadow-sm">
+      <section className="rounded-md border bg-white p-5 text-sm text-gray-500 shadow-sm">
         Unable to resolve patient for this consultation.
       </section>
     );

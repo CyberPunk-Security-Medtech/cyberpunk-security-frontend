@@ -23,7 +23,7 @@ export default function RejectTransferModal({
       title="Reject Patients Transfer"
       isOpen
       onClose={onClose}
-      panelClassName="w-full max-w-xl rounded-xl bg-white shadow-2xl"
+      panelClassName="w-full max-w-xl rounded-md bg-white shadow-2xl"
     >
         <div className="flex items-center justify-between px-6 py-5">
           <h2 className="text-xl font-semibold text-[#111827]">
@@ -34,7 +34,7 @@ export default function RejectTransferModal({
             type="button"
             onClick={onClose}
             aria-label="Close Reject Patients Transfer"
-            className="rounded text-gray-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
+            className="rounded-md text-gray-500 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#211783] focus-visible:ring-offset-2"
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -50,11 +50,11 @@ export default function RejectTransferModal({
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               placeholder="Please provide a detailed reason for rejection..."
-              className="h-36 w-full resize-none rounded border border-gray-300 bg-[#F4FFFF] p-4 text-sm outline-none focus:border-red-500"
+              className="h-36 w-full resize-none rounded-md border border-gray-300 bg-[#F4FFFF] p-4 text-sm outline-none focus:border-red-500"
             />
           </label>
 
-          <div className="mt-4 flex items-center gap-2 rounded bg-red-100 px-4 py-3 text-sm text-red-600">
+          <div className="mt-4 flex items-center gap-2 rounded-md bg-red-100 px-4 py-3 text-sm text-red-600">
             <AlertCircle size={16} />
             The sending hospital will be notified of the rejection and your reason.
           </div>
@@ -63,7 +63,7 @@ export default function RejectTransferModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded border border-gray-400 px-6 py-3 text-gray-700 hover:bg-gray-50"
+              className="rounded-md border border-gray-400 px-6 py-3 text-gray-700 hover:bg-gray-50"
             >
               Cancel
             </button>
@@ -72,7 +72,7 @@ export default function RejectTransferModal({
               type="button"
               onClick={() => onDecline(reason)}
               disabled={!canSubmit}
-              className={`rounded px-6 py-3 text-white ${
+              className={`rounded-md px-6 py-3 text-white ${
                 canSubmit
                   ? "bg-red-600 hover:bg-red-700"
                   : "cursor-not-allowed bg-red-300"

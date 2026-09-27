@@ -2,11 +2,11 @@ import { ArrowUpRight, ArrowDownRight, ChevronDown } from "lucide-react";
 
 export default function TotalTransfers() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border p-4">
+    <div className="bg-white rounded-md shadow-sm border p-4">
       <p className="text-xs text-slate-500 mb-4">Total Patients Transfers</p>
 
       <div>
-        <button className="flex items-center gap-1 text-xs border rounded-full px-3 py-1 mb-2 hover:bg-slate-50">
+        <button className="flex items-center gap-1 text-xs border rounded-md px-3 py-1 mb-2 hover:bg-slate-50">
           October 2025 <ChevronDown className="w-3 h-3" />
         </button>
       </div>

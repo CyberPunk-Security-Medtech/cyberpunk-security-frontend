@@ -21,7 +21,7 @@ export default function VerificationCard({
   onVerify,
 }: Props) {
   return (
-    <div className="rounded-xl border border-gray-400 bg-white px-8 py-8">
+    <div className="rounded-md border border-gray-400 bg-white px-8 py-8">
       <div className="mb-6 flex items-center gap-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#b6f1ea] text-[#11bdb2]">
           {icon}

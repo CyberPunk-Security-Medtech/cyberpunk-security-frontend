@@ -6,7 +6,7 @@ export default function RecentActivity() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border p-4">
+    <div className="bg-white rounded-md shadow-sm border p-4">
       <p className="text-xs font-semibold text-emerald-600 mb-1">Recent Activity</p>
       <p className="text-xs text-slate-500 mb-4">Latest updates</p>
 
@@ -23,7 +23,7 @@ export default function RecentActivity() {
       </div>
 
       <div className="mt-4 flex justify-center">
-        <button className="text-xs border rounded-full px-3 py-1 hover:bg-slate-50">
+        <button className="text-xs border rounded-md px-3 py-1 hover:bg-slate-50">
           View all
         </button>
       </div>

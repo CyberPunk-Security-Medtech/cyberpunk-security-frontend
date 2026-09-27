@@ -21,7 +21,8 @@ export interface MenuItem {
 export interface UserProfile {
     name: string;
     role: string;
-    avatar: string;
+    /** Profile photo URL; the default avatar is shown when absent. */
+    avatar?: string;
 }
 
 export interface User {

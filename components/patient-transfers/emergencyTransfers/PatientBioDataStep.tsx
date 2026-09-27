@@ -51,7 +51,7 @@ export default function PatientBioDataStep({
       <div className="mt-8 flex justify-end">
         <button
           onClick={onNext}
-          className="rounded-full bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
+          className="rounded-md bg-[#211783] px-10 py-3 text-white hover:bg-[#18105f]"
         >
           Continue
         </button>
@@ -78,7 +78,7 @@ function InputField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-full border border-gray-300 px-5 py-3 outline-none focus:border-[#211783]"
+        className="w-full rounded-md border border-gray-300 px-5 py-3 outline-none focus:border-[#211783]"
       />
     </label>
   );

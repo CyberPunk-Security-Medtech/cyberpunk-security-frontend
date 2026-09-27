@@ -22,7 +22,7 @@ export default function AdminAuthorizationStep({
         <p className="mt-3 text-gray-500">Admin Authorization</p>
       </div>
 
-      <div className="mx-auto max-w-xl rounded-xl border border-[#00B8A8] bg-[#F0FFFF] px-8 py-5 text-center text-[#00B8A8]">
+      <div className="mx-auto max-w-xl rounded-md border border-[#00B8A8] bg-[#F0FFFF] px-8 py-5 text-center text-[#00B8A8]">
         “By continuing, you confirm that you are authorized to transfer this Patient in Privacure
         and agree to our Privacy Policy and NDPR, HIPAA, GDPR terms.”
       </div>
@@ -49,7 +49,7 @@ export default function AdminAuthorizationStep({
         <button
           onClick={onContinue}
           disabled={!canContinue}
-          className={`rounded-full px-10 py-3 text-white ${
+          className={`rounded-md px-10 py-3 text-white ${
             canContinue
               ? "bg-[#211783] hover:bg-[#18105f]"
               : "cursor-not-allowed bg-[#9690C7]"
@@ -74,10 +74,10 @@ function AuthorizationBox({
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-4 rounded-lg border border-gray-200 px-6 py-6 text-left"
+      className="flex w-full items-center gap-4 rounded-md border border-gray-200 px-6 py-6 text-left"
     >
       <span
-        className={`flex h-5 w-5 items-center justify-center rounded border ${
+        className={`flex h-5 w-5 items-center justify-center rounded-md border ${
           checked ? "border-[#211783] bg-[#211783] text-white" : "border-gray-300"
         }`}
       >

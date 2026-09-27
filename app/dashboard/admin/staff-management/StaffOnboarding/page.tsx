@@ -94,7 +94,7 @@ export default function StaffOnboarding() {
 
   return (
     <div className="flex justify-center items-center py-10 px-6">
-          <div className="w-full max-w-3xl rounded-2xl bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
+          <div className="w-full max-w-3xl rounded-md bg-white px-5 py-10 text-center shadow-sm sm:px-10 sm:py-14">
             <div className="flex flex-col items-center mb-6">
               <Image src="/auth_logo.svg" width={110} height={70} alt="PrivaCure" />
             </div>
@@ -115,7 +115,7 @@ export default function StaffOnboarding() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-full border px-4 py-3 text-sm"
+                  className="w-full rounded-md border px-4 py-3 text-sm"
                 />
               </div>
 
@@ -129,7 +129,7 @@ export default function StaffOnboarding() {
                     setRole(e.target.value);
                     setDepartmentId("");
                   }}
-                  className="w-full rounded-full border px-4 py-3 text-sm"
+                  className="w-full rounded-md border px-4 py-3 text-sm"
                 >
                   <option value="">Select role</option>
                   <option value="doctor">Doctor</option>
@@ -148,7 +148,7 @@ export default function StaffOnboarding() {
                   <select
                     value={departmentId}
                     onChange={(e) => setDepartmentId(e.target.value)}
-                    className="w-full rounded-full border px-4 py-3 text-sm"
+                    className="w-full rounded-md border px-4 py-3 text-sm"
                     disabled={loadingDepartments}
                   >
                     <option value="">
@@ -180,7 +180,7 @@ export default function StaffOnboarding() {
                       !departmentId))
                 }
                 type="submit"
-                className="rounded-full bg-[#1A2380] text-white w-full py-3 font-medium"
+                className="rounded-md bg-[#1A2380] text-white w-full py-3 font-medium"
               >
                 {loading ? "Sending..." : "Continue"}
               </button>

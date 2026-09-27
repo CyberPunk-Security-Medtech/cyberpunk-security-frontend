@@ -42,7 +42,7 @@ export default function SuccessScreen({
       <button
         type="button"
         onClick={onContinue}
-        className="min-h-11 w-full max-w-sm rounded-full bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none"
+        className="min-h-11 w-full max-w-sm rounded-md bg-[#1A2380] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151C6B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2380] focus-visible:ring-offset-2 motion-reduce:transition-none"
       >
         Continue to workspaces
       </button>

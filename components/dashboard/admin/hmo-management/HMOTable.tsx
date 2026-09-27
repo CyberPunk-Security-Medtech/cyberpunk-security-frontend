@@ -52,7 +52,7 @@ export default function HMOTable() {
               <td className="px-4 py-3">{hmo.providers}</td>
               <td className="whitespace-nowrap px-4 py-3">{hmo.date}</td>
               <td className="px-4 py-3">
-                <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[hmo.status]}`}>
+                <span className={`rounded-md px-3 py-1 text-xs font-medium ${statusStyles[hmo.status]}`}>
                   {hmo.status}
                 </span>
               </td>
@@ -60,7 +60,7 @@ export default function HMOTable() {
                 <button
                   type="button"
                   aria-label={`Open actions for ${hmo.name}`}
-                  className="dashboard-button min-h-10 min-w-10 rounded-lg p-2 hover:bg-slate-100"
+                  className="dashboard-button min-h-10 min-w-10 rounded-md p-2 hover:bg-slate-100"
                 >
                   <span aria-hidden="true">⋮</span>
                 </button>

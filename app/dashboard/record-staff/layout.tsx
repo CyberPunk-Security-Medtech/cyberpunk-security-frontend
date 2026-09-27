@@ -52,7 +52,6 @@ export default function RecordStaffLayout({
   const profile: UserProfile = {
     name: buildDisplayName(user),
     role: activeWorkspace?.role ?? "Record Staff",
-    avatar: "/avatars/eleanor.png",
   };
 
   return (

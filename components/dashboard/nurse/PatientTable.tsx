@@ -45,7 +45,7 @@ export default function PatientTable() {
 
         const mappedPatients = data.map((p) => ({
           id: p.id,
-          patientCode: p.patient_code?.trim() || p.id,
+          patientCode: p.patient_code?.trim() || "Not recorded",
           initials: `${p.first_name?.[0] ?? ""}${p.last_name?.[0] ?? ""}`.toUpperCase(),
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
           age: resolvePatientAge(p.age, p.dob ?? p.date_of_birth),
@@ -80,7 +80,7 @@ export default function PatientTable() {
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-md border border-gray-200 bg-white p-6 shadow-sm">
         <LoaderIcon />
       </div>
     );
@@ -92,7 +92,7 @@ export default function PatientTable() {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+    <div className="rounded-md border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
       <ResponsiveTableRegion label="Nurse patient records">
         <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead className="border-b bg-gray-50 text-gray-600">
@@ -135,7 +135,7 @@ export default function PatientTable() {
             key={`mobile-${patient.id}`}
             type="button"
             onClick={() => router.push(`/dashboard/nurse/patient/${patient.id}`)}
-            className="w-full rounded-lg border border-gray-200 p-4 text-left shadow-sm transition hover:bg-gray-50"
+            className="w-full rounded-md border border-gray-200 p-4 text-left shadow-sm transition hover:bg-gray-50"
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">

@@ -138,7 +138,7 @@ function FieldLabel({ label, children, optional = false }: { label: string; chil
   );
 }
 
-const fieldClassName = "min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20";
+const fieldClassName = "min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#051466] focus:ring-2 focus:ring-[#051466]/20";
 
 export default function PatientEditForm({ patientId }: PatientEditFormProps) {
   const router = useRouter();
@@ -281,7 +281,7 @@ export default function PatientEditForm({ patientId }: PatientEditFormProps) {
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <Link
         href={`/dashboard/admin/patient/${patientId}`}
-        className="inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm font-medium text-[#051466] hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
+        className="inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-medium text-[#051466] hover:bg-indigo-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466]"
       >
         <ArrowLeft size={17} aria-hidden="true" />
         Back to patient record
@@ -293,19 +293,19 @@ export default function PatientEditForm({ patientId }: PatientEditFormProps) {
       </header>
 
       {loading ? (
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm" aria-live="polite">
+        <section className="mt-6 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm" aria-live="polite">
           Loading patient information...
         </section>
       ) : error && !form ? (
-        <section className="mt-6 rounded-2xl border border-red-200 bg-white p-6 shadow-sm" role="alert">
+        <section className="mt-6 rounded-md border border-red-200 bg-white p-6 shadow-sm" role="alert">
           <p className="text-sm text-red-700">{error}</p>
           <Button className="mt-4" onClick={() => void loadPatient()}>Retry</Button>
         </section>
       ) : form ? (
         <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
-          {error && <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">{error}</p>}
+          {error && <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">{error}</p>}
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">Personal information</h2>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldLabel label="First name"><input required name="first_name" value={form.first_name} onChange={handleChange} className={fieldClassName} autoComplete="given-name" /></FieldLabel>
@@ -317,7 +317,7 @@ export default function PatientEditForm({ patientId }: PatientEditFormProps) {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">Contact details</h2>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldLabel label="Email address" optional><input type="email" name="email" value={form.email} onChange={handleChange} className={fieldClassName} autoComplete="email" /></FieldLabel>
@@ -325,7 +325,7 @@ export default function PatientEditForm({ patientId }: PatientEditFormProps) {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">Clinical information</h2>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {(["allergies", "past_medical_history", "family_medical_history", "symptoms", "current_medications", "immunizations", "lifestyle_info"] as const).map((field) => (
@@ -336,13 +336,13 @@ export default function PatientEditForm({ patientId }: PatientEditFormProps) {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">Coverage information</h2>
             <fieldset className="mt-5">
               <legend className="text-sm font-medium text-slate-700">Coverage type</legend>
               <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <label className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium ${coverageType === "hmo" ? "border-[#051466] bg-indigo-50 text-[#051466]" : "border-slate-200 text-slate-700"}`}><input type="radio" name="coverage_type" checked={coverageType === "hmo"} onChange={() => setCoverage("hmo")} />HMO / Insurance</label>
-                <label className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium ${coverageType === "self_pay" ? "border-[#051466] bg-indigo-50 text-[#051466]" : "border-slate-200 text-slate-700"}`}><input type="radio" name="coverage_type" checked={coverageType === "self_pay"} onChange={() => setCoverage("self_pay")} />Self-pay</label>
+                <label className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium ${coverageType === "hmo" ? "border-[#051466] bg-indigo-50 text-[#051466]" : "border-slate-200 text-slate-700"}`}><input type="radio" name="coverage_type" checked={coverageType === "hmo"} onChange={() => setCoverage("hmo")} />HMO / Insurance</label>
+                <label className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium ${coverageType === "self_pay" ? "border-[#051466] bg-indigo-50 text-[#051466]" : "border-slate-200 text-slate-700"}`}><input type="radio" name="coverage_type" checked={coverageType === "self_pay"} onChange={() => setCoverage("self_pay")} />Self-pay</label>
               </div>
             </fieldset>
             {coverageType === "hmo" && <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">

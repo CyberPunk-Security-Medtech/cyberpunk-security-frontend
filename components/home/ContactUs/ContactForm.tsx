@@ -3,7 +3,7 @@
 
 // export default function ContactForm() {
 //   return (
-//     <form className="p-10 space-y-6 bg-white rounded-r-2xl">
+//     <form className="p-10 space-y-6 bg-white rounded-r-md">
 //       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //         <div>
 //           <label className="block text-sm font-medium mb-2">First Name</label>
@@ -87,7 +87,7 @@ import Image from "next/image";
 
 export default function ContactForm() {
   return (
-    <form className="p-10 space-y-6 bg-white rounded-r-2xl">
+    <form className="p-10 space-y-6 bg-white rounded-r-md">
       {/* First & Last Name */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>

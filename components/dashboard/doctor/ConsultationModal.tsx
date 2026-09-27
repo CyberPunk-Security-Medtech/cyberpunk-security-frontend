@@ -177,14 +177,14 @@ export function CreateConsultationModal({ open, onClose, patientId, onCreated }:
           <button
             type="button"
             onClick={handleClose}
-            className="rounded-full border px-6 py-2.5 text-sm font-medium"
+            className="rounded-md border px-6 py-2.5 text-sm font-medium"
           >
             Cancel
           </button>
           <Button
             type="submit"
             disabled={loading || !form.reason_for_visit || !form.department_id}
-            className="rounded-full bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-md bg-[#1A2380] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Consultation'}
           </Button>

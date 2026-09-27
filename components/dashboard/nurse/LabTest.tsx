@@ -58,13 +58,13 @@ export default function LabTest() {
   return (
     <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* ──────────────── Lab Test Updates ──────────────── */}
-      <div className="bg-white shadow rounded-xl p-6 min-h-[400px]">
+      <div className="bg-white shadow rounded-md p-6 min-h-[400px]">
         <h4 className="font-semibold text-gray-900 mb-4">Lab Test Updates</h4>
 
         {labTests.map((test, idx) => (
           <div key={idx} className="flex items-start gap-4 py-4 border-b last:border-none">
             {/* Icon */}
-            <div className="bg-emerald-50 p-2 rounded-lg">
+            <div className="bg-emerald-50 p-2 rounded-md">
               <Image src="/lab-icon.svg" alt="Lab icon" width={32} height={32} />
             </div>
 
@@ -107,7 +107,7 @@ export default function LabTest() {
       </div>
 
       {/* ──────────────── Recent Activities ──────────────── */}
-      <div className="bg-white shadow rounded-xl p-6 min-h-[400px]">
+      <div className="bg-white shadow rounded-md p-6 min-h-[400px]">
         <h4 className="font-semibold text-gray-900 mb-4">Recent Activities</h4>
 
         {activities.map((activity, idx) => (

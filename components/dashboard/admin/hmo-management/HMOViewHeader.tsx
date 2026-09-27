@@ -16,7 +16,7 @@ export default function HMOViewHeader() {
 
       <button
         onClick={() => router.push("/dashboard/admin")}
-        className="inline-flex items-center justify-center px-5 h-10 rounded-full border border-gray-300 text-sm hover:bg-gray-50"
+        className="inline-flex items-center justify-center px-5 h-10 rounded-md border border-gray-300 text-sm hover:bg-gray-50"
       >
         ← Back to Dashboard
       </button>

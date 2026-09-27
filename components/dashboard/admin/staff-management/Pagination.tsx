@@ -50,7 +50,7 @@ export default function Pagination({
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="min-h-10 min-w-10 rounded border px-3 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-10 min-w-10 rounded-md border px-3 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] disabled:cursor-not-allowed disabled:opacity-40"
         >
           Prev
         </button>
@@ -70,7 +70,7 @@ export default function Pagination({
               type="button"
               onClick={() => onPageChange(item)}
               aria-current={item === page ? "page" : undefined}
-              className={`min-h-10 min-w-10 rounded border px-3 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] ${
+              className={`min-h-10 min-w-10 rounded-md border px-3 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] ${
                 item === page
                   ? "bg-blue-50 font-semibold text-blue-600"
                   : "hover:bg-slate-50"
@@ -85,7 +85,7 @@ export default function Pagination({
           type="button"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
-          className="min-h-10 min-w-10 rounded border px-3 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-10 min-w-10 rounded-md border px-3 text-xs hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#051466] disabled:cursor-not-allowed disabled:opacity-40"
         >
           Next
         </button>

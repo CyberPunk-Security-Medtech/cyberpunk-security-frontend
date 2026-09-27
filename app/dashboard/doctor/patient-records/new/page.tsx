@@ -105,7 +105,7 @@ export default function AddNewPatientRecord() {
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:relative">
         <Link
           href="/dashboard/doctor/patient-records"
-          className="inline-flex items-center gap-2 rounded-full bg-[#ECEEFD] text-[#1A2380] text-xs md:text-sm font-medium px-4 py-2 hover:bg-[#E0E4FA] transition"
+          className="inline-flex items-center gap-2 rounded-md bg-[#ECEEFD] text-[#1A2380] text-xs md:text-sm font-medium px-4 py-2 hover:bg-[#E0E4FA] transition"
         >
           <ChevronLeft size={16} />
           Back to Patients List
@@ -118,7 +118,7 @@ export default function AddNewPatientRecord() {
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-xl border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6"
+        className="rounded-md border border-gray-200 bg-white p-4 md:p-6 shadow-sm space-y-6"
       >
         <section className="space-y-4">
           <h3 className="text-sm md:text-base font-semibold text-gray-900">
@@ -126,14 +126,14 @@ export default function AddNewPatientRecord() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               placeholder="First Name"
               value={form.first_name}
               onChange={(e) => update("first_name", e.target.value)}
               required
             />
             <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               placeholder="Last Name"
               value={form.last_name}
               onChange={(e) => update("last_name", e.target.value)}
@@ -144,14 +144,14 @@ export default function AddNewPatientRecord() {
               <input
                 type="date"
                 max={getTodayDateInputValue()}
-                className="h-10 w-full rounded-full border border-gray-200 px-4 text-xs text-gray-900 outline-none md:text-sm"
+                className="h-10 w-full rounded-md border border-gray-200 px-4 text-xs text-gray-900 outline-none md:text-sm"
                 value={form.dob}
                 onChange={(e) => update("dob", e.target.value)}
                 required
               />
             </label>
             <select
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               value={form.gender}
               onChange={(e) => update("gender", e.target.value)}
             >
@@ -160,7 +160,7 @@ export default function AddNewPatientRecord() {
               <option value="Other">Other</option>
             </select>
             <select
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               value={form.marital_status ?? ""}
               onChange={(e) => update("marital_status", e.target.value || null)}
             >
@@ -171,21 +171,21 @@ export default function AddNewPatientRecord() {
               <option value="Widowed">Widowed</option>
             </select>
             <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               placeholder="Blood Group (e.g O+)"
               value={form.blood_group ?? ""}
               onChange={(e) => update("blood_group", e.target.value || null)}
             />
             <input
               type="email"
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               placeholder="Email Address"
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
               required
             />
             <input
-              className="w-full h-10 rounded-full border border-gray-200 px-4 text-xs md:text-sm outline-none"
+              className="w-full h-10 rounded-md border border-gray-200 px-4 text-xs md:text-sm outline-none"
               placeholder="Phone Number"
               value={form.phone_number}
               onChange={(e) => update("phone_number", e.target.value)}
@@ -200,44 +200,44 @@ export default function AddNewPatientRecord() {
           </h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <textarea
-              className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+              className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
               placeholder="Allergies"
               value={form.allergies ?? ""}
               onChange={(e) => update("allergies", e.target.value)}
             />
             <textarea
-              className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+              className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
               placeholder="Past Medical History"
               value={form.past_medical_history ?? ""}
               onChange={(e) => update("past_medical_history", e.target.value)}
             />
             <textarea
-              className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+              className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
               placeholder="Family Medical History"
               value={form.family_medical_history ?? ""}
               onChange={(e) => update("family_medical_history", e.target.value)}
             />
             <textarea
-              className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+              className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
               placeholder="Symptoms / Observations"
               value={form.symptoms ?? ""}
               onChange={(e) => update("symptoms", e.target.value)}
             />
             <textarea
-              className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+              className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
               placeholder="Current Medications"
               value={form.current_medications ?? ""}
               onChange={(e) => update("current_medications", e.target.value)}
             />
             <textarea
-              className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+              className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
               placeholder="Immunizations"
               value={form.immunizations ?? ""}
               onChange={(e) => update("immunizations", e.target.value)}
             />
           </div>
           <textarea
-            className="w-full min-h-[80px] rounded-xl border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
+            className="w-full min-h-[80px] rounded-md border border-gray-200 px-4 py-3 text-xs md:text-sm outline-none resize-none"
             placeholder="Lifestyle Info"
             value={form.lifestyle_info ?? ""}
             onChange={(e) => update("lifestyle_info", e.target.value)}
@@ -255,7 +255,7 @@ export default function AddNewPatientRecord() {
             <legend className="sr-only">Coverage type</legend>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {(["hmo", "self_pay"] as const).map((option) => (
-                <label key={option} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}>
+                <label key={option} className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}>
                   <input
                     required
                     type="radio"
@@ -277,27 +277,27 @@ export default function AddNewPatientRecord() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
                 <span>Enrollee Type (Optional)</span>
-                <input className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.enrollee_type ?? ""} onChange={(e) => update("enrollee_type", e.target.value)} />
+                <input className="h-10 w-full rounded-md border border-gray-200 px-4 outline-none" value={form.enrollee_type ?? ""} onChange={(e) => update("enrollee_type", e.target.value)} />
               </label>
               <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
                 <span>HMO Provider</span>
-                <input required className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.hmo_provider ?? ""} onChange={(e) => update("hmo_provider", e.target.value)} />
+                <input required className="h-10 w-full rounded-md border border-gray-200 px-4 outline-none" value={form.hmo_provider ?? ""} onChange={(e) => update("hmo_provider", e.target.value)} />
               </label>
               <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
                 <span>HMO Plan</span>
-                <input required className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.hmo_plan ?? ""} onChange={(e) => update("hmo_plan", e.target.value)} />
+                <input required className="h-10 w-full rounded-md border border-gray-200 px-4 outline-none" value={form.hmo_plan ?? ""} onChange={(e) => update("hmo_plan", e.target.value)} />
               </label>
               <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
                 <span>HMO ID / Enrollee Number</span>
-                <input required className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.hmo_number ?? ""} onChange={(e) => update("hmo_number", e.target.value)} />
+                <input required className="h-10 w-full rounded-md border border-gray-200 px-4 outline-none" value={form.hmo_number ?? ""} onChange={(e) => update("hmo_number", e.target.value)} />
               </label>
               <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
                 <span>Policy Start Date (Optional)</span>
-                <input type="date" className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.policy_start_date ?? ""} onChange={(e) => update("policy_start_date", e.target.value)} />
+                <input type="date" className="h-10 w-full rounded-md border border-gray-200 px-4 outline-none" value={form.policy_start_date ?? ""} onChange={(e) => update("policy_start_date", e.target.value)} />
               </label>
               <label className="space-y-2 text-xs font-medium text-gray-700 md:text-sm">
                 <span>Policy Expiry Date (Optional)</span>
-                <input type="date" className="h-10 w-full rounded-full border border-gray-200 px-4 outline-none" value={form.policy_expiry_date ?? ""} onChange={(e) => update("policy_expiry_date", e.target.value)} />
+                <input type="date" className="h-10 w-full rounded-md border border-gray-200 px-4 outline-none" value={form.policy_expiry_date ?? ""} onChange={(e) => update("policy_expiry_date", e.target.value)} />
               </label>
             </div>
           )}
@@ -306,7 +306,7 @@ export default function AddNewPatientRecord() {
         <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
           <button
             type="button"
-            className="rounded-full border border-gray-200 px-4 py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-50 transition"
+            className="rounded-md border border-gray-200 px-4 py-2 text-xs md:text-sm text-gray-600 hover:bg-gray-50 transition"
             onClick={() => router.push("/dashboard/doctor/patient-records")}
           >
             Cancel
@@ -314,7 +314,7 @@ export default function AddNewPatientRecord() {
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-full bg-[#1A2380] text-white px-4 py-2 text-xs md:text-sm font-medium hover:bg-[#111B66] transition disabled:opacity-50"
+            className="rounded-md bg-[#1A2380] text-white px-4 py-2 text-xs md:text-sm font-medium hover:bg-[#111B66] transition disabled:opacity-50"
           >
             {submitting ? "Creating..." : "Create patient records"}
           </button>

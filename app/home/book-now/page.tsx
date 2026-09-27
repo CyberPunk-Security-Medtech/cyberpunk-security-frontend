@@ -158,7 +158,7 @@ export default function BookNowPage() {
         className="
           relative z-[1] flex flex-col md:flex-row md:flex-wrap
           items-start justify-center gap-10 max-w-6xl mx-auto
-          bg-white shadow-xl rounded-2xl px-4 sm:px-8 md:px-10 py-12
+          bg-white shadow-xl rounded-md px-4 sm:px-8 md:px-10 py-12
           overflow-visible
         "
       >

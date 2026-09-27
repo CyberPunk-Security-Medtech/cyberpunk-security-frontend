@@ -20,7 +20,7 @@ export default function HMOManagementPage() {
             onClose={() => setIsAddHmoModalOpen(false)}
           />
 
-         <div className="bg-white rounded-xl border overflow-hidden">
+         <div className="bg-white rounded-md border overflow-hidden">
                     <HMOTable />
         </div>
     </div>

@@ -129,7 +129,7 @@ export default function GlobalPatientSearch() {
         placeholder="Search patients"
         autoComplete="off"
         maxLength={100}
-        className="w-64 rounded-full border border-gray-200 py-2 pl-9 pr-9 text-sm outline-none focus:border-[#00B8A8] focus:ring-1 focus:ring-[#00B8A8] [&::-webkit-search-cancel-button]:appearance-none"
+        className="w-64 rounded-md border border-gray-200 py-2 pl-9 pr-9 text-sm outline-none focus:border-[#00B8A8] focus:ring-1 focus:ring-[#00B8A8] [&::-webkit-search-cancel-button]:appearance-none"
       />
       {query && (
         <button
@@ -155,7 +155,7 @@ export default function GlobalPatientSearch() {
           id={regionId}
           role="region"
           aria-label="Patient search results"
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-dropdown w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+          className="absolute right-0 top-[calc(100%+0.5rem)] z-dropdown w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
         >
           {!activeWorkspace?.id ? (
             <p className="px-4 py-4 text-sm text-slate-600">

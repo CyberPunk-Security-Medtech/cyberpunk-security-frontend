@@ -31,7 +31,7 @@ export function ClinicalListThumbnail({ kind, tone }: ClinicalListThumbnailProps
   return (
     <span
       aria-hidden="true"
-      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border ${styles.border} ${styles.background}`}
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${styles.border} ${styles.background}`}
     >
       <Icon className={`h-5 w-5 ${styles.icon}`} strokeWidth={1.8} />
     </span>
@@ -46,7 +46,7 @@ export function DiagnosisEmptyState({ tone }: DiagnosisEmptyStateProps) {
   const styles = TONE_STYLES[tone];
 
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 px-4 py-10 text-center">
+    <div className="rounded-md border border-dashed border-gray-300 px-4 py-10 text-center">
       <span
         aria-hidden="true"
         className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full border ${styles.border} ${styles.background}`}

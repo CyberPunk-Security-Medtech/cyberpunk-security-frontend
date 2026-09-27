@@ -25,14 +25,14 @@ export default function TransferSuccessStep({
       <div className="mt-8 w-full max-w-xl space-y-3">
         <button
           onClick={onGoToDashboard}
-          className="w-full rounded-full bg-[#211783] px-8 py-4 text-white hover:bg-[#18105f]"
+          className="w-full rounded-md bg-[#211783] px-8 py-4 text-white hover:bg-[#18105f]"
         >
           Go to Dashboard
         </button>
 
         <button
           onClick={onSeeAppointmentDetails}
-          className="w-full rounded-full border border-[#00B8A8] px-8 py-4 text-[#00B8A8] hover:bg-[#F0FFFF]"
+          className="w-full rounded-md border border-[#00B8A8] px-8 py-4 text-[#00B8A8] hover:bg-[#F0FFFF]"
         >
           See Appointment Details
         </button>

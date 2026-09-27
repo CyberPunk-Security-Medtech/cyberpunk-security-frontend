@@ -122,7 +122,7 @@ export default function OverviewCards() {
         {cards.map((card) => (
           <div
             key={card.title}
-            className="rounded-lg border bg-white p-6 shadow-sm transition hover:shadow-md"
+            className="rounded-md border bg-white p-6 shadow-sm transition hover:shadow-md"
           >
             <p className="mb-2 text-sm text-gray-500">{card.title}</p>
             <p className="text-2xl font-semibold text-[#003C36]">

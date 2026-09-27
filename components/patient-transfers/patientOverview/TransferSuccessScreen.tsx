@@ -14,7 +14,7 @@ export default function TransferSuccessScreen({
       onClose={onGoToDashboard}
       backdropClassName="bg-white"
       containerClassName="px-6"
-      panelClassName="w-full max-w-4xl rounded-[32px] bg-white px-6 py-16 text-center"
+      panelClassName="w-full max-w-4xl rounded-md bg-white px-6 py-16 text-center"
     >
         <div className="mx-auto mb-10 flex h-40 w-40 items-center justify-center rounded-full bg-[#FFF2C2] text-7xl">
           🎉
@@ -32,7 +32,7 @@ export default function TransferSuccessScreen({
         <button
           type="button"
           onClick={onGoToDashboard}
-          className="mt-10 w-full max-w-3xl rounded-full bg-[#211783] px-8 py-5 text-2xl text-white hover:bg-[#18105f]"
+          className="mt-10 w-full max-w-3xl rounded-md bg-[#211783] px-8 py-5 text-2xl text-white hover:bg-[#18105f]"
         >
           Go to Dashboard
         </button>

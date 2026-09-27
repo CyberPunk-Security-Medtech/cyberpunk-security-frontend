@@ -139,7 +139,7 @@ function ResetPasswordForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 onBlur={() => setPasswordTouched(true)}
                 aria-describedby="reset-password-rules"
-                className="w-full rounded-full border px-4 py-3 pr-10 focus:ring-2 focus:ring-[#1E237E]"
+                className="w-full rounded-md border px-4 py-3 pr-10 focus:ring-2 focus:ring-[#1E237E]"
               />
               <button
                 type="button"
@@ -181,7 +181,7 @@ function ResetPasswordForm() {
                 placeholder="Enter Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-full border px-4 py-3 pr-10 focus:ring-2 focus:ring-[#1E237E]"
+                className="w-full rounded-md border px-4 py-3 pr-10 focus:ring-2 focus:ring-[#1E237E]"
               />
               <button
                 type="button"
@@ -197,7 +197,7 @@ function ResetPasswordForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#1E237E] text-white py-3 rounded-full font-semibold hover:bg-[#151b5e] transition disabled:opacity-50"
+            className="w-full bg-[#1E237E] text-white py-3 rounded-md font-semibold hover:bg-[#151b5e] transition disabled:opacity-50"
           >
             {loading ? "Resetting..." : "Reset Password"}
           </button>

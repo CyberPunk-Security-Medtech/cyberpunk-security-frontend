@@ -36,7 +36,7 @@ export default function SmsConsentSuccess({ onContinue }: Props) {
 
         <button
           onClick={onContinue}
-          className="absolute bottom-10 right-10 rounded-full bg-[#201985] px-16 py-5 text-2xl font-medium text-white"
+          className="absolute bottom-10 right-10 rounded-md bg-[#201985] px-16 py-5 text-2xl font-medium text-white"
         >
           Continue
         </button>

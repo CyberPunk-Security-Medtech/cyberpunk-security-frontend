@@ -102,7 +102,7 @@ export default function TodayAppointments() {
             id: c.id,
             name: `${c.patient?.first_name ?? ""} ${c.patient?.last_name ?? ""}`.trim() || "Unknown Patient",
             patient_id: c.patient_id ?? "",
-            patient_code: c.patient?.patient_code?.trim() || c.patient_id || "-",
+            patient_code: c.patient?.patient_code?.trim() || "-",
             condition: c.reason_for_visit ?? "-",
             status: toStatus(c.status),
             date: formatDate(c.created_at ?? c.updated_at),
@@ -131,7 +131,7 @@ export default function TodayAppointments() {
   const todaysAppointments = useMemo(() => appointments.slice(0, 8), [appointments]);
 
   return (
-    <div className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+    <div className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <h3 className="dashboard-section-title mb-4 text-[#1A2380] sm:mb-6">Today's Appointments</h3>
       <ResponsiveTableRegion label="Today's appointments">
       <table className="w-full min-w-[760px] border-collapse text-left text-sm">

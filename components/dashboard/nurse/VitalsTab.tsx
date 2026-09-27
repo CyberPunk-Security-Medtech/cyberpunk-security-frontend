@@ -149,7 +149,7 @@ export default function VitalsTab() {
   };
 
   return (
-    <section className="rounded-lg border bg-white p-4 shadow-sm sm:p-6">
+    <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-brand-navy">Vitals</h3>
@@ -167,7 +167,7 @@ export default function VitalsTab() {
       </div>
 
       {!isSelectedConsultationActive && (
-        <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+        <p className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
           Start an active consultation before recording vitals.
         </p>
       )}
@@ -177,13 +177,13 @@ export default function VitalsTab() {
           <LoaderIcon />
         </div>
       ) : vitals.length === 0 ? (
-        <div className="rounded-xl border px-4 py-4 text-sm text-gray-500">
+        <div className="rounded-md border px-4 py-4 text-sm text-gray-500">
           No vitals recorded yet.
         </div>
       ) : (
         <div className="space-y-3">
           {vitals.map((record) => (
-            <div key={record.id} className="rounded-xl border px-4 py-4">
+            <div key={record.id} className="rounded-md border px-4 py-4">
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs text-gray-500">
                   Recorded {formatDateTime(record.recorded_at)}
@@ -245,13 +245,13 @@ export default function VitalsTab() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-full border px-6 py-2.5 text-sm font-medium"
+              className="rounded-md border px-6 py-2.5 text-sm font-medium"
             >
               Cancel
             </button>
             <button
               disabled={submitting || !orgId || !selectedConsultationId}
-              className="rounded-full bg-[#1A2380] hover:bg-[#00B8A8] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
               type="submit"
             >
               {submitting ? "Submitting..." : "Save Vitals"}
