@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { isAxiosError } from "axios";
 import { LoaderIcon } from "@components/Skeletons";
 import {
@@ -16,11 +16,6 @@ const ACTION_LABELS: Record<string, string> = {
   "consultation.completed": "Consultation completed",
   "note.created": "Doctor's note added",
   "diagnosis.created": "Diagnosis added",
-  "prescription.created": "Prescription created",
-  "prescription.updated": "Prescription updated",
-  "lab_test.created": "Lab test ordered",
-  "lab_test.updated": "Lab test updated",
-  "vitals.recorded": "Vitals recorded",
 };
 
 const DETAIL_KEYS = [
@@ -44,7 +39,7 @@ type ConsultationActivityLogProps = {
 const themeStyles = {
   doctor: {
     heading: "text-brand-navy",
-    dot: "bg-brand-teal",
+    dot: "bg-[#1A2380]",
     button:
       "border-brand-navy text-brand-navy hover:bg-[#ECEEFD] focus-visible:ring-brand-navy",
   },
@@ -112,9 +107,17 @@ export default function ConsultationActivityLog({
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [retryVersion, setRetryVersion] = useState(0);
+  const requestController = useRef<AbortController | null>(null);
+  const loadMorePending = useRef(false);
+  const nextOffset = useRef(0);
 
   useEffect(() => {
     const controller = new AbortController();
+    requestController.current = controller;
+    loadMorePending.current = false;
+    nextOffset.current = 0;
+    setLoadingMore(false);
+    setLoadMoreError(null);
 
     const loadActivity = async () => {
       if (!orgId || !consultationId) {
@@ -136,7 +139,9 @@ export default function ConsultationActivityLog({
           { limit: PAGE_SIZE, offset: 0 },
           controller.signal,
         );
+        if (controller.signal.aborted) return;
         const page = Array.isArray(result) ? result : [];
+        nextOffset.current = page.length;
         setEntries(sortNewestFirst(page));
         setHasMore(page.length === PAGE_SIZE);
       } catch (requestError) {
@@ -154,8 +159,13 @@ export default function ConsultationActivityLog({
   }, [consultationId, orgId, refreshKey, retryVersion]);
 
   const loadMore = async () => {
-    if (!orgId || !consultationId || loadingMore) return;
+    const controller = requestController.current;
+    if (
+      !orgId || !consultationId || loading || !hasMore ||
+      loadMorePending.current || !controller || controller.signal.aborted
+    ) return;
 
+    loadMorePending.current = true;
     setLoadingMore(true);
     setLoadMoreError(null);
 
@@ -163,9 +173,13 @@ export default function ConsultationActivityLog({
       const result = await activityService.listConsultationActivity(
         orgId,
         consultationId,
-        { limit: PAGE_SIZE, offset: entries.length },
+        { limit: PAGE_SIZE, offset: nextOffset.current },
+        controller.signal,
       );
+      if (controller.signal.aborted) return;
       const page = Array.isArray(result) ? result : [];
+      // Advance by server rows consumed, even if entries overlap between pages.
+      nextOffset.current += page.length;
       setEntries((current) => {
         const uniqueEntries = new Map(
           [...current, ...page].map((entry) => [entry.id, entry]),
@@ -174,9 +188,13 @@ export default function ConsultationActivityLog({
       });
       setHasMore(page.length === PAGE_SIZE);
     } catch (requestError) {
+      if (controller.signal.aborted) return;
       setLoadMoreError(getActivityErrorMessage(requestError));
     } finally {
-      setLoadingMore(false);
+      if (!controller.signal.aborted) {
+        loadMorePending.current = false;
+        setLoadingMore(false);
+      }
     }
   };
 
