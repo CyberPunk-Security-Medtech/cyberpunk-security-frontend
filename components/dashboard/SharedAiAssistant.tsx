@@ -27,6 +27,7 @@ import {
   aiService,
   AiChatItem,
   AiUsageInfo,
+  isAiAuthUnavailable,
 } from "@services/api";
 
 type Attachment = {
@@ -93,9 +94,14 @@ export default function SharedAiAssistant() {
   const [usage, setUsage] = useState<AiUsageInfo | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  // Signed in, but the AI service couldn't authenticate the request.
+  const [authUnavailable, setAuthUnavailable] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  const userId = user?.id ?? user?.email ?? null;
+  // The AI service identifies the user from the login cookie. Only the usage
+  // and chat-list URLs still carry a user key: the token subject, which is the
+  // signed-in user's email.
+  const userId = user?.email ?? null;
   const workerName = useMemo(
     () =>
       `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim() ||
@@ -106,14 +112,23 @@ export default function SharedAiAssistant() {
   const activeChat = chats.find((c) => c.session_id === activeSessionId) ?? null;
   const limitReached = usage?.limit_reached ?? false;
 
+  // Returns true when the failure was the AI auth problem (already surfaced by
+  // the banner), so callers can skip their own error toast.
+  const handleAuthFailure = (error: unknown) => {
+    if (!isAiAuthUnavailable(error)) return false;
+    setAuthUnavailable(true);
+    return true;
+  };
+
   const loadChats = async () => {
     if (!userId) return;
     setLoadingChats(true);
     try {
       const list = await aiService.listChats(userId);
       setChats(list);
-    } catch {
-      toast.error("Could not load your chat history.");
+      setAuthUnavailable(false);
+    } catch (error) {
+      if (!handleAuthFailure(error)) toast.error("Could not load your chat history.");
     } finally {
       setLoadingChats(false);
     }
@@ -125,7 +140,10 @@ export default function SharedAiAssistant() {
     aiService
       .getUsage(userId)
       .then(setUsage)
-      .catch(() => setUsage(null));
+      .catch((error) => {
+        handleAuthFailure(error);
+        setUsage(null);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
@@ -134,7 +152,7 @@ export default function SharedAiAssistant() {
     let cancelled = false;
     setLoadingMessages(true);
     aiService
-      .getMessages(activeSessionId, userId)
+      .getMessages(activeSessionId)
       .then((history) => {
         if (cancelled) return;
         setMessages(
@@ -145,8 +163,8 @@ export default function SharedAiAssistant() {
           })),
         );
       })
-      .catch(() => {
-        toast.error("Could not load messages for this chat.");
+      .catch((error) => {
+        if (!handleAuthFailure(error)) toast.error("Could not load messages for this chat.");
       })
       .finally(() => {
         if (!cancelled) setLoadingMessages(false);
@@ -177,7 +195,7 @@ export default function SharedAiAssistant() {
   const removeChat = async (chat: AiChatItem) => {
     if (!userId) return;
     try {
-      await aiService.deleteChat(chat.session_id, userId);
+      await aiService.deleteChat(chat.session_id);
       setChats((current) =>
         current.filter((c) => c.session_id !== chat.session_id),
       );
@@ -185,8 +203,8 @@ export default function SharedAiAssistant() {
         setActiveSessionId(null);
         setMessages([]);
       }
-    } catch {
-      toast.error("Could not delete this chat. Please try again.");
+    } catch (error) {
+      if (!handleAuthFailure(error)) toast.error("Could not delete this chat. Please try again.");
     }
   };
 
@@ -195,14 +213,14 @@ export default function SharedAiAssistant() {
     setRenamingId(null);
     if (!userId || !title || title === chat.title) return;
     try {
-      await aiService.renameChat(chat.session_id, userId, title);
+      await aiService.renameChat(chat.session_id, title);
       setChats((current) =>
         current.map((c) =>
           c.session_id === chat.session_id ? { ...c, title } : c,
         ),
       );
-    } catch {
-      toast.error("Could not rename this chat.");
+    } catch (error) {
+      if (!handleAuthFailure(error)) toast.error("Could not rename this chat.");
     }
   };
 
@@ -264,7 +282,6 @@ export default function SharedAiAssistant() {
     setTyping(true);
     try {
       const response = await aiService.chat({
-        user_id: userId,
         message: text,
         session_id: activeSessionId,
         files: sentAttachments.map((attachment) => attachment.file),
@@ -282,8 +299,9 @@ export default function SharedAiAssistant() {
       const detail = (
         err as { response?: { data?: { detail?: unknown } } }
       )?.response?.data?.detail;
-      const failureText =
-        typeof detail === "string"
+      const failureText = handleAuthFailure(err)
+        ? "The AI assistant couldn't verify your session, so this message wasn't sent."
+        : typeof detail === "string"
           ? detail
           : "The AI service could not be reached. Please try again shortly.";
       setMessages((current) => [
@@ -295,7 +313,7 @@ export default function SharedAiAssistant() {
     }
   };
 
-  const disabled = !userId || typing || limitReached;
+  const disabled = !userId || typing || limitReached || authUnavailable;
 
   return (
     <main className="h-full min-h-0 overflow-hidden bg-[#f8fcfb] p-0">
@@ -419,6 +437,30 @@ export default function SharedAiAssistant() {
               )}
             </div>
           </header>
+          {authUnavailable ? (
+            <div
+              role="alert"
+              className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-900 sm:px-6"
+            >
+              <span>
+                The AI assistant couldn&apos;t verify your session. You&apos;re
+                still signed in — try again in a moment.
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthUnavailable(false);
+                  void loadChats();
+                  if (userId) {
+                    aiService.getUsage(userId).then(setUsage).catch(handleAuthFailure);
+                  }
+                }}
+                className="rounded-md px-2 py-1 font-medium hover:bg-amber-100"
+              >
+                Try again
+              </button>
+            </div>
+          ) : null}
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
             {loadingMessages ? (
               <div className="flex h-full items-center justify-center">
