@@ -34,6 +34,26 @@ const isInvitationRoute = () =>
   typeof window !== "undefined" &&
   window.location.pathname.startsWith("/invitations");
 
+// One in-flight refresh shared by every 401, from either backend.
+const refreshSessionOnce = () => {
+  refreshPromise =
+    refreshPromise ??
+    api.post("/api/v1/auth/refresh").finally(() => {
+      refreshPromise = null;
+    });
+  return refreshPromise;
+};
+
+// The session is gone: clear cached auth state and send the user to login.
+const endSession = () => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("workspaces");
+  localStorage.removeItem("activeWorkspace");
+  if (!isPublicRoute()) {
+    window.location.assign("/auth/login");
+  }
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -58,23 +78,10 @@ api.interceptors.response.use(
     original._retry = true;
 
     try {
-      // Share a single in-flight refresh across parallel 401s.
-      refreshPromise =
-        refreshPromise ??
-        api.post("/api/v1/auth/refresh").finally(() => {
-          refreshPromise = null;
-        });
-      await refreshPromise;
+      await refreshSessionOnce();
       return api(original);
     } catch {
-      // Refresh failed — the session is gone. Clear cached auth state and
-      // send the user back to login.
-      localStorage.removeItem("user");
-      localStorage.removeItem("workspaces");
-      localStorage.removeItem("activeWorkspace");
-      if (!isPublicRoute()) {
-        window.location.assign("/auth/login");
-      }
+      endSession();
       return Promise.reject(error);
     }
   },
@@ -148,8 +155,51 @@ const AI_API_BASE_URL =
   process.env.NEXT_PUBLIC_AI_API_BASE_URL ??
   "https://aibackend.privacurehealth.com";
 
-// Separate axios instance for the dedicated AI service
-export const aiApi = axios.create({ baseURL: AI_API_BASE_URL });
+// Separate axios instance for the dedicated AI service. It authenticates from
+// the HTTP-only access_token login cookie (no Bearer header), so every request
+// must carry credentials.
+export const aiApi = axios.create({
+  baseURL: AI_API_BASE_URL,
+  withCredentials: true,
+});
+
+/**
+ * Set on an AI 401 when the login session itself is still valid (the refresh
+ * succeeded) but the AI service still can't authenticate the request — e.g.
+ * its login cookie isn't reaching the AI domain. Not a reason to log out.
+ */
+export const isAiAuthUnavailable = (error: unknown) =>
+  Boolean((error as { aiAuthUnavailable?: boolean })?.aiAuthUnavailable);
+
+aiApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error?.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
+    if ((error as AxiosError)?.response?.status !== 401 || !original) {
+      return Promise.reject(error);
+    }
+
+    if (original._retry) {
+      // Refreshed and still rejected: the user IS signed in, so don't log
+      // them out — surface it to the caller instead.
+      (error as { aiAuthUnavailable?: boolean }).aiAuthUnavailable = true;
+      return Promise.reject(error);
+    }
+
+    // 401 = not logged in or the access token expired. Refresh the session
+    // once and retry; if the refresh fails, the session is really gone.
+    original._retry = true;
+    try {
+      await refreshSessionOnce();
+    } catch {
+      endSession();
+      return Promise.reject(error);
+    }
+    return aiApi(original);
+  },
+);
 
 // Auth endpoints
 export const authService = {
@@ -1779,8 +1829,8 @@ export const aiService = {
   // Form fields): a text `message` (max 2000 chars) plus an optional
   // repeatable `file` field — up to 3 attachments per message (PDF,
   // DOCX, TXT, CSV, PNG, JPG), processed server-side.
+  // The user is identified from the login cookie — no user_id is sent.
   chat: async (payload: {
-    user_id: string;
     message: string;
     session_id?: string | null;
     model?: AiModel | null;
@@ -1788,7 +1838,6 @@ export const aiService = {
     files?: File[];
   }): Promise<AiChatResponse> => {
     const form = new FormData();
-    form.append("user_id", payload.user_id);
     form.append("message", payload.message);
     if (payload.session_id) {
       form.append("session_id", payload.session_id);
@@ -1807,45 +1856,34 @@ export const aiService = {
     return response.data;
   },
 
-  resetSession: async (user_id: string, session_id: string) => {
-    const response = await aiApi.post("/ai/session/reset", {
-      user_id,
-      session_id,
-    });
+  resetSession: async (session_id: string) => {
+    const response = await aiApi.post("/ai/session/reset", { session_id });
     return response.data;
   },
 
-  getUsage: async (user_id: string): Promise<AiUsageInfo> => {
-    const response = await aiApi.get(`/ai/usage/${user_id}`);
+  // These two routes still take a user key in the URL, and the backend checks
+  // it against the token's subject — the signed-in user's EMAIL (403 for
+  // anything else, including the user id).
+  getUsage: async (email: string): Promise<AiUsageInfo> => {
+    const response = await aiApi.get(`/ai/usage/${encodeURIComponent(email)}`);
     return response.data.usage;
   },
 
-  listChats: async (user_id: string): Promise<AiChatItem[]> => {
-    const response = await aiApi.get(`/ai/chats/${user_id}`);
+  listChats: async (email: string): Promise<AiChatItem[]> => {
+    const response = await aiApi.get(`/ai/chats/${encodeURIComponent(email)}`);
     return response.data.chats;
   },
 
-  getMessages: async (
-    session_id: string,
-    user_id: string,
-  ): Promise<AiChatMessage[]> => {
-    const response = await aiApi.get(`/ai/chats/${session_id}/messages`, {
-      params: { user_id },
-    });
+  getMessages: async (session_id: string): Promise<AiChatMessage[]> => {
+    const response = await aiApi.get(`/ai/chats/${session_id}/messages`);
     return response.data.messages;
   },
 
-  renameChat: async (
-    session_id: string,
-    user_id: string,
-    title: string,
-  ): Promise<void> => {
-    await aiApi.patch(`/ai/chats/${session_id}`, { user_id, title });
+  renameChat: async (session_id: string, title: string): Promise<void> => {
+    await aiApi.patch(`/ai/chats/${session_id}`, { title });
   },
 
-  deleteChat: async (session_id: string, user_id: string): Promise<void> => {
-    await aiApi.delete(`/ai/chats/${session_id}`, {
-      params: { user_id },
-    });
+  deleteChat: async (session_id: string): Promise<void> => {
+    await aiApi.delete(`/ai/chats/${session_id}`);
   },
 };
