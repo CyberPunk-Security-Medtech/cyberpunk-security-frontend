@@ -179,9 +179,11 @@ export default function OverviewCards() {
             className="rounded-md border bg-white p-6 shadow-sm transition hover:shadow-md"
           >
             <p className="mb-2 text-sm text-gray-500">{card.title}</p>
-            <p className="text-2xl font-semibold text-[#1A2380]">
-              {loading ? "..." : card.value}
-            </p>
+            {loading ? (
+              <div className="h-8 w-20 animate-pulse rounded-md bg-slate-200" />
+            ) : (
+              <p className="text-2xl font-semibold text-[#1A2380]">{card.value}</p>
+            )}
           </div>
         ))}
       </div>

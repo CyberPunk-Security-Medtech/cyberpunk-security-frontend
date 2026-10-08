@@ -162,13 +162,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Boxes, CircleAlert, Pill, Users } from "lucide-react";
 import { inventoryService, prescriptionService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
 import PrescriptionTable from "@components/dashboard/pharmacy/PrescriptionTable";
-import DispensePrescriptionModal from "@components/dashboard/pharmacy/DispensePrescriptionModal";
 import {
   collectionFromResponse,
   getInventoryGroup,
@@ -181,13 +181,10 @@ import { buildDisplayName } from "@utils/helper";
 export default function PharmacyDashboardPage() {
   const { activeWorkspace, user } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
+  const router = useRouter();
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dispensingId, setDispensingId] = useState<string | null>(null);
-  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
-  const [dispenseMode, setDispenseMode] = useState<"create" | "edit">("create");
-  const [dispenseRecord, setDispenseRecord] = useState<Record<string, string | null> | null>(null);
 
   const loadDashboard = useCallback(async () => {
     if (!orgId) {
@@ -239,39 +236,8 @@ export default function PharmacyDashboardPage() {
     return { pending, lowStock, groupCount: groups.size, realMedicineCount: realInventory.length };
   }, [inventory, prescriptions]);
 
-  const handleDispense = async (payload: { quantity: string; batch_number?: string; expiry_date?: string; substitution_note?: string; counseling_notes?: string }) => {
-    const prescriptionId = selectedPrescription?.id;
-    if (!orgId || dispensingId) return;
-    if (!prescriptionId) return;
-    setDispensingId(prescriptionId);
-    try {
-      if (dispenseMode === "edit") {
-        await prescriptionService.correctDispenseRecord(orgId, prescriptionId, payload);
-        toast.success("Dispense record corrected.");
-      } else {
-        await prescriptionService.dispensePrescription(orgId, prescriptionId, payload);
-        toast.success("Prescription marked as completed.");
-      }
-      await loadDashboard();
-    } catch (error) {
-      console.error("Failed to dispense prescription", error);
-      toast.error("Unable to dispense this prescription.");
-    } finally {
-      setDispensingId(null);
-    }
-  };
-
-  const openCorrection = async (prescriptionId: string) => {
-    if (!orgId) return;
-    const prescription = prescriptions.find((item) => item.id === prescriptionId) ?? null;
-    if (!prescription) return;
-    try {
-      const response = await prescriptionService.getDispenseRecord(orgId, prescriptionId);
-      const record = (response && typeof response === "object" && "data" in response ? (response as { data: Record<string, string | null> }).data : response) as Record<string, string | null>;
-      setSelectedPrescription(prescription);
-      setDispenseRecord(record);
-      setDispenseMode("edit");
-    } catch (error) { console.error("Failed to load dispense record", error); toast.error("Unable to load this dispense record for editing."); }
+  const openPrescriptionDetails = (prescriptionId: string) => {
+    router.push(`/dashboard/pharmacy/prescriptions/${prescriptionId}`);
   };
 
   const cards = [
@@ -303,7 +269,11 @@ export default function PharmacyDashboardPage() {
               <p className="text-sm text-[#737791]">{label}</p>
               <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${bg}`}><Icon size={18} className={color} /></span>
             </div>
-            <p className="mt-4 text-3xl font-semibold text-[#151D48]">{loading ? "—" : value}</p>
+            {loading ? (
+              <div className="mt-4 h-10 w-20 animate-pulse rounded-md bg-slate-200" />
+            ) : (
+              <p className="mt-4 text-3xl font-semibold text-[#151D48]">{value}</p>
+            )}
             <p className="mt-2 text-xs text-[#737791]">{detail}</p>
           </article>
         ))}
@@ -317,9 +287,8 @@ export default function PharmacyDashboardPage() {
           </div>
           <Link href="/dashboard/pharmacy/inventory/list" className="text-sm font-medium text-[#00796B] hover:underline">View inventory</Link>
         </div>
-        <PrescriptionTable prescriptions={prescriptions} onDispense={(id) => { setDispenseMode("create"); setDispenseRecord(null); setSelectedPrescription(prescriptions.find((item) => item.id === id) ?? null); }} onCorrectDispense={openCorrection} dispensingId={dispensingId} />
+        <PrescriptionTable prescriptions={prescriptions} loading={loading} onView={openPrescriptionDetails} />
       </article>
-      <DispensePrescriptionModal prescription={selectedPrescription} isOpen={Boolean(selectedPrescription)} mode={dispenseMode} initialRecord={dispenseRecord} onClose={() => { setSelectedPrescription(null); setDispenseRecord(null); }} onConfirm={handleDispense} />
     </section>
   );
 }

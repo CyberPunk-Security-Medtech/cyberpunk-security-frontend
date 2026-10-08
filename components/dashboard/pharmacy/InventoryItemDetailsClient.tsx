@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@context/AuthContext";
 import { inventoryService } from "@services/api";
 import { toast } from "react-toastify";
@@ -13,6 +14,7 @@ const toRecord = (value: unknown): Record<string, unknown> => value && typeof va
 
 export default function InventoryItemDetailsClient({ itemId }: { itemId: string }) {
   const { activeWorkspace } = useAuth();
+  const router = useRouter();
   const orgId = activeWorkspace?.id;
   const [item, setItem] = useState<InventoryItem | null>(null);
   const [form, setForm] = useState<CatalogForm | null>(null);
@@ -28,23 +30,23 @@ export default function InventoryItemDetailsClient({ itemId }: { itemId: string 
       const data = (response && typeof response === "object" && "data" in response ? (response as { data: unknown }).data : response) as InventoryItem;
       setItem(data);
       setForm({ name: data.name ?? "", unit: data.unit ?? "", form: data.form ?? "", strength: data.strength ?? "" });
-    } catch (error) { console.error("Failed to load inventory item", error); toast.error("Unable to load this medicine."); }
+    } catch (error) { console.error("Failed to load inventory item", error); toast.error("Unable to load this item."); }
     finally { setLoading(false); }
   }, [itemId, orgId]);
   useEffect(() => { void load(); }, [load]);
 
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!orgId || !form || !form.name.trim() || !form.unit.trim()) return toast.error("Medicine name and dispensing unit are required.");
+    if (!orgId || !form || !form.name.trim() || !form.unit.trim()) return toast.error("Item name and dispensing unit are required.");
     setSaving(true);
-    try { await inventoryService.updateInventoryItem(orgId, itemId, { name: form.name.trim(), unit: form.unit.trim(), form: form.form.trim() || null, strength: form.strength.trim() || null }); toast.success("Medicine catalog details updated."); setEditing(false); await load(); }
-    catch (error) { console.error("Failed to update inventory item", error); toast.error("Unable to update this medicine."); }
+    try { await inventoryService.updateInventoryItem(orgId, itemId, { name: form.name.trim(), unit: form.unit.trim(), form: form.form.trim() || null, strength: form.strength.trim() || null }); toast.success("Item details updated."); setEditing(false); await load(); }
+    catch (error) { console.error("Failed to update inventory item", error); toast.error("Unable to update this item."); }
     finally { setSaving(false); }
   };
 
-  if (loading) return <div className="h-64 animate-pulse rounded-md border bg-gray-100" />;
-  if (!item || !form) return <section className="rounded-md border border-dashed p-8 text-sm text-gray-500">Medicine details are unavailable.</section>;
+  if (loading) return <div className="h-64 animate-pulse rounded-md border border-[#E6EBF2] bg-gray-100" />;
+  if (!item || !form) return <section className="rounded-md border border-dashed border-gray-300 bg-slate-50 p-8 text-sm text-gray-500">Item details are unavailable.</section>;
   const details = toRecord(item);
   const batches = Array.isArray(details.batches) ? details.batches as Array<Record<string, unknown>> : [];
-  return <section className="space-y-8"><div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><BreadcrumbHeading items={["Inventory", "List of Medicines", item.name ?? "Unnamed medicine"]} description="Catalog details and current stock batches." /><button onClick={() => setEditing((value) => !value)} className="inline-flex items-center gap-1 self-start rounded-md bg-[#00796B] px-5 py-2 text-xs font-medium text-white"><Pencil size={12} />{editing ? "Cancel editing" : "Edit details"}</button></div>{editing ? <form onSubmit={save} className="max-w-[820px] space-y-5"><div className="grid grid-cols-1 gap-5 md:grid-cols-2">{([['name','Medicine name'],['unit','Dispensing unit'],['form','Medicine form'],['strength','Strength']] as Array<[keyof CatalogForm,string]>).map(([key,label]) => <label key={key} className="space-y-2 text-sm"><span>{label}{(key === 'name' || key === 'unit') ? ' *' : ''}</span><input required={key === 'name' || key === 'unit'} value={form[key]} onChange={(event) => setForm((current) => current ? { ...current, [key]: event.target.value } : current)} className="h-11 w-full rounded-md border px-3" /></label>)}</div><button disabled={saving} className="rounded-md bg-[#00796B] px-7 py-3 text-xs font-medium text-white disabled:opacity-60">{saving ? "Saving..." : "Save changes"}</button></form> : <><article className="rounded-md border bg-white"><div className="border-b px-5 py-3 font-semibold">Medicine catalog</div><dl className="grid grid-cols-1 gap-5 px-5 py-4 text-sm sm:grid-cols-2 lg:grid-cols-4"><div><dt className="text-gray-500">Dispensing unit</dt><dd className="mt-1 font-medium">{item.unit}</dd></div><div><dt className="text-gray-500">Form</dt><dd className="mt-1 font-medium">{item.form ?? "Not recorded"}</dd></div><div><dt className="text-gray-500">Strength</dt><dd className="mt-1 font-medium">{item.strength ?? "Not recorded"}</dd></div><div><dt className="text-gray-500">Quantity on hand</dt><dd className="mt-1 text-2xl font-semibold">{getInventoryQuantity(item)}</dd></div></dl></article><article className="rounded-md border bg-white"><div className="border-b px-5 py-3 font-semibold">Stock batches</div>{batches.length ? <div className="overflow-x-auto"><table className="min-w-[600px] w-full text-left text-sm"><thead className="border-b bg-gray-50"><tr><th className="px-5 py-3">Batch</th><th className="px-5 py-3">Expiry</th><th className="px-5 py-3">On hand</th></tr></thead><tbody>{batches.map((batch) => <tr key={String(batch.id)} className="border-b"><td className="px-5 py-3">{String(batch.batch_number ?? "—")}</td><td className="px-5 py-3">{String(batch.expiry_date ?? "—")}</td><td className="px-5 py-3">{String(batch.quantity_on_hand ?? "0")}</td></tr>)}</tbody></table></div> : <p className="px-5 py-4 text-sm text-gray-500">No stock batches have been received for this medicine.</p>}</article></>}</section>;
+  return <section className="space-y-8"><div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><BreadcrumbHeading items={["Inventory", "Items", item.name ?? "Unnamed item"]} description="Item details and current stock batches." /><div className="flex flex-wrap gap-2"><button onClick={() => router.push(`/dashboard/pharmacy/inventory/items/${itemId}/batches/new`)} className="inline-flex items-center gap-2 self-start rounded-md bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]"><Plus size={12} />Add stock batch</button><button onClick={() => setEditing((value) => !value)} className="inline-flex items-center gap-1 self-start rounded-md border border-[#CED7E3] bg-white px-4 py-2 text-xs font-medium text-[#2D3648] hover:bg-[#F7F9FB]"><Pencil size={12} />{editing ? "Cancel editing" : "Edit details"}</button></div></div>{editing ? <form onSubmit={save} className="max-w-[820px] space-y-5"><div className="grid grid-cols-1 gap-5 md:grid-cols-2">{([['name','Item name'],['unit','Dispensing unit'],['form','Form'],['strength','Strength']] as Array<[keyof CatalogForm,string]>).map(([key,label]) => <label key={key} className="space-y-2 text-sm"><span>{label}{(key === 'name' || key === 'unit') ? ' *' : ''}</span><input required={key === 'name' || key === 'unit'} value={form[key]} onChange={(event) => setForm((current) => current ? { ...current, [key]: event.target.value } : current)} className="h-11 w-full rounded-md border px-3" /></label>)}</div><button disabled={saving} className="rounded-md bg-[#00796B] px-7 py-3 text-xs font-medium text-white disabled:opacity-60">{saving ? "Saving..." : "Save changes"}</button></form> : <><article className="rounded-md border bg-white"><div className="border-b px-5 py-3 font-semibold">{item.name ?? "Item details"}</div><dl className="grid grid-cols-1 gap-5 px-5 py-4 text-sm sm:grid-cols-2 lg:grid-cols-4"><div><dt className="text-gray-500">Dispensing unit</dt><dd className="mt-1 font-medium">{item.unit}</dd></div><div><dt className="text-gray-500">Form</dt><dd className="mt-1 font-medium">{item.form ?? "Not recorded"}</dd></div><div><dt className="text-gray-500">Strength</dt><dd className="mt-1 font-medium">{item.strength ?? "Not recorded"}</dd></div><div><dt className="text-gray-500">Quantity on hand</dt><dd className="mt-1 text-2xl font-semibold">{getInventoryQuantity(item)}</dd></div></dl></article><article className="rounded-md border bg-white"><div className="border-b px-5 py-3 font-semibold">Stock batches</div>{batches.length ? <div className="overflow-x-auto"><table className="min-w-[600px] w-full text-left text-sm"><thead className="border-b bg-gray-50"><tr><th className="px-5 py-3">Batch</th><th className="px-5 py-3">Expiry</th><th className="px-5 py-3">On hand</th></tr></thead><tbody>{batches.map((batch) => <tr key={String(batch.id)} className="border-b"><td className="px-5 py-3">{String(batch.batch_number ?? "—")}</td><td className="px-5 py-3">{String(batch.expiry_date ?? "—")}</td><td className="px-5 py-3">{String(batch.quantity_on_hand ?? "0")}</td></tr>)}</tbody></table></div> : <p className="px-5 py-4 text-sm text-gray-500">No stock batches have been received for this medicine.</p>}</article></>}</section>;
 }

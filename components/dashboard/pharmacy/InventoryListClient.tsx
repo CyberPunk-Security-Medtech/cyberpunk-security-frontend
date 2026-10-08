@@ -36,7 +36,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowUpDown, ChevronRight } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
@@ -48,26 +48,113 @@ import { collectionFromResponse, InventoryItem } from "./pharmacyUtils";
 export default function InventoryListClient() {
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id;
-  const [medicines, setMedicines] = useState<InventoryItem[]>([]);
+  const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    if (!orgId) { setMedicines([]); setLoading(false); return; }
+    if (!orgId) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
     const load = async () => {
       setLoading(true);
       try {
         const allItems = collectionFromResponse<InventoryItem>(await inventoryService.listInventoryItems(orgId));
-        // Hide placeholder items from the medicine table
-        const realMedicines = allItems.filter(item => !item.name?.startsWith("[Group Placeholder]"));
-        setMedicines(realMedicines);
+        setItems(allItems.filter((item) => !item.name?.startsWith("[Group Placeholder]")));
+      } catch (cause) {
+        console.error("Failed to load inventory items", cause);
+        toast.error("Failed to load inventory items");
+      } finally {
+        setLoading(false);
       }
-      catch (cause) { console.error("Failed to load inventory items", cause); toast.error("Failed to load inventory items"); }
-      finally { setLoading(false); }
     };
+
     void load();
   }, [orgId]);
 
-  if (loading) return <section className="min-w-0 space-y-8" role="status" aria-label="Loading inventory"><BreadcrumbHeading items={["Inventory"]} description="Loading medicines available for dispensing." /><div className="h-64 animate-pulse rounded-md border border-[#D8DEE8] bg-gray-100" /></section>;
+  const filteredItems = useMemo(() => {
+    const normalisedQuery = query.trim().toLowerCase();
+    if (!normalisedQuery) return items;
+    return items.filter((item) => (item.name ?? "").toLowerCase().includes(normalisedQuery));
+  }, [items, query]);
 
-  return<section className="min-w-0 space-y-8"><div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><BreadcrumbHeading items={["Inventory", `List of medicines (${medicines.length})`]} description="Catalogue entries. Open an item to see its batches and on-hand quantity." /><Link href="/dashboard/pharmacy/inventory/new" className="inline-flex items-center gap-1 self-start rounded-md bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]">+ Add Medicine</Link></div>{medicines.length === 0 ? <div className="rounded-md border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">No medicines found in inventory.</div> : <div role="region" aria-label="Medicine list table" className="w-full overflow-x-auto rounded-md border border-[#D8DEE8] bg-white"><table className="min-w-[840px] w-full table-auto"><thead className="border-b border-[#D8DEE8] text-left text-sm font-medium text-[#2D3648]"><tr>{["Medicine name", "Unit", "Form", "Strength"].map((label) => <th key={label} className="whitespace-nowrap px-6 py-4"><span className="inline-flex items-center gap-2">{label}<ArrowUpDown size={13} className="text-[#8792A8]" /></span></th>)}<th className="px-6 py-4 text-right">Action</th></tr></thead><tbody>{medicines.map((medicine) => <tr key={medicine.id} className="border-b border-[#E8EDF4] text-[13px] text-[#3A4253] last:border-0"><td className="px-6 py-4 font-medium">{medicine.name || "Unnamed medicine"}</td><td className="px-6 py-4">{medicine.unit || "—"}</td><td className="px-6 py-4">{medicine.form || "—"}</td><td className="px-6 py-4">{medicine.strength || "—"}</td><td className="px-6 py-4 text-right"><Link href={`/dashboard/pharmacy/inventory/list/${medicine.id}`} className="inline-flex items-center gap-1 text-[#2D3648] hover:text-[#00796B]">View batches <ChevronRight size={13} /></Link></td></tr>)}</tbody></table></div>}</section>;
+  if (loading) {
+    return (
+      <section className="min-w-0 space-y-8" role="status" aria-label="Loading inventory">
+        <BreadcrumbHeading items={["Inventory"]} description="Loading items available for dispensing." />
+        <div className="h-64 animate-pulse rounded-md border border-[#D8DEE8] bg-gray-100" />
+      </section>
+    );
+  }
+
+  return (
+    <section className="min-w-0 space-y-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <BreadcrumbHeading items={["Inventory", `Items (${filteredItems.length})`]} description="Search and open any item to review its batches and stock history." />
+        <Link href="/dashboard/pharmacy/inventory/new" className="inline-flex items-center gap-1 self-start rounded-md bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]">+ Add item</Link>
+      </div>
+
+      <div className="rounded-md border border-[#D8DEE8] bg-white p-3">
+        <label className="block text-sm text-[#2D3648]">
+          <span className="mb-2 block font-medium">Search items</span>
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by item name"
+            className="h-11 w-full rounded-md border border-[#CED7E3] px-3"
+          />
+        </label>
+      </div>
+
+      {filteredItems.length === 0 ? (
+        <div className="rounded-md border border-dashed border-gray-300 bg-slate-50 p-8 text-center">
+          <p className="text-lg font-medium text-[#1E2433]">No items match your search.</p>
+          <p className="mt-2 text-sm text-[#5B6478]">
+            Try another item name or add a new inventory item to get started.
+          </p>
+          <div className="mt-4 flex justify-center">
+            <Link
+              href="/dashboard/pharmacy/inventory/new"
+              className="inline-flex items-center gap-2 rounded-md bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]"
+            >
+              + Add new item
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div role="region" aria-label="Item list table" className="w-full overflow-x-auto rounded-md border border-[#D8DEE8] bg-white">
+          <table className="min-w-[840px] w-full table-auto">
+            <thead className="border-b border-[#D8DEE8] text-left text-sm font-medium text-[#2D3648]">
+              <tr>
+                {['Item name', 'Unit', 'Form', 'Strength'].map((label) => (
+                  <th key={label} className="whitespace-nowrap px-6 py-4">
+                    <span className="inline-flex items-center gap-2">{label}<ArrowUpDown size={13} className="text-[#8792A8]" /></span>
+                  </th>
+                ))}
+                <th className="px-6 py-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.map((item) => (
+                <tr key={item.id} className="border-b border-[#E8EDF4] text-[13px] text-[#3A4253] last:border-0">
+                  <td className="px-6 py-4 font-medium">{item.name || "Unnamed item"}</td>
+                  <td className="px-6 py-4">{item.unit || "—"}</td>
+                  <td className="px-6 py-4">{item.form || "—"}</td>
+                  <td className="px-6 py-4">{item.strength || "—"}</td>
+                  <td className="px-6 py-4 text-right">
+                    <Link href={`/dashboard/pharmacy/inventory/items/${item.id}`} className="inline-flex items-center gap-1 text-[#2D3648] hover:text-[#00796B]">
+                      View details <ChevronRight size={13} />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
 }

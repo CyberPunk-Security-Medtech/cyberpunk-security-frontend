@@ -1,6 +1,10 @@
-import InventoryItemDetailsClient from "@components/dashboard/pharmacy/InventoryItemDetailsClient";
+import { redirect } from "next/navigation";
 
-export default async function PharmacyMedicineDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PharmacyMedicineDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  return <InventoryItemDetailsClient itemId={id} />;
+  redirect(`/dashboard/pharmacy/inventory/items/${id}`);
 }

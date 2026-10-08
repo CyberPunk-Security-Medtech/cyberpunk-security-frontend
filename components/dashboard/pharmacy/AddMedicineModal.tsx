@@ -20,5 +20,50 @@ export default function AddMedicineModal({ isOpen, onClose, orgId, groupName, me
     catch (error) { console.error("Failed to assign medicine to group", error); toast.error("Unable to update this medicine."); }
     finally { setSaving(false); }
   };
-  return <Modal title={`Add medicine to ${groupName}`} isOpen={isOpen} onClose={onClose}><div className="space-y-4 p-6"><label className="block text-sm">Search inventory<input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Medicine name" className="mt-1 h-10 w-full rounded-md border p-2" /></label><label className="block text-sm">Medicine<select value={medicineId} onChange={(event) => setMedicineId(event.target.value)} className="mt-1 h-10 w-full rounded-md border p-2"><option value="">Select medicine</option>{candidates.map((item) => <option key={item.id} value={item.id}>{item.name ?? "Unnamed medicine"}</option>)}</select></label><div className="flex justify-end gap-3"><button type="button" onClick={onClose} className="rounded-md border px-4 py-2 text-sm">Cancel</button><button type="button" onClick={() => void add()} disabled={saving} className="rounded-md bg-[#00796B] px-4 py-2 text-sm text-white disabled:opacity-60">{saving ? "Adding..." : "Add medicine"}</button></div></div></Modal>;
+  return (
+    <Modal title={`Add medicine to ${groupName}`} isOpen={isOpen} onClose={onClose}>
+      <div className="space-y-4 p-6">
+        <label className="block text-sm text-[#2D3648]">
+          Search inventory
+          <input
+            autoFocus
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Medicine name"
+            className="mt-1 h-10 w-full rounded-md border border-[#CED7E3] bg-white p-2 text-sm text-[#2D3648] placeholder:text-[#8B93A7] outline-none"
+          />
+        </label>
+
+        <label className="block text-sm text-[#2D3648]">
+          Medicine
+          <select
+            value={medicineId}
+            onChange={(event) => setMedicineId(event.target.value)}
+            className="mt-1 h-10 w-full rounded-md border border-[#CED7E3] bg-white p-2 text-sm text-[#2D3648] outline-none"
+          >
+            <option value="">Select medicine</option>
+            {candidates.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name ?? "Unnamed medicine"}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button type="button" onClick={onClose} className="rounded-md border border-[#CED7E3] bg-white px-4 py-2 text-sm font-medium text-[#2D3648] hover:bg-[#F7F9FB]">
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => void add()}
+            disabled={saving}
+            className="rounded-md bg-[#00796B] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#00695F] disabled:opacity-60"
+          >
+            {saving ? "Adding..." : "Add medicine"}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
 }

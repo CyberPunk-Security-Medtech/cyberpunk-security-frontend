@@ -8,8 +8,10 @@ type BreadcrumbHeadingProps = {
 };
 
 const defaultHref = (label: string) => {
+  if (label === "Pharmacy") return "/dashboard/pharmacy";
+  if (label === "Prescriptions") return "/dashboard/pharmacy";
   if (label === "Inventory") return "/dashboard/pharmacy/inventory";
-  if (label.startsWith("List of Medicines")) return "/dashboard/pharmacy/inventory/list";
+  if (label.startsWith("Items") || label.startsWith("List of Items")) return "/dashboard/pharmacy/inventory/items";
   if (label === "Medicine Groups") return "/dashboard/pharmacy/inventory/groups";
   return undefined;
 };

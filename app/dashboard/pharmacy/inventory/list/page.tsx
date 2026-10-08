@@ -1,5 +1,5 @@
-import InventoryListClient from "@components/dashboard/pharmacy/InventoryListClient";
+import { redirect } from "next/navigation";
 
 export default function PharmacyMedicineListPage() {
-  return <InventoryListClient />;
+  redirect("/dashboard/pharmacy/inventory/items");
 }

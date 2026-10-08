@@ -70,23 +70,20 @@ export default function RecordStaffDashboardPage() {
     () => [
       {
         title: "Total Patients",
-        value: loading ? "..." : String(patients.length),
+        value: String(patients.length),
         icon: Users,
         iconClassName: "bg-sky-50 text-sky-600",
       },
       {
         title: "Records Filed Today",
-        value: loading
-          ? "..."
-          : String(
-              patients.filter((patient) => wasCreatedToday(patient.createdAt))
-                .length,
-            ),
+        value: String(
+          patients.filter((patient) => wasCreatedToday(patient.createdAt)).length,
+        ),
         icon: FileText,
         iconClassName: "bg-emerald-50 text-emerald-600",
       },
     ],
-    [loading, patients],
+    [patients],
   );
 
   return (
@@ -108,8 +105,12 @@ export default function RecordStaffDashboardPage() {
             >
               <Icon size={17} />
             </div>
-            <p className="text-2xl font-bold text-[#111827]">{value}</p>
-            <p className="text-xs text-slate-500">{title}</p>
+            {loading ? (
+              <div className="h-8 w-20 animate-pulse rounded-md bg-slate-200" />
+            ) : (
+              <p className="text-2xl font-bold text-[#111827]">{value}</p>
+            )}
+            <p className="mt-2 text-xs text-slate-500">{title}</p>
           </div>
         ))}
       </section>

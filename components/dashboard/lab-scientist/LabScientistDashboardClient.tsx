@@ -487,7 +487,11 @@ export default function LabScientistDashboardClient() {
         ].map(([label, value]) => (
           <div key={label} className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
             <p className="text-xs text-gray-500">{label}</p>
-            <p className="mt-1 text-2xl font-semibold text-[#1A2380]">{loading ? "…" : value}</p>
+            {loading ? (
+              <div className="mt-2 h-8 w-16 animate-pulse rounded-md bg-slate-200" />
+            ) : (
+              <p className="mt-1 text-2xl font-semibold text-[#1A2380]">{value}</p>
+            )}
           </div>
         ))}
       </section>
