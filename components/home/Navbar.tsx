@@ -11,7 +11,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  
+
   const isAboutUs = pathname?.includes("/home/about-us");
   const buttonText = isAboutUs ? "Join the Waitlist" : "Request Early Access";
 
@@ -57,10 +57,10 @@ export default function Navbar() {
       {/* Right-side buttons */}
       <div className="hidden md:flex items-center gap-4">
         {/* Two small circle buttons */}
-        <button className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-300 hover:bg-gray-100 transition">
+        <button aria-label="Notifications" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C7D2FE] bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#818CF8] hover:shadow-md">
           <Image src="/icons/bell.svg" alt="notifications" width={42} height={42} />
         </button>
-        <button className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-300 hover:bg-gray-100 transition">
+        <button aria-label="Search" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#99E4DF] bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#00A9B7] hover:shadow-md">
           <Image src="/icons/search.svg" alt="search" width={42} height={42} />
         </button>
 
@@ -100,10 +100,10 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="flex gap-3 mt-3">
-             <button className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-300 hover:bg-gray-100 transition">
+             <button aria-label="Notifications" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C7D2FE] bg-white shadow-sm transition hover:border-[#818CF8]">
           <Image src="/icons/bell.svg" alt="notifications" width={42} height={42} />
         </button>
-        <button className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-300 hover:bg-gray-100 transition">
+        <button aria-label="Search" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#99E4DF] bg-white shadow-sm transition hover:border-[#00A9B7]">
           <Image src="/icons/search.svg" alt="search" width={42} height={42} />
         </button>
               </div>

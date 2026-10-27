@@ -32,7 +32,7 @@ export default function FAQSection() {
   const [active, setActive] = useState<number | null>(null);
 
   return (
-    <section className="relative bg-white py-24 overflow-hidden">
+    <section className="relative overflow-hidden bg-white py-20 sm:py-24">
       {/* Decorative dotted vector */}
       <Image
         src="/vision-splash.svg"

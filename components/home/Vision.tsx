@@ -17,7 +17,7 @@ export default function VisionSection() {
     },
     {
       title: "Portable",
-      desc: "Your health data travels with you across Africa.",
+      desc: "Your health data travels with you wherever care takes you.",
       icon: "/icons/shield.svg",
     },
   ];
@@ -76,8 +76,8 @@ export default function VisionSection() {
 
           <p className="text-gray-600 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto px-2 sm:px-4">
             “To make healthcare data accessible, secure, and portable for every
-            African patient — creating a continent where your medical history
-            travels with you, your privacy is protected, and your healthcare
+            patient — creating a world where your medical history travels with
+            you, your privacy is protected, and your healthcare
             decisions are informed by complete, trusted information.”
           </p>
         </motion.div>
@@ -93,13 +93,15 @@ export default function VisionSection() {
               viewport={{ once: true }}
               className="relative z-20 bg-white shadow-md rounded-md p-6 sm:p-8 text-center w-full max-w-[300px] md:max-w-[280px]"
             >
-              <Image
-                src={item.icon}
-                alt={item.title}
-                width={40}
-                height={40}
-                className="mx-auto mb-4 sm:mb-5"
-              />
+              <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}>
+                <Image
+                  src={item.icon}
+                  alt={item.title}
+                  width={40}
+                  height={40}
+                  className="mx-auto mb-4 sm:mb-5"
+                />
+              </motion.div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 {item.title}
               </h3>

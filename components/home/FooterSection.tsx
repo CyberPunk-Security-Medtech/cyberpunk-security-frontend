@@ -10,7 +10,7 @@
 //             <div>
 //               <div className="text-2xl font-bold mb-4">PrivaCure</div>
 //               <p className="text-gray-400 mb-4">
-//                 Building Africa&apos;s most trusted healthcare data infrastructure.
+//                 Building trusted healthcare data infrastructure for every care team.
 //               </p>
 //               <p className="text-gray-400">
 //                 Secure, compliant, and AI-powered interoperability for hospitals, HMOs, and healthcare providers across the continent.
@@ -116,9 +116,9 @@ export default function Footer() {
               <span className="text-lg font-semibold text-[#0F1C2E]">PrivaCure</span>
             </div>
             <p className="text-sm leading-6 text-[#2F3E4C]/90">
-              Building Africa’s most trusted healthcare data infrastructure.
+              Building trusted healthcare data infrastructure for every care team.
               Secure, compliant, and AI-powered interoperability for hospitals,
-              HMOs, and healthcare providers across the continent.
+              HMOs, and healthcare providers worldwide.
             </p>
 
         <div className="mt-4 space-y-2 text-sm text-[#2F3E4C]/90">
@@ -176,7 +176,7 @@ export default function Footer() {
         {/* Bottom text + email form */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-[#2F3E4C]/80">
-            Get the latest updates on PrivaCure’s development and African healthcare innovation.
+            Get the latest updates on PrivaCure’s development and healthcare innovation.
           </p>
 
           <form className="relative w-full md:w-[420px]">

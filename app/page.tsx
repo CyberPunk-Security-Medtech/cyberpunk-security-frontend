@@ -2,6 +2,7 @@
 
 import Footer from "components/home/FooterSection";
 import Hero from "components/home/Hero";
+import DashboardDemo from "components/home/DashboardDemo";
 import Features from "components/home/Features";
 import Vision from "components/home/Vision";
 import Process from "components/home/Process";
@@ -22,6 +23,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="w-full overflow-x-hidden">
         <Hero />
+        <DashboardDemo />
         <Features />
         <WhatsPrivaCure />
         <Vision />

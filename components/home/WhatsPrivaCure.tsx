@@ -37,7 +37,7 @@ export default function WhatsPrivaCure() {
   ];
 
   return (
-    <section className="relative pt-20 pb-24 bg-white overflow-hidden">
+    <section className="relative overflow-hidden bg-white py-20 sm:py-24">
       {/* Background splash (hidden on mobile) */}
       <Image
         src="/vision-splash.svg"
@@ -63,7 +63,7 @@ export default function WhatsPrivaCure() {
 
         <p className="mt-4 text-gray-600 text-base sm:text-lg leading-relaxed tracking-wide max-w-2xl mx-auto">
           PrivaCure is a secure, interoperable electronic health records (EHR) platform
-          designed for African hospitals. It enables authorized doctors, nurses,
+          designed for modern healthcare organizations. It enables authorized doctors, nurses,
           pharmacists, and lab technicians to access and share patient records across
           hospitals — with encryption, patient consent, and strict role-based access control.
         </p>
@@ -79,13 +79,15 @@ export default function WhatsPrivaCure() {
             transition={{ duration: 0.4 }}
             className="relative rounded-md bg-white border border-gray-100 p-6 sm:p-8 hover:shadow-lg transition-shadow text-center flex flex-col items-center"
           >
-            <Image
-              src={f.icon}
-              alt={f.title}
-              width={50}
-              height={50}
-              className="object-contain mb-4 sm:mb-6"
-            />
+            <motion.div whileHover={{ y: -5, rotate: 3 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
+              <Image
+                src={f.icon}
+                alt={f.title}
+                width={50}
+                height={50}
+                className="mb-4 object-contain sm:mb-6"
+              />
+            </motion.div>
             <h3 className="font-semibold text-gray-900 mb-1 text-base sm:text-lg">
               {f.title}
             </h3>

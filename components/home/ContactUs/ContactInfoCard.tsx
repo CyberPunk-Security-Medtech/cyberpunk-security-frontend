@@ -2,10 +2,10 @@ import Image from "next/image";
 
 export default function ContactInfoCard() {
   return (
-     <div className="h-full w-full p-10 text-white flex flex-col justify-between">
+     <div className="flex h-full w-full flex-col justify-between p-6 text-white sm:p-10">
       <div>
         <h3 className="text-xl font-semibold mb-2">Contact Information</h3>
-        <p className="text-sm mb-8 opacity-90">Say something to start a live chat!</p>
+        <p className="mb-8 text-sm opacity-90">Reach our team through the channels below.</p>
 
         <ul className="space-y-5">
           <li className="flex items-center gap-3">
@@ -18,7 +18,7 @@ export default function ContactInfoCard() {
           </li>
           <li className="flex items-center gap-3">
             <Image src="/icons/location.svg" alt="location" width={24} height={24} />
-            <span>Lagos, Nigeria.</span>
+            <span>Supporting healthcare teams globally</span>
           </li>
         </ul>
       </div>

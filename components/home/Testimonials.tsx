@@ -10,28 +10,28 @@ export default function TestimonialsSection() {
       role: "Registered Nurse",
       quote:
         "The dashboard is clear and secure. Updating vitals and notes has never been easier.",
-      image: "/chidinma-testimonial.svg",
+      image: "/testimonials/chidinma.png",
     },
     {
       name: "Dr. Tunde A.",
       role: "Consultant Physician",
       quote:
         "With PrivaCure, I can instantly access my patients’ full medical history even if they were treated in another state. It saves precious time in emergencies and helps me make safer, faster decisions.",
-      image: "/tunde-testimonial.svg",
+      image: "/testimonials/tunde.png",
     },
     {
       name: "Michael K.",
       role: "Patient’s Son",
       quote:
         "When I moved my father from one hospital to another, PrivaCure made the transfer stress-free. We simply approved the data sharing via SMS, and his new doctors had everything they needed instantly.",
-      image: "/michael-testimonial.svg",
+      image: "/testimonials/michael.png",
     },
     {
       name: "Grace O.",
       role: "Hospital Administrator",
       quote:
         "PrivaCure makes onboarding and role assignment simple, with full visibility and secure logs.",
-      image: "/grace-testimonial.svg",
+      image: "/testimonials/grace.png",
     },
   ];
 
@@ -43,7 +43,7 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative overflow-hidden py-20 sm:py-24">
       {/* Decorative dashed line at top */}
       {/* <div className="absolute top-0 left-0 w-full h-[1px] bg-[repeating-linear-gradient(to_right,#00A9B7_0_6px,transparent_6px_14px)] opacity-40"></div> */}
 

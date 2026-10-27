@@ -23,7 +23,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="relative overflow-hidden py-24">
+    <section className="relative overflow-hidden py-20 sm:py-24">
       {/* ===== Background Wavy Line (behind text & image) ===== */}
       <motion.img
         src="/how-our-platform-works-wavy-line.svg"

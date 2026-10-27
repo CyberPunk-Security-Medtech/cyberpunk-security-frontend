@@ -86,7 +86,7 @@ export default function FutureHealthCare() {
   ];
 
   return (
-    <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden px-4 sm:px-6">
+    <section className="relative overflow-hidden px-4 py-20 sm:px-6 sm:py-24">
       {/* === Decorative elements (hidden on mobile) === */}
       <Image
         src="/vision-splash.svg"
@@ -122,7 +122,7 @@ export default function FutureHealthCare() {
         <p className="mt-3 text-sm sm:text-base text-[#4A5D6A] max-w-2xl mx-auto leading-relaxed px-2">
           PrivaCure is currently in the MVP stage. We’re inviting
           forward-thinking hospitals, HMOs, and clinics to join our early access
-          program and shape the future of African healthcare interoperability.
+          program and shape the future of healthcare interoperability.
         </p>
 
         {/* === Benefits cards === */}
@@ -157,7 +157,7 @@ export default function FutureHealthCare() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mt-12 sm:mt-16 mx-auto max-w-lg bg-gradient-to-r from-[#0040C1] to-[#00A9B7] rounded-md sm:rounded-md shadow-lg p-6 sm:p-8 text-left text-white relative overflow-hidden"
+          className="mt-12 sm:mt-16 mx-auto max-w-lg rounded-md bg-[#000EA0] p-6 text-left text-white shadow-lg sm:rounded-md sm:p-8 relative overflow-hidden"
         >
           {/* dotted decorative in top-left of form */}
           <Image

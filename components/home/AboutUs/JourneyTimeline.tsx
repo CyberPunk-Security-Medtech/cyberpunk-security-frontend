@@ -8,7 +8,7 @@ export default function JourneyTimelineSection() {
     {
       year: "2024",
       title: "Founded",
-      text: "PrivaCure was born to solve the challenge of secure, seamless patient data sharing between African hospitals.",
+      text: "PrivaCure was born to solve the challenge of secure, seamless patient data sharing between healthcare organizations.",
     },
     {
       year: "2024",
@@ -33,7 +33,7 @@ export default function JourneyTimelineSection() {
     {
       year: "2026",
       title: "Future - Full Launch",
-      text: "Full Launch Expand into Africa’s trusted health information network.",
+      text: "Full Launch Expand into a trusted global health information network.",
     },
 
   ];

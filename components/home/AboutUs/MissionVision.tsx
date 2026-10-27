@@ -66,7 +66,7 @@ export default function MissionVisionSection() {
               Our Mission
             </h3>
             <p className="text-[#444] leading-relaxed">
-              To empower African healthcare institutions with secure, seamless and standardized access to patient information reducing delays, paperwork and duplicated tests — so that every patient receives faster, safer and more coordinated care.
+              To empower healthcare institutions with secure, seamless and standardized access to patient information, reducing delays, paperwork and duplicated tests so that every patient receives faster, safer and more coordinated care.
             </p>
           </div>
         </motion.div>
@@ -90,7 +90,7 @@ export default function MissionVisionSection() {
               Our Vision
             </h3>
             <p className="text-[#444] leading-relaxed">
-         To build Africa’s most trusted, interoperable health information network where hospitals, clinics and specialists can securely collaborate across borders, ensuring that every patient’s medical history follows them wherever they go.
+         To build a trusted, interoperable health information network where hospitals, clinics and specialists can securely collaborate across borders, ensuring that every patient’s medical history follows them wherever they go.
             </p>
           </div>
         </motion.div>
