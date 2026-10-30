@@ -111,13 +111,13 @@ export default function FAQSection() {
               You can ask anything you want to know. Feedback welcome.
             </p>
 
-            <form className="w-full max-w-sm">
+            {/* <form className="w-full max-w-sm">
               <input
                 type="text"
                 placeholder="Let me know"
                 className="w-full border border-[#E0EEF4] rounded-md px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-[#00A9B7]"
               />
-            </form>
+            </form> */}
           </div>
         </div>
       </div>

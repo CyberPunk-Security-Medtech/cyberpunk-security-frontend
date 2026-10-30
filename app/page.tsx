@@ -23,7 +23,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="w-full overflow-x-hidden">
         <Hero />
-        <DashboardDemo />
+        {/* <DashboardDemo /> */}
         <Features />
         <WhatsPrivaCure />
         <Vision />
