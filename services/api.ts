@@ -1070,6 +1070,73 @@ export const admissionService = {
   },
 };
 
+/* ================= REPORTS (admins only) ================= */
+
+export type ReportPeriodParams = {
+  /** Defaults to the current year server-side. */
+  year?: number;
+  /** 1–12; omit for every month of the year. */
+  month?: number;
+};
+
+export type HmoConsultationRow = {
+  year: number;
+  month: number;
+  hmo_provider: string;
+  consultation_count: number;
+  patient_count: number;
+};
+
+export type HmoConsultationReport = {
+  year: number;
+  month: number | null;
+  hmo_provider: string | null;
+  total_consultations: number;
+  rows: HmoConsultationRow[];
+};
+
+export type DoctorMonthlyRow = {
+  year: number;
+  month: number;
+  doctor_id: string;
+  doctor: UserWithNames;
+  patients_treated: number;
+  consultations: number;
+  completed_consultations: number;
+};
+
+export type DoctorMonthlyReport = {
+  year: number;
+  month: number | null;
+  doctor_id: string | null;
+  rows: DoctorMonthlyRow[];
+};
+
+export const reportService = {
+  getHmoConsultationReport: async (
+    org_id: string,
+    params?: ReportPeriodParams & { hmo_provider?: string },
+    signal?: AbortSignal,
+  ): Promise<HmoConsultationReport> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/reports/hmo-consultations`,
+      { params, signal },
+    );
+    return unwrap(response.data);
+  },
+
+  getDoctorPatientsReport: async (
+    org_id: string,
+    params?: ReportPeriodParams & { doctor_id?: string },
+    signal?: AbortSignal,
+  ): Promise<DoctorMonthlyReport> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/reports/doctor-patients`,
+      { params, signal },
+    );
+    return unwrap(response.data);
+  },
+};
 
 export const dataSharingService = {
   createShareGrant: async (
@@ -1210,6 +1277,24 @@ export const auditService = {
 };
 
 export const activityService = {
+  // Everything that happened inside the organization, newest first (admins
+  // only). Filter by action, actor and a since/until time window.
+  listOrganizationActivity: async (
+    org_id: string,
+    params?: ActivityLogPaginationParams & {
+      action?: string;
+      user_id?: string;
+      since?: string;
+      until?: string;
+    },
+    signal?: AbortSignal,
+  ): Promise<ActivityLogRecord[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/activity-logs`,
+      { params, signal },
+    );
+    return unwrap(response.data);
+  },
 
   listConsultationActivity: async (
     org_id: string,
