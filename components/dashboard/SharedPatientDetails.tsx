@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { ArrowLeft, ShieldPlus } from "lucide-react";
 import { PageSkeleton } from "@components/Skeletons";
+import AdmittedBadge from "@components/dashboard/admissions/AdmittedBadge";
 import type { PatientDetailRecord } from "@services/api";
+import { buildDisplayName } from "@utils/helper";
 import { resolvePatientAge } from "@utils/patientAge";
 
 type SharedPatientDetailsProps = {
@@ -119,10 +121,16 @@ export default function SharedPatientDetails({
                   </p>
                 </div>
               </div>
-              <span className="inline-flex w-fit items-center gap-2 rounded-md bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                <ShieldPlus size={15} aria-hidden="true" />
-                Patient record
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <AdmittedBadge
+                  isAdmitted={patient.is_admitted}
+                  admission={patient.current_admission}
+                />
+                <span className="inline-flex w-fit items-center gap-2 rounded-md bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                  <ShieldPlus size={15} aria-hidden="true" />
+                  Patient record
+                </span>
+              </div>
             </div>
           </section>
 
@@ -133,6 +141,7 @@ export default function SharedPatientDetails({
             <DetailItem label="Marital status" value={patient.marital_status} />
             <DetailItem label="Blood group" value={patient.blood_group} />
             <DetailItem label="Registered" value={formatDate(patient.created_at)} />
+            <DetailItem label="Registered by" value={buildDisplayName(patient.creator ?? null)} />
           </DetailsSection>
 
           <DetailsSection title="Contact details">

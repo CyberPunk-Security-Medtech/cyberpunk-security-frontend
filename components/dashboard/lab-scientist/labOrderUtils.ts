@@ -296,7 +296,8 @@ export interface RawConsultation {
 }
 
 // Mirrors the backend's LabReportAttachmentResponse. file_url is a signed,
-// short-lived link, so it is refreshed whenever the report is re-fetched.
+// short-lived link; open files via labService.getLabReportAttachmentFileUrl,
+// which never expires.
 export interface Attachment {
   id: string;
   file_name?: string | null;

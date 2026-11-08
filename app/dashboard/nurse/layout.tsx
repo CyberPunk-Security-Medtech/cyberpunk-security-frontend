@@ -66,7 +66,7 @@
 import { useState } from 'react';
 import Sidebar from '@components/SideBar';
 import Header from '@components/Header';
-import { ClipboardList, LayoutDashboard, Settings, Sparkles, Users } from "lucide-react";
+import { BedSingle, ClipboardList, LayoutDashboard, Settings, Sparkles, Users } from "lucide-react";
 import { MenuItem, UserProfile } from '@/types/index';
 import { useAuth } from '@context/AuthContext';
 
@@ -74,6 +74,7 @@ const nurseMenu: MenuItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard/nurse" },
   { name: "Patients Records", icon: Users, href: "/dashboard/nurse/patient-records" },
   { name: "Consultations", icon: ClipboardList, href: "/dashboard/nurse/consultations" },
+  { name: "In-patients", icon: BedSingle, href: "/dashboard/nurse/in-patients" },
   { name: "Ai Assistant", icon: Sparkles, href: "/dashboard/nurse/ai-assistant" },
   { name: "Settings", icon: Settings, href: "/dashboard/nurse/settings" },
 ];

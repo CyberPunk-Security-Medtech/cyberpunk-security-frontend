@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Button from "@components/Button";
 import { consultationService, type ConsultationNote } from "@services/api";
 import { getApiErrorMessage } from "@utils/apiError";
+import { buildDisplayName } from "@utils/helper";
 import { toast } from "react-toastify";
 import { useConsultation } from "./ConsultationContext";
 
@@ -119,9 +120,10 @@ export default function ConsultationNotesPanel() {
                   <span className="text-xs font-semibold uppercase tracking-wide text-[#1A2380]">
                     Note {index + 1}
                   </span>
-                  <time className="text-xs text-gray-500" dateTime={note.created_at}>
-                    {formatDateTime(note.created_at)}
-                  </time>
+                  <span className="text-xs text-gray-500">
+                    {note.creator ? `${buildDisplayName(note.creator)} · ` : ""}
+                    <time dateTime={note.created_at}>{formatDateTime(note.created_at)}</time>
+                  </span>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-gray-700">
                   {note.content}

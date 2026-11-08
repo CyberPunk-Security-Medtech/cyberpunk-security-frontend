@@ -79,6 +79,11 @@ const supportedScopes: Array<{ value: ShareScope; label: string; helper: string 
     label: "Immunizations",
     helper: "Vaccination records",
   },
+  {
+    value: "vitals",
+    label: "Vitals",
+    helper: "Vital-sign readings and their notes",
+  },
 ];
 
 const initialForm: TransferForm = {

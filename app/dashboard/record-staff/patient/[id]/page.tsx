@@ -17,6 +17,8 @@ import { useAuth } from "@context/AuthContext";
 import { consultationService, patientService } from "@services/api";
 import { formatPatientDate } from "../../patientDisplay";
 import { PageSkeleton } from "@components/Skeletons";
+import AdmittedBadge from "@components/dashboard/admissions/AdmittedBadge";
+import { buildDisplayName } from "@utils/helper";
 
 type ConsultationStatus =
   | "Pending"
@@ -211,9 +213,15 @@ export default function RecordStaffPatientDetailsPage() {
               </p>
             </div>
           </div>
-          <span className="w-fit rounded-md bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
-            Record Staff View
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <AdmittedBadge
+              isAdmitted={patient?.is_admitted}
+              admission={patient?.current_admission}
+            />
+            <span className="w-fit rounded-md bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+              Record Staff View
+            </span>
+          </div>
         </div>
       </section>
 
@@ -231,6 +239,7 @@ export default function RecordStaffPatientDetailsPage() {
           <DetailItem label="Email" value={patient?.email} />
           <DetailItem label="Phone Number" value={patient?.phone_number ?? patient?.phone} />
           <DetailItem label="Created" value={formatDateTime(patient?.created_at)} />
+          <DetailItem label="Registered By" value={buildDisplayName(patient?.creator ?? null)} />
           <DetailItem label="Last Updated" value={formatDateTime(patient?.updated_at)} />
         </div>
       </section>
@@ -294,6 +303,10 @@ export default function RecordStaffPatientDetailsPage() {
                     <p className="mt-1 text-sm text-slate-500">
                       {consultation.department?.name || "Department not recorded"}
                     </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Created by {buildDisplayName(consultation.creator ?? null) || "—"}
+                      {" · "}Doctor: {buildDisplayName(consultation.doctor ?? null) || "Not assigned"}
+                    </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span
@@ -344,9 +357,27 @@ export default function RecordStaffPatientDetailsPage() {
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                       Clinical Notes
                     </p>
-                    <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
-                      {formatValue(consultation.clinical_notes ?? consultation.notes)}
-                    </p>
+                    {Array.isArray(consultation.notes) && consultation.notes.length > 0 ? (
+                      <ul className="mt-2 space-y-2">
+                        {consultation.notes.map((note: any) => (
+                          <li key={note.id} className="text-sm text-slate-700">
+                            <p className="whitespace-pre-wrap">{note.content}</p>
+                            <p className="mt-0.5 text-xs text-slate-400">
+                              {buildDisplayName(note.creator ?? null) || "Unknown author"} ·{" "}
+                              {formatDateTime(note.created_at)}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
+                        {formatValue(
+                          typeof consultation.clinical_notes === "string"
+                            ? consultation.clinical_notes
+                            : null,
+                        )}
+                      </p>
+                    )}
                   </div>
                   <div className="rounded-md border border-slate-100 p-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">

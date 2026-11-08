@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   CreditCard,
   ClipboardList,
+  BedDouble,
+  BedSingle,
 } from "lucide-react";
 import { authService } from "@services/api";
 import OrganizationLogo from "@components/shared/OrganizationLogo";
@@ -129,6 +131,8 @@ export default function Sidebar({
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
     { label: "Staff management", icon: Users, href: "/dashboard/admin/staff-management" },
     { label: "Departments", icon: Building2, href: "/dashboard/admin/departments" },
+    { label: "Wards", icon: BedDouble, href: "/dashboard/admin/wards" },
+    { label: "In-patients", icon: BedSingle, href: "/dashboard/admin/in-patients" },
     {
       label: "Patient Transfers",
       icon: Activity,

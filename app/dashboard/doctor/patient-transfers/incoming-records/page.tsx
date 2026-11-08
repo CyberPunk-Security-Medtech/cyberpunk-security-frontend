@@ -90,6 +90,7 @@ const scopeLabels: Record<string, string> = {
   lab_results: "Lab results",
   prescriptions: "Prescriptions",
   immunizations: "Immunizations",
+  vitals: "Vitals",
 };
 
 const formatScopes = (grant?: DataShareGrant | null) => {

@@ -1338,6 +1338,7 @@ import { toast } from "react-toastify";
 import { ArrowLeft, Download, ExternalLink, FileText, Image as ImageIcon, Loader2, Plus, Trash2, UploadCloud } from "lucide-react";
 import { useConfirm } from "@components/ConfirmDialog";
 import { labRequestReferrer } from "./labRequest";
+import { buildDisplayName } from "@utils/helper";
 
 const ATTACHMENT_ACCEPT = "image/*,application/pdf";
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
@@ -1709,22 +1710,35 @@ function LabReportSection({
               const isImage = attachment.content_type?.startsWith("image/");
               const name = attachment.file_name || "Untitled file";
               const deleting = deletingId === attachment.id;
+              const fileHref = orgId
+                ? labService.getLabReportAttachmentFileUrl(orgId, order.id, attachment.id)
+                : null;
               return (
                 <li
                   key={attachment.id}
                   className={`flex items-center gap-3 px-3 py-2.5 text-sm ${deleting ? "opacity-50" : ""}`}
                 >
-                  <span
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
-                      isImage ? "bg-sky-50 text-sky-600" : "bg-red-50 text-red-600"
-                    }`}
-                  >
-                    {isImage ? (
-                      <ImageIcon className="h-4 w-4" aria-hidden="true" />
-                    ) : (
-                      <FileText className="h-4 w-4" aria-hidden="true" />
-                    )}
-                  </span>
+                  {isImage && fileHref ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- cookie-authenticated redirect, not optimisable by next/image
+                    <img
+                      src={fileHref}
+                      alt=""
+                      loading="lazy"
+                      className="h-9 w-9 shrink-0 rounded-md bg-sky-50 object-cover"
+                    />
+                  ) : (
+                    <span
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
+                        isImage ? "bg-sky-50 text-sky-600" : "bg-red-50 text-red-600"
+                      }`}
+                    >
+                      {isImage ? (
+                        <ImageIcon className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <FileText className="h-4 w-4" aria-hidden="true" />
+                      )}
+                    </span>
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-gray-800" title={name}>
                       {name}
@@ -1734,9 +1748,9 @@ function LabReportSection({
                       {attachment.created_at ? ` · Uploaded ${formatDateTime(attachment.created_at)}` : ""}
                     </p>
                   </div>
-                  {attachment.file_url ? (
+                  {fileHref ? (
                     <a
-                      href={attachment.file_url}
+                      href={fileHref}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-md px-2 text-xs font-medium text-[#007F73] hover:bg-teal-50"
@@ -1903,7 +1917,12 @@ function LabReportSection({
   );
 }
 
-type ConsultationNoteItem = { id: string; content: string; created_at?: string };
+type ConsultationNoteItem = {
+  id: string;
+  content: string;
+  created_at?: string;
+  creator?: { first_name?: string; last_name?: string } | null;
+};
 
 const EMPTY_VALUES = /^(-|none|nil|n\/a|not recorded|no allergies recorded)$/i;
 const hasValue = (value?: string | null): value is string =>
@@ -2172,8 +2191,12 @@ export default function LabOrderDetailsClient({ id }: { id: string }) {
                 {notes.map((note) => (
                   <li key={note.id} className="rounded-md bg-gray-50 p-3">
                     <p className="whitespace-pre-wrap text-sm leading-6 text-gray-800">{note.content}</p>
-                    {note.created_at ? (
-                      <p className="mt-1.5 text-xs text-gray-500">{formatDateTime(note.created_at)}</p>
+                    {note.created_at || note.creator ? (
+                      <p className="mt-1.5 text-xs text-gray-500">
+                        {[buildDisplayName(note.creator ?? null), note.created_at && formatDateTime(note.created_at)]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
                     ) : null}
                   </li>
                 ))}

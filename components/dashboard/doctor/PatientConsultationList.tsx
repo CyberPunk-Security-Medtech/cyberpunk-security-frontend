@@ -4,6 +4,7 @@ import Link from "next/link";
 import { StatusBadge } from "@components/StatusBadge";
 import { useConsultation } from "./ConsultationContext";
 import { LoaderIcon } from "@components/Skeletons";
+import { buildDisplayName } from "@utils/helper";
 
 const formatDate = (value?: string | null) => {
   if (!value) return "-";
@@ -98,6 +99,14 @@ export default function PatientConsultationList() {
                   <div className="overflow-hidden">
                     <div className="border-t pt-4">
                       <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-gray-700 xl:grid-cols-2">
+                        <div className="rounded-md bg-gray-50 p-3">
+                          <p className="text-xs text-gray-500">Created by</p>
+                          <p className="font-medium">{buildDisplayName(consultation.creator ?? null) || "-"}</p>
+                        </div>
+                        <div className="rounded-md bg-gray-50 p-3">
+                          <p className="text-xs text-gray-500">Doctor</p>
+                          <p className="font-medium">{buildDisplayName(consultation.doctor ?? null) || "Not assigned"}</p>
+                        </div>
                         <div className="rounded-md bg-gray-50 p-3">
                           <p className="text-xs text-gray-500">Created</p>
                           <p className="font-medium">{formatDate(consultation.created_at)}</p>
