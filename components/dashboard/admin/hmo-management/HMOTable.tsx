@@ -1,24 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import Pagination from "@components/dashboard/admin/staff-management/Pagination";
-import { useRouter } from "next/navigation";
+import { TableSkeleton } from "@components/Skeletons";
+import type { HmoSummary } from "./hmoData";
 
 const PAGE_SIZE = 10;
 
-const statusStyles: Record<string, string> = {
-  Approved: "bg-green-100 text-green-700",
-  Restricted: "bg-yellow-100 text-yellow-700",
-  Received: "bg-blue-100 text-blue-700",
+export const hmoDetailHref = (name: string) =>
+  `/dashboard/admin/hmo-management/view-hmo?provider=${encodeURIComponent(name)}`;
+
+const formatDate = (value: string | null) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "-"
+    : new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(date);
 };
 
-const hmos = [
-  { id: 2879, name: "Verve HMO", providers: 10, date: "10/10/2020", status: "Received" },
-  { id: 2879, name: "Avon HMO", providers: 25, date: "10/10/2020", status: "Received" },
-];
+type HMOTableProps = {
+  hmos: HmoSummary[];
+  loading: boolean;
+  year: number;
+  emptyMessage: string;
+};
 
-export default function HMOTable() {
+export default function HMOTable({ hmos, loading, year, emptyMessage }: HMOTableProps) {
   const router = useRouter();
   const [page, setPage] = useState(1);
 
@@ -28,53 +38,58 @@ export default function HMOTable() {
 
   return (
     <ResponsiveTableRegion label="HMO providers">
-      <table className="w-full min-w-[880px] text-sm">
+      <table className="w-full min-w-[820px] text-sm">
         <thead className="bg-slate-100 text-slate-600">
           <tr>
-            <th scope="col" className="min-w-[130px] bg-slate-100 px-4 py-3 text-left">Patient ID</th>
-            <th scope="col" className="min-w-[180px] px-4 py-3 text-left">HMO&apos;s Name</th>
-            <th scope="col" className="min-w-[210px] px-4 py-3 text-left">No. of Health Providers</th>
-            <th scope="col" className="min-w-[170px] px-4 py-3 text-left">Date Registered</th>
-            <th scope="col" className="min-w-[130px] px-4 py-3 text-left">Status</th>
-            <th scope="col" className="min-w-[72px] px-4 py-3 text-right"><span className="sr-only">Actions</span></th>
+            <th scope="col" className="min-w-[200px] bg-slate-100 px-4 py-3 text-left">HMO</th>
+            <th scope="col" className="px-4 py-3 text-right">Enrolled patients</th>
+            <th scope="col" className="px-4 py-3 text-right" title="Policies not past their expiry date">
+              Current policies
+            </th>
+            <th scope="col" className="px-4 py-3 text-right">Expired policies</th>
+            <th scope="col" className="px-4 py-3 text-right">Consultations ({year})</th>
+            <th scope="col" className="px-4 py-3 text-left">Last enrolment</th>
           </tr>
         </thead>
 
         <tbody>
-          {pagedHmos.map((hmo, index) => (
-            <tr
-              key={`${hmo.name}-${index}`}
-              onClick={() => router.push("/dashboard/admin/hmo-management/view-hmo")}
-              className="group cursor-pointer border-t bg-white hover:bg-slate-50"
-            >
-              <td className="bg-white px-4 py-3 group-hover:bg-slate-50">{hmo.id}</td>
-              <td className="px-4 py-3">{hmo.name}</td>
-              <td className="px-4 py-3">{hmo.providers}</td>
-              <td className="whitespace-nowrap px-4 py-3">{hmo.date}</td>
-              <td className="px-4 py-3">
-                <span className={`rounded-md px-3 py-1 text-xs font-medium ${statusStyles[hmo.status]}`}>
-                  {hmo.status}
-                </span>
-              </td>
-              <td className="px-4 py-3 text-right" onClick={(event) => event.stopPropagation()}>
-                <button
-                  type="button"
-                  aria-label={`Open actions for ${hmo.name}`}
-                  className="dashboard-button min-h-10 min-w-10 rounded-md p-2 hover:bg-slate-100"
-                >
-                  <span aria-hidden="true">⋮</span>
-                </button>
+          {loading ? (
+            <TableSkeleton columns={6} />
+          ) : hmos.length === 0 ? (
+            <tr>
+              <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-500">
+                {emptyMessage}
               </td>
             </tr>
-          ))}
+          ) : (
+            pagedHmos.map((hmo) => (
+              <tr
+                key={hmo.key}
+                onClick={() => router.push(hmoDetailHref(hmo.name))}
+                className="group cursor-pointer border-t bg-white hover:bg-slate-50"
+              >
+                <td className="bg-white px-4 py-3 group-hover:bg-slate-50">
+                  {/* A real link keeps the row reachable by keyboard and middle-click. */}
+                  <Link
+                    href={hmoDetailHref(hmo.name)}
+                    onClick={(event) => event.stopPropagation()}
+                    className="font-medium text-[#051466] hover:underline"
+                  >
+                    {hmo.name}
+                  </Link>
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums">{hmo.patients.length}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{hmo.activePolicies}</td>
+                <td className={`px-4 py-3 text-right tabular-nums ${hmo.expiredPolicies ? "font-medium text-red-700" : ""}`}>
+                  {hmo.expiredPolicies}
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums">{hmo.consultations}</td>
+                <td className="whitespace-nowrap px-4 py-3">{formatDate(hmo.lastEnrolledAt)}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
-
-      {hmos.length === 0 && (
-        <p className="px-4 py-8 text-center text-sm text-slate-500">
-          No HMOs registered yet.
-        </p>
-      )}
 
       {totalPages > 1 && (
         <div className="border-t px-4 py-3">

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import Modal from "@components/Modal"; 
+import { useState, type ChangeEvent, type FormEvent, type InputHTMLAttributes } from "react";
+import Modal from "@components/Modal";
+import { FieldLabel, Input, Select, Textarea } from "@components/Field";
 import { patientService, type PatientCreatePayload } from "@services/api";
 import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
@@ -68,6 +69,20 @@ const emptyForm: FormState = {
   policy_start_date: "",
   policy_expiry_date: "",
 };
+
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
+
+const MEDICAL_FIELDS: Array<[keyof FormState, string, string]> = [
+  ["symptoms", "Symptoms", "Presenting complaints"],
+  ["allergies", "Allergies", "e.g. Penicillin"],
+  ["current_medications", "Current medications", "Drug, dose and frequency"],
+  ["past_medical_history", "Past medical history", "Previous conditions or surgeries"],
+  ["family_medical_history", "Family medical history", "e.g. Hypertension, diabetes"],
+  ["immunizations", "Immunizations", "Vaccines received"],
+  ["lifestyle_info", "Lifestyle", "Smoking, alcohol, exercise, diet"],
+];
+
+const SECTION_TITLE = "text-sm font-semibold uppercase tracking-wide text-gray-500";
 
 const asOptional = (value: string): string | undefined => {
   const next = value.trim();
@@ -230,236 +245,189 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
     }
   };
 
-  return (
-    <>
-      {/* <button
-        className="bg-[#1A2380] text-white px-4 py-2 rounded-md"
-        onClick={() => setIsOpen(true)}
-      >
-        Add Patient
-      </button> */}
+  const textField = (
+    name: keyof FormState,
+    label: string,
+    props: InputHTMLAttributes<HTMLInputElement> = {},
+  ) => (
+    <div>
+      <FieldLabel htmlFor={`add-patient-${name}`}>{label}</FieldLabel>
+      <Input
+        id={`add-patient-${name}`}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        {...props}
+      />
+    </div>
+  );
 
-      <Modal
-        title="Patient Details"
-        isOpen={isOpen}
-        onClose={onClose}
-        className="w-full max-w-4xl"
-      >
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
-              placeholder="First Name"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <input
-              type="text"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
-              placeholder="Last Name"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <label className="space-y-1 text-sm text-gray-600">
-              <span>Date of Birth</span>
-              <input
-                required
-                type="date"
-                name="dob"
-                max={getTodayDateInputValue()}
-                value={formData.dob}
+  return (
+    <Modal
+      title="Add patient"
+      header="Fields marked * are required"
+      isOpen={isOpen}
+      onClose={onClose}
+      className="w-full max-w-4xl"
+      headerClassName="bg-[var(--dashboard-accent,#1A2380)]"
+    >
+      <form className="space-y-8" onSubmit={handleSubmit}>
+        <section className="space-y-4">
+          <h4 className={SECTION_TITLE}>Personal details</h4>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {textField("first_name", "First name *", { required: true, autoComplete: "off" })}
+            {textField("last_name", "Last name *", { required: true, autoComplete: "off" })}
+            {textField("dob", "Date of birth *", {
+              required: true,
+              type: "date",
+              max: getTodayDateInputValue(),
+            })}
+            <div>
+              <FieldLabel htmlFor="add-patient-gender">Gender *</FieldLabel>
+              <Select id="add-patient-gender" name="gender" value={formData.gender} onChange={handleChange} required>
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </Select>
+            </div>
+            <div>
+              <FieldLabel htmlFor="add-patient-marital_status">Marital status</FieldLabel>
+              <Select
+                id="add-patient-marital_status"
+                name="marital_status"
+                value={formData.marital_status}
                 onChange={handleChange}
-                className="w-full rounded-md border px-3 py-2 text-gray-900"
-              />
-            </label>
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 w-full"
-              required
-            >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-            <select
-              name="marital_status"
-              value={formData.marital_status}
-              onChange={handleChange}
-              className="border rounded-md px-3 py-2 w-full"
-            >
-              <option value="">Marital Status (Optional)</option>
-              <option value="Single">Single</option>
-              <option value="Married">Married</option>
-              <option value="Divorced">Divorced</option>
-              <option value="Widowed">Widowed</option>
-            </select>
-            <input
-              type="text"
-              name="blood_group"
-              value={formData.blood_group}
-              onChange={handleChange}
-              placeholder="Blood Group"
-              className="border rounded-md px-3 py-2 w-full"
-            />
+              >
+                <option value="">Not specified</option>
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+                <option value="Divorced">Divorced</option>
+                <option value="Widowed">Widowed</option>
+              </Select>
+            </div>
+            <div>
+              <FieldLabel htmlFor="add-patient-blood_group">Blood group</FieldLabel>
+              <Select
+                id="add-patient-blood_group"
+                name="blood_group"
+                value={formData.blood_group}
+                onChange={handleChange}
+              >
+                <option value="">Unknown</option>
+                {BLOOD_GROUPS.map((group) => (
+                  <option key={group} value={group}>
+                    {group}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h4 className={SECTION_TITLE}>Contact</h4>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {textField("email", "Email *", { required: true, type: "email", autoComplete: "off", placeholder: "name@example.com" })}
+            {textField("phone_number", "Phone number *", { required: true, type: "tel", inputMode: "tel", placeholder: "e.g. 08012345678" })}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div>
+            <h4 className={SECTION_TITLE}>Medical background</h4>
+            <p className="mt-1 text-sm text-gray-500">Optional. You can complete this later from the patient record.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {MEDICAL_FIELDS.map(([name, label, placeholder]) => (
+              <div key={name}>
+                <FieldLabel htmlFor={`add-patient-${name}`}>{label}</FieldLabel>
+                <Textarea
+                  id={`add-patient-${name}`}
+                  name={name}
+                  rows={2}
+                  placeholder={placeholder}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <fieldset className="space-y-4">
+          <legend className={SECTION_TITLE}>Payment coverage *</legend>
+          <p className="text-sm text-gray-500">
+            Choose HMO/Insurance to add policy details, or Self-pay to continue without them.
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {(["hmo", "self_pay"] as const).map((option) => (
+              <label
+                key={option}
+                className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${
+                  coverageType === option
+                    ? "border-[var(--dashboard-accent,#1A2380)] bg-indigo-50 text-[var(--dashboard-accent,#1A2380)]"
+                    : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="coverage_type"
+                  value={option}
+                  checked={coverageType === option}
+                  className="accent-[var(--dashboard-accent,#1A2380)]"
+                  onChange={() => {
+                    setCoverageType(option);
+                    if (option === "self_pay") {
+                      setFormData((current) => ({
+                        ...current,
+                        enrollee_type: "",
+                        hmo_provider: "",
+                        hmo_plan: "",
+                        hmo_number: "",
+                        policy_start_date: "",
+                        policy_expiry_date: "",
+                      }));
+                    }
+                  }}
+                />
+                {option === "hmo" ? "HMO / Insurance" : "Self-pay"}
+              </label>
+            ))}
           </div>
 
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="border rounded-md px-3 py-2 w-full"
-            required
-          />
-          <input
-            type="text"
-            name="phone_number"
-            value={formData.phone_number}
-            onChange={handleChange}
-            placeholder="Phone Number"
-            className="border rounded-md px-3 py-2 w-full"
-            required
-          />
-
-          <textarea
-            name="allergies"
-            value={formData.allergies}
-            onChange={handleChange}
-            placeholder="Allergies"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <textarea
-            name="past_medical_history"
-            value={formData.past_medical_history}
-            onChange={handleChange}
-            placeholder="Past Medical History"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <textarea
-            name="family_medical_history"
-            value={formData.family_medical_history}
-            onChange={handleChange}
-            placeholder="Family Medical History"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <textarea
-            name="symptoms"
-            value={formData.symptoms}
-            onChange={handleChange}
-            placeholder="Symptoms"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <textarea
-            name="current_medications"
-            value={formData.current_medications}
-            onChange={handleChange}
-            placeholder="Current Medications"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <textarea
-            name="immunizations"
-            value={formData.immunizations}
-            onChange={handleChange}
-            placeholder="Immunizations"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <textarea
-            name="lifestyle_info"
-            value={formData.lifestyle_info}
-            onChange={handleChange}
-            placeholder="Lifestyle Information"
-            className="border rounded-md px-3 py-2 w-full"
-          />
-
-          <fieldset className="space-y-4 border-t border-gray-100 pt-4">
-            <legend className="text-sm font-semibold text-gray-900">Payment coverage</legend>
-            <p className="text-sm text-gray-500">
-              Choose HMO/Insurance to add policy details, or Self-pay to continue without them.
-            </p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {(["hmo", "self_pay"] as const).map((option) => (
-                <label
-                  key={option}
-                  className={`flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-sm font-medium transition-colors motion-reduce:transition-none ${coverageType === option ? "border-[#1A2380] bg-indigo-50 text-[#1A2380]" : "border-gray-200 text-gray-700"}`}
-                >
-                  <input
-                    type="radio"
-                    name="coverage_type"
-                    value={option}
-                    checked={coverageType === option}
-                    onChange={() => {
-                      setCoverageType(option);
-                      if (option === "self_pay") {
-                        setFormData((current) => ({
-                          ...current,
-                          enrollee_type: "",
-                          hmo_provider: "",
-                          hmo_plan: "",
-                          hmo_number: "",
-                          policy_start_date: "",
-                          policy_expiry_date: "",
-                        }));
-                      }
-                    }}
-                    required
-                  />
-                  {option === "hmo" ? "HMO / Insurance" : "Self-pay"}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
           {coverageType === "hmo" && (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="space-y-1 text-sm font-medium text-gray-700">
-                <span>Enrollee Type (Optional)</span>
-                <input type="text" name="enrollee_type" value={formData.enrollee_type} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
-              </label>
-              <label className="space-y-1 text-sm font-medium text-gray-700">
-                <span>HMO Provider</span>
-                <input required type="text" name="hmo_provider" value={formData.hmo_provider} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
-              </label>
-              <label className="space-y-1 text-sm font-medium text-gray-700">
-                <span>HMO Plan</span>
-                <input required type="text" name="hmo_plan" value={formData.hmo_plan} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
-              </label>
-              <label className="space-y-1 text-sm font-medium text-gray-700">
-                <span>HMO Number</span>
-                <input required type="text" name="hmo_number" value={formData.hmo_number} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
-              </label>
-              <label className="space-y-1 text-sm font-medium text-gray-700">
-                <span>Policy Start Date (Optional)</span>
-                <input type="date" name="policy_start_date" value={formData.policy_start_date} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
-              </label>
-              <label className="space-y-1 text-sm font-medium text-gray-700">
-                <span>Policy Expiry Date (Optional)</span>
-                <input type="date" name="policy_expiry_date" value={formData.policy_expiry_date} onChange={handleChange} className="w-full rounded-md border px-3 py-2" />
-              </label>
+            <div className="grid grid-cols-1 gap-4 rounded-md border border-gray-200 bg-gray-50/60 p-4 md:grid-cols-2">
+              {textField("hmo_provider", "HMO provider *", { required: true, placeholder: "e.g. Avon HMO" })}
+              {textField("hmo_plan", "HMO plan *", { required: true })}
+              {textField("hmo_number", "Enrollee number *", { required: true })}
+              {textField("enrollee_type", "Enrollee type", { placeholder: "e.g. Principal, Dependant" })}
+              {textField("policy_start_date", "Policy start date", { type: "date" })}
+              {textField("policy_expiry_date", "Policy expiry date", {
+                type: "date",
+                min: formData.policy_start_date || undefined,
+              })}
             </div>
           )}
+        </fieldset>
 
+        <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border px-6 py-2.5 text-sm font-medium hover:bg-gray-50"
+          >
+            Cancel
+          </button>
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#1A2380] text-white px-4 py-2 rounded-md mt-4 disabled:opacity-50"
+            className="rounded-md bg-[var(--dashboard-accent,#1A2380)] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[var(--dashboard-accent-hover,#11185F)] disabled:opacity-50"
           >
-            {submitting ? "Submitting..." : "Submit"}
+            {submitting ? "Saving…" : "Add patient"}
           </button>
-        </form>
-      </Modal>
-    </>
+        </div>
+      </form>
+    </Modal>
   );
 }
