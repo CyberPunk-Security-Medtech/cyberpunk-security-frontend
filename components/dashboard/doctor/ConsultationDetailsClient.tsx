@@ -13,6 +13,7 @@ import MedicalHistoryTab from "./MedicalHistoryTab";
 import PatientPrescriptionTab from "./PatientPrescriptionTab";
 import VitalsTab from "./VitalsTab";
 import { LoaderIcon } from "@components/Skeletons";
+import { buildDisplayName } from "@utils/helper";
 import Button from "@components/Button";
 import { getApiErrorMessage } from "@utils/apiError";
 import { toast } from "react-toastify";
@@ -162,7 +163,15 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 text-sm text-gray-700 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 text-sm text-gray-700 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-md bg-gray-50 p-3">
+            <p className="text-xs text-gray-500">Created by</p>
+            <p className="font-medium">{buildDisplayName(selectedConsultation?.creator ?? null) || "-"}</p>
+          </div>
+          <div className="rounded-md bg-gray-50 p-3">
+            <p className="text-xs text-gray-500">Doctor</p>
+            <p className="font-medium">{buildDisplayName(selectedConsultation?.doctor ?? null) || "Not assigned"}</p>
+          </div>
           <div className="rounded-md bg-gray-50 p-3">
             <p className="text-xs text-gray-500">Created</p>
             <p className="font-medium">{formatDate(selectedConsultation?.created_at)}</p>

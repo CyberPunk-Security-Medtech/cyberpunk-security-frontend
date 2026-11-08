@@ -32,7 +32,8 @@ type ConsultationContextType = {
   hasOpenConsultation: boolean;
   canStartConsultation: boolean;
   setSelectedConsultationId: (consultationId: string | null) => void;
-  refreshPatient: () => Promise<void>;
+  /** `silent` refetches without the loading state, keeping the page mounted. */
+  refreshPatient: (options?: { silent?: boolean }) => Promise<void>;
   refreshConsultations: () => Promise<void>;
   createConsultation: (payload: {
     department_id: string;
@@ -65,14 +66,14 @@ export function ConsultationProvider({
   const [currentConsultationId, setCurrentConsultationId] = useState<string | null>(null);
   const [selectedConsultationId, setSelectedConsultationId] = useState<string | null>(null);
 
-  const refreshPatient = async () => {
+  const refreshPatient = async ({ silent = false }: { silent?: boolean } = {}) => {
     if (!orgId || !patientId) {
       setPatient(null);
       setPatientError("Select an organization workspace to view this patient.");
       setPatientLoading(false);
       return;
     }
-    setPatientLoading(true);
+    if (!silent) setPatientLoading(true);
     setPatientError("");
     try {
       const result = await patientService.getPatient(orgId, patientId);

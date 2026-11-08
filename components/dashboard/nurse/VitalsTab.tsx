@@ -8,6 +8,7 @@ import { useConsultation } from "./ConsultationContext";
 import { toast } from "react-toastify";
 import { getApiErrorMessage } from "@utils/apiError";
 import { LoaderIcon } from "@components/Skeletons";
+import { buildDisplayName } from "@utils/helper";
 
 // Field definitions mirror the backend's VitalRecordCreate ranges —
 // submitting a value outside these is rejected with 422 before it lands.
@@ -187,6 +188,7 @@ export default function VitalsTab() {
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs text-gray-500">
                   Recorded {formatDateTime(record.recorded_at)}
+                  {record.creator ? ` by ${buildDisplayName(record.creator)}` : ""}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

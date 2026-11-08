@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Button from "@components/Button";
 import SharedPatientDetails from "@components/dashboard/SharedPatientDetails";
+import PatientAdmissionPanel from "@components/dashboard/admissions/PatientAdmissionPanel";
+import PatientVitalsHistory from "@components/dashboard/vitals/PatientVitalsHistory";
 import { CreateConsultationModal } from "./ConsultationModal";
 import { useConsultation } from "./ConsultationContext";
 import PatientConsultationList from "./PatientConsultationList";
@@ -10,6 +12,7 @@ import PatientConsultationList from "./PatientConsultationList";
 export default function DoctorPatientDetails() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const {
+    orgId,
     patient,
     patientError,
     patientId,
@@ -72,6 +75,13 @@ export default function DoctorPatientDetails() {
         patient={patient}
         patientId={patientId}
       >
+        <PatientAdmissionPanel
+          orgId={orgId}
+          patientId={patientId}
+          patientName={`${patient?.first_name ?? ""} ${patient?.last_name ?? ""}`.trim() || "Patient"}
+          onChange={() => void refreshPatient({ silent: true })}
+        />
+        <PatientVitalsHistory orgId={orgId} patientId={patientId} />
         <PatientConsultationList />
       </SharedPatientDetails>
 

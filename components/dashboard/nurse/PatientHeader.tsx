@@ -3,6 +3,8 @@
 import { StatusBadge } from "@components/StatusBadge";
 import Button from "@components/Button";
 import { useState } from "react";
+import AdmittedBadge from "@components/dashboard/admissions/AdmittedBadge";
+import { buildDisplayName } from "@utils/helper";
 import { useConsultation } from "./ConsultationContext";
 import { CreateConsultationModal } from "./ConsultationModal";
 
@@ -31,6 +33,7 @@ export default function PatientHeader() {
   const fullName = `${patient?.first_name ?? ""} ${patient?.last_name ?? ""}`.trim() || "Patient";
   const initials =
     `${patient?.first_name?.[0] ?? ""}${patient?.last_name?.[0] ?? ""}`.toUpperCase() || "NA";
+  const registeredBy = buildDisplayName(patient?.creator ?? null);
 
   return (
     <div className="mb-6 rounded-md border bg-white p-4 shadow-sm sm:p-6">
@@ -66,6 +69,14 @@ export default function PatientHeader() {
             <span className="text-sm text-[#00B8A8]">Patient ID:</span>{" "}
             <span className="break-all text-gray-700">{patient?.patient_code || "-"}</span>
           </p>
+          {registeredBy && (
+            <p className="text-xs text-gray-500">Registered by {registeredBy}</p>
+          )}
+          <AdmittedBadge
+            isAdmitted={patient?.is_admitted}
+            admission={patient?.current_admission}
+            className="mt-2"
+          />
         </div>
       </div>
 

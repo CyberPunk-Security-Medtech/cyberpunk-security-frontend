@@ -577,6 +577,82 @@ export const invitationService = {
   },
 };
 
+/** The id and name the backend attaches to records for the staff behind them. */
+export type UserWithNames = {
+  id: string;
+  first_name: string;
+  last_name: string;
+};
+
+/* ================= WARDS & ADMISSIONS ================= */
+
+export type Ward = {
+  id: string;
+  organization_id: string;
+  name: string;
+  /** Number of beds; null when the ward has no fixed capacity. */
+  capacity: number | null;
+  occupied: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type WardBrief = {
+  id: string;
+  name: string;
+};
+
+export type AdmissionStatus = "Admitted" | "Discharged";
+
+export type CurrentAdmission = {
+  id: string;
+  ward: WardBrief;
+  bed_number: string | null;
+  admitted_at: string;
+};
+
+export type Admission = {
+  id: string;
+  patient_id: string;
+  patient: {
+    id: string;
+    patient_code: string;
+    first_name: string;
+    last_name: string;
+    dob: string;
+    gender: string;
+  };
+  organization_id: string;
+  ward_id: string;
+  ward: WardBrief;
+  consultation_id: string | null;
+  bed_number: string | null;
+  reason: string | null;
+  status: AdmissionStatus;
+  admitted_by: string;
+  admitted_by_user?: UserWithNames | null;
+  admitted_at: string;
+  discharged_by: string | null;
+  discharged_by_user?: UserWithNames | null;
+  discharged_at: string | null;
+  discharge_notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AdmitPatientPayload = {
+  ward_id: string;
+  bed_number?: string | null;
+  reason?: string | null;
+  consultation_id?: string | null;
+};
+
+export type AdmissionListParams = {
+  /** The backend defaults to Admitted (current in-patients). */
+  status_filter?: AdmissionStatus;
+  ward_id?: string;
+};
+
 export type PatientCreatePayload = {
   first_name: string;
   last_name: string;
@@ -646,6 +722,10 @@ export type PatientListRecord = {
   updated_at?: string | null;
   department?: string | null;
   ward?: string | null;
+  /** The staff member who registered the patient. */
+  creator?: UserWithNames | null;
+  is_admitted?: boolean;
+  current_admission?: CurrentAdmission | null;
 };
 
 /** The full patient representation returned by the patient detail endpoint. */
@@ -677,7 +757,8 @@ export type ShareScope =
   | "consultations"
   | "lab_results"
   | "prescriptions"
-  | "immunizations";
+  | "immunizations"
+  | "vitals";
 
 export type SharePurpose =
   | "referral"
@@ -893,6 +974,168 @@ export const patientService = {
     return unwrap(response.data);
   },
 
+  // Vitals across all of the patient's consultations. Pass `days` (e.g. 7)
+  // to only get readings from that look-back window.
+  getPatientVitals: async (
+    org_id: string,
+    patient_id: string,
+    params?: { days?: number },
+  ): Promise<VitalRecord[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}/vitals`,
+      { params },
+    );
+    return unwrap(response.data);
+  },
+
+  admitPatient: async (
+    org_id: string,
+    patient_id: string,
+    payload: AdmitPatientPayload,
+  ): Promise<Admission> => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}/admissions`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+
+  /** The patient's admission history here, newest first. */
+  getPatientAdmissions: async (
+    org_id: string,
+    patient_id: string,
+  ): Promise<Admission[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/patients/${patient_id}/admissions`,
+    );
+    return unwrap(response.data);
+  },
+};
+
+export const wardService = {
+  listWards: async (org_id: string): Promise<Ward[]> => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/wards`);
+    return unwrap(response.data);
+  },
+
+  // Admins only. Admissions into a ward that has reached `capacity` are
+  // refused with 409.
+  createWard: async (
+    org_id: string,
+    payload: { name: string; capacity?: number | null },
+  ): Promise<Ward> => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/wards`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+};
+
+export const admissionService = {
+  listAdmissions: async (
+    org_id: string,
+    params?: AdmissionListParams,
+  ): Promise<Admission[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/admissions`,
+      { params },
+    );
+    return unwrap(response.data);
+  },
+
+  // 409 when the target ward is full; 400 once the patient is discharged.
+  changeWard: async (
+    org_id: string,
+    admission_id: string,
+    payload: { ward_id: string; bed_number?: string | null },
+  ): Promise<Admission> => {
+    const response = await api.patch(
+      `/api/v1/organizations/${org_id}/admissions/${admission_id}/ward`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+
+  discharge: async (
+    org_id: string,
+    admission_id: string,
+    payload: { discharge_notes?: string | null },
+  ): Promise<Admission> => {
+    const response = await api.post(
+      `/api/v1/organizations/${org_id}/admissions/${admission_id}/discharge`,
+      payload,
+    );
+    return unwrap(response.data);
+  },
+};
+
+/* ================= REPORTS (admins only) ================= */
+
+export type ReportPeriodParams = {
+  /** Defaults to the current year server-side. */
+  year?: number;
+  /** 1–12; omit for every month of the year. */
+  month?: number;
+};
+
+export type HmoConsultationRow = {
+  year: number;
+  month: number;
+  hmo_provider: string;
+  consultation_count: number;
+  patient_count: number;
+};
+
+export type HmoConsultationReport = {
+  year: number;
+  month: number | null;
+  hmo_provider: string | null;
+  total_consultations: number;
+  rows: HmoConsultationRow[];
+};
+
+export type DoctorMonthlyRow = {
+  year: number;
+  month: number;
+  doctor_id: string;
+  doctor: UserWithNames;
+  patients_treated: number;
+  consultations: number;
+  completed_consultations: number;
+};
+
+export type DoctorMonthlyReport = {
+  year: number;
+  month: number | null;
+  doctor_id: string | null;
+  rows: DoctorMonthlyRow[];
+};
+
+export const reportService = {
+  getHmoConsultationReport: async (
+    org_id: string,
+    params?: ReportPeriodParams & { hmo_provider?: string },
+    signal?: AbortSignal,
+  ): Promise<HmoConsultationReport> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/reports/hmo-consultations`,
+      { params, signal },
+    );
+    return unwrap(response.data);
+  },
+
+  getDoctorPatientsReport: async (
+    org_id: string,
+    params?: ReportPeriodParams & { doctor_id?: string },
+    signal?: AbortSignal,
+  ): Promise<DoctorMonthlyReport> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/reports/doctor-patients`,
+      { params, signal },
+    );
+    return unwrap(response.data);
+  },
 };
 
 export const dataSharingService = {
@@ -1034,6 +1277,25 @@ export const auditService = {
 };
 
 export const activityService = {
+  // Everything that happened inside the organization, newest first (admins
+  // only). Filter by action, actor and a since/until time window.
+  listOrganizationActivity: async (
+    org_id: string,
+    params?: ActivityLogPaginationParams & {
+      action?: string;
+      user_id?: string;
+      since?: string;
+      until?: string;
+    },
+    signal?: AbortSignal,
+  ): Promise<ActivityLogRecord[]> => {
+    const response = await api.get(
+      `/api/v1/organizations/${org_id}/activity-logs`,
+      { params, signal },
+    );
+    return unwrap(response.data);
+  },
+
   listConsultationActivity: async (
     org_id: string,
     consultation_id: string,
@@ -1082,6 +1344,7 @@ export type VitalRecord = {
   id: string;
   consultation_id: string;
   recorded_by: string;
+  creator?: UserWithNames | null;
   recorded_at: string;
   created_at: string;
   updated_at: string;
@@ -1100,6 +1363,7 @@ export type ConsultationNote = {
   consultation_id: string;
   content: string;
   created_by: string;
+  creator?: UserWithNames | null;
   created_at: string;
   updated_at: string;
 };
@@ -1112,7 +1376,10 @@ export type ConsultationRecord = {
   reason_for_visit: string;
   priority: ConsultationPriority;
   creator_id: string;
+  creator?: UserWithNames | null;
   doctor_id: string | null;
+  /** The doctor who attended the consultation. */
+  doctor?: UserWithNames | null;
   referral_id: string | null;
   status: ConsultationStatus;
   notes: ConsultationNote[];
@@ -1648,6 +1915,13 @@ export const labService = {
       },
     );
     return unwrap(res.data);
+  },
+
+  // A stable link to an attachment's file. The backend checks the session
+  // cookie and redirects to a freshly signed URL, so unlike `file_url` it
+  // never expires and can go straight into an <img>, <iframe> or <a>.
+  getLabReportAttachmentFileUrl(orgId: string, labTestId: string, attachmentId: string) {
+    return `${API_BASE_URL ?? ""}/api/v1/organizations/${orgId}/lab-tests/${labTestId}/report/attachments/${attachmentId}/file`;
   },
 
   async deleteLabReportAttachment(orgId: string, labTestId: string, attachmentId: string) {

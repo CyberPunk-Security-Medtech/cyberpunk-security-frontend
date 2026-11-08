@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import SharedPatientDetails from "@components/dashboard/SharedPatientDetails";
+import PatientAdmissionPanel from "@components/dashboard/admissions/PatientAdmissionPanel";
+import PatientVitalsHistory from "@components/dashboard/vitals/PatientVitalsHistory";
 import { useAuth } from "@context/AuthContext";
 import { patientService, type PatientDetailRecord } from "@services/api";
 
@@ -20,7 +22,9 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadPatient = useCallback(async () => {
+  // `silent` refetches in the background (e.g. after an admission change)
+  // without swapping the page for the loading skeleton.
+  const loadPatient = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
     if (!activeWorkspace?.id || !patientId) {
       setPatient(null);
       setError("Select an organization workspace to view this patient.");
@@ -28,7 +32,7 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
       return;
     }
 
-    setLoading(true);
+    if (!silent) setLoading(true);
     setError("");
 
     try {
@@ -69,7 +73,15 @@ export default function PatientDetails({ patientId }: PatientDetailsProps) {
         onRetry={activeWorkspace?.id ? () => void loadPatient() : undefined}
         patient={patient}
         patientId={patientId}
-      />
+      >
+        <PatientAdmissionPanel
+          orgId={activeWorkspace?.id}
+          patientId={patientId}
+          patientName={`${patient?.first_name ?? ""} ${patient?.last_name ?? ""}`.trim() || "Patient"}
+          onChange={() => void loadPatient({ silent: true })}
+        />
+        <PatientVitalsHistory orgId={activeWorkspace?.id} patientId={patientId} />
+      </SharedPatientDetails>
     </div>
   );
 }

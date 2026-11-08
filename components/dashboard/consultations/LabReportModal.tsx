@@ -170,24 +170,40 @@ export default function LabReportModal({ orgId, labTest, onClose, headerClassNam
                 {attachments.map((attachment) => {
                   const isImage = attachment.content_type?.startsWith("image/");
                   const name = attachment.file_name || "Untitled file";
+                  // The stable link outlives file_url's signature, so it's safe
+                  // to render inline and to open long after the report loaded.
+                  const fileHref =
+                    orgId && labTest
+                      ? labService.getLabReportAttachmentFileUrl(orgId, labTest.id, attachment.id)
+                      : null;
                   return (
                     <li key={attachment.id} className="flex items-center gap-3 px-3 py-2.5 text-sm">
-                      <span
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
-                          isImage ? "bg-sky-50 text-sky-600" : "bg-red-50 text-red-600"
-                        }`}
-                      >
-                        {isImage ? <ImageIcon size={16} aria-hidden="true" /> : <FileText size={16} aria-hidden="true" />}
-                      </span>
+                      {isImage && fileHref ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- cookie-authenticated redirect, not optimisable by next/image
+                        <img
+                          src={fileHref}
+                          alt=""
+                          loading="lazy"
+                          className="h-9 w-9 shrink-0 rounded-md bg-sky-50 object-cover"
+                        />
+                      ) : (
+                        <span
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
+                            isImage ? "bg-sky-50 text-sky-600" : "bg-red-50 text-red-600"
+                          }`}
+                        >
+                          {isImage ? <ImageIcon size={16} aria-hidden="true" /> : <FileText size={16} aria-hidden="true" />}
+                        </span>
+                      )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium text-gray-800" title={name}>{name}</p>
                         {attachment.created_at ? (
                           <p className="text-xs text-gray-500">Uploaded {formatDate(attachment.created_at)}</p>
                         ) : null}
                       </div>
-                      {attachment.file_url ? (
+                      {fileHref ? (
                         <a
-                          href={attachment.file_url}
+                          href={fileHref}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-md px-2 text-xs font-medium text-[var(--dashboard-accent,#1A2380)] hover:bg-gray-100"

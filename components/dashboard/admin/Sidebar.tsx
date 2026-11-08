@@ -15,6 +15,9 @@ import {
   ChevronLeft,
   CreditCard,
   ClipboardList,
+  BedDouble,
+  BedSingle,
+  BarChart3,
 } from "lucide-react";
 import { authService } from "@services/api";
 import OrganizationLogo from "@components/shared/OrganizationLogo";
@@ -129,6 +132,8 @@ export default function Sidebar({
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
     { label: "Staff management", icon: Users, href: "/dashboard/admin/staff-management" },
     { label: "Departments", icon: Building2, href: "/dashboard/admin/departments" },
+    { label: "Wards", icon: BedDouble, href: "/dashboard/admin/wards" },
+    { label: "In-patients", icon: BedSingle, href: "/dashboard/admin/in-patients" },
     {
       label: "Patient Transfers",
       icon: Activity,
@@ -145,6 +150,7 @@ export default function Sidebar({
       ],
     },
     { label: "HMO management", icon: ShieldCheck, href: "/dashboard/admin/hmo-management" },
+    { label: "Reports", icon: BarChart3, href: "/dashboard/admin/reports" },
     { label: "Audit Logs", icon: ClipboardList, href: "/dashboard/admin/audit-logs" },
     { label: "Billing & Payment", icon: CreditCard, href: "/dashboard/admin/billing-payment" },
     { label: "AI Assistant", icon: Sparkles, href: "/dashboard/admin/ai-assistant" },
@@ -196,7 +202,7 @@ export default function Sidebar({
         className={`fixed inset-y-0 left-0 z-dropdown flex h-[100dvh] min-h-0 w-72 shrink-0 flex-col overflow-hidden bg-[#051466] text-slate-100 transition-transform duration-300 motion-reduce:transition-none lg:sticky lg:top-0 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
       {/* Logo Area */}
-      <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-6">
+      <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-6 py-5 [@media(max-height:820px)]:py-3">
         <OrganizationLogo />
         <button
           ref={closeButtonRef}
@@ -217,7 +223,7 @@ export default function Sidebar({
       </div>
 
       {/* Menu */}
-      <nav className="flex min-h-0 flex-1 flex-col gap-y-1 overflow-y-auto overscroll-y-contain px-3 py-6">
+      <nav className="flex min-h-0 flex-1 flex-col gap-y-0.5 overflow-y-auto overflow-x-hidden overscroll-y-contain px-3 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [@media(max-height:820px)]:py-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const hasChildren = item.children && item.children.length > 0;
@@ -244,7 +250,7 @@ export default function Sidebar({
                       [item.label]: !isOpen,
                     }))
                   }
-                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors motion-reduce:transition-none
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm [@media(max-height:820px)]:py-1.5 transition-colors motion-reduce:transition-none
                     ${
                       isActive
                         ? "bg-white text-[#051466] font-semibold"
@@ -265,7 +271,7 @@ export default function Sidebar({
                 <Link
                   href={item.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors motion-reduce:transition-none
+                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm [@media(max-height:820px)]:py-1.5 transition-colors motion-reduce:transition-none
                     ${
                       isActive
                         ? "bg-white text-[#051466] font-semibold"
@@ -278,7 +284,7 @@ export default function Sidebar({
               )}
 
               {hasChildren && isOpen && (
-                <div className="mt-1 space-y-1 pl-7">
+                <div className="mt-0.5 space-y-0.5 pl-7">
                   {item.children?.map((child) => {
                     const childActive = matchesRoute(child.href);
 
@@ -287,7 +293,7 @@ export default function Sidebar({
                         key={child.label}
                         href={child.href}
                         aria-current={childActive ? "page" : undefined}
-                        className={`block rounded-md px-3 py-2 text-sm transition-colors motion-reduce:transition-none ${
+                        className={`block rounded-md px-3 py-1.5 text-sm transition-colors motion-reduce:transition-none ${
                           childActive
                             ? "bg-white/20 text-white"
                             : "text-slate-300 hover:bg-white/10 hover:text-white"
@@ -305,12 +311,12 @@ export default function Sidebar({
       </nav>
 
       {/* User Bottom Card */}
-      <div className="shrink-0 px-3 pb-6">
+      <div className="shrink-0 border-t border-white/10 px-3 py-3">
         <div className="relative" ref={profileMenuRef}>
           <button
             type="button"
             onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-            className="w-full flex items-center gap-3 bg-white/5 rounded-md px-3 py-3 text-left"
+            className="w-full flex items-center gap-3 bg-white/5 rounded-md px-3 py-2.5 text-left [@media(max-height:820px)]:py-2"
             aria-haspopup="menu"
             aria-expanded={isProfileMenuOpen}
           >
@@ -325,9 +331,9 @@ export default function Sidebar({
                 .map((part) => part[0]?.toUpperCase())
                 .join("") || "A"}
             </span>
-            <div>
-              <p className="text-sm font-medium">{displayName}</p>
-              <p className="text-xs text-slate-300">{displayRole}</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium" title={displayName}>{displayName}</p>
+              <p className="truncate text-xs text-slate-300">{displayRole}</p>
             </div>
             <span
                 className={`ml-auto transition-transform motion-reduce:transition-none ${
