@@ -89,15 +89,16 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
+// Only the founder and clinical lead are shown for now; uncomment to restore.
 const team = [
   { name: "Godwin Abimbola", role: "CEO / Founder", img: "/godwin-pic.png" },
-  { name: "Israel Adedokun", role: "Capital Strategy and Growth", img: "/financial_advisor_img.jpg" },
-  { name: "Dr. Chukwuebuka Collins", role: "Head of strategy & Global Partnerships", img: "/collins-pic.png" },
+  // { name: "Israel Adedokun", role: "Capital Strategy and Growth", img: "/financial_advisor_img.jpg" },
+  // { name: "Dr. Chukwuebuka Collins", role: "Head of strategy & Global Partnerships", img: "/collins-pic.png" },
   { name: "Dr. S. Ekwegbara", role: "Clinical Operations & Health strategy", img: "/dr_somto_img.jpg" },
-  { name: "Prevailer Ndubueze", role: "Security & Infrastructure lead", img: "/prevailer-pic.png" },
-  { name: "Stephen David", role: "Product Lead", img: "/stephen-pic.png" },
-  { name: "Oluchi Faith", role: "Governance, Risk & Compliance (GRC) Lead", img: "/oluchi-pic.png" },
-  { name: "Nonso Henry", role: "Head of Legal & Regulatory Affairs", img: "/nonso-pic.png" },
+  // { name: "Prevailer Ndubueze", role: "Security & Infrastructure lead", img: "/prevailer-pic.png" },
+  // { name: "Stephen David", role: "Product Lead", img: "/stephen-pic.png" },
+  // { name: "Oluchi Faith", role: "Governance, Risk & Compliance (GRC) Lead", img: "/oluchi-pic.png" },
+  // { name: "Nonso Henry", role: "Head of Legal & Regulatory Affairs", img: "/nonso-pic.png" },
 ];
 
 export default function TeamSection() {
@@ -145,7 +146,7 @@ export default function TeamSection() {
         </p>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 gap-y-10">
+        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-6 gap-y-10 sm:grid-cols-2">
           {team.map((member, i) => (
             <div
               key={i}

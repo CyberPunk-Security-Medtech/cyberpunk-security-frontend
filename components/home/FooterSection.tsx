@@ -77,7 +77,36 @@
 //     </footer>
 //   );
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin, Mail, Linkedin } from "lucide-react";
+
+type FooterLink = { label: string; href: string };
+
+// Only pages and sections that exist; add a link here when its page ships.
+const FOOTER_COLUMNS: Array<{ title: string; links: FooterLink[] }> = [
+  {
+    title: "Platform",
+    links: [
+      { label: "Get started", href: "/auth/signup" },
+      { label: "Sign in", href: "/auth/login" },
+      { label: "Explore the platform", href: "/#platform" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About us", href: "/home/about-us" },
+      { label: "Contact us", href: "/home/contact-us" },
+    ],
+  },
+  {
+    title: "Work with us",
+    links: [
+      { label: "Partner with us", href: "/#partner" },
+      { label: "Refer and earn credit", href: "/#refer" },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
@@ -108,7 +137,7 @@ export default function Footer() {
         "
       >
         {/* Main grid */}
-        <div className="grid md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-10">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr]">
           {/* Company info */}
           <div>
             <div className="mb-4 flex items-center gap-2">
@@ -151,61 +180,12 @@ export default function Footer() {
 
           </div>
 
-          {/* Link columns on the same line */}
-          <FooterCol
-            title="Product"
-            items={["Features", "Security", "Integrations", "API", "Documentation", "Pricing"]}
-          />
-          <FooterCol
-            title="Company"
-            items={["About Us", "Careers", "Press", "Blog", "Contact"]}
-          />
-          <FooterCol
-            title="Resources"
-            items={["Case Studies", "White Papers", "Webinars", "Help Center", "Community"]}
-          />
-          <FooterCol
-            title="Legal"
-            items={["Privacy Policy", "Terms of Service", "Compliance", "Security", "GDPR"]}
-          />
+          {FOOTER_COLUMNS.map((column) => (
+            <FooterCol key={column.title} title={column.title} links={column.links} />
+          ))}
         </div>
 
-        {/* top black divider */}
-        <div className="my-6 h-px w-full bg-black/20" />
-
-        {/* Bottom text + email form */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-[#2F3E4C]/80">
-            Get the latest updates on PrivaCure’s development and healthcare innovation.
-          </p>
-
-          <form className="relative w-full md:w-[420px]">
-            <input
-              type="email"
-              placeholder="Enter your mail..."
-              className="
-                w-full rounded-md border border-black/20 bg-white/50
-                px-5 py-3 text-sm text-[#0F1C2E]
-                placeholder:text-[#0F1C2E]/50
-                backdrop-blur-md outline-none
-                focus:ring-2 focus:ring-[#00A9B7]
-              "
-            />
-            <button
-              type="submit"
-              className="
-                absolute right-1 top-1/2 -translate-y-1/2
-                rounded-md bg-[#00A9B7] px-4 py-2 text-sm font-medium text-white
-                hover:bg-[#0096A4] transition
-              "
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
-
-        {/* bottom black divider */}
-        <div className="mt-6 h-px w-full bg-black/20" />
+        <div className="mt-10 h-px w-full bg-black/20" />
 
         <p className="mt-6 text-center text-xs text-[#2F3E4C]/70">
           © {new Date().getFullYear()} PrivaCure. All Rights Reserved.
@@ -215,17 +195,19 @@ export default function Footer() {
   );
 }
 
-function FooterCol({ title, items }: { title: string; items: string[] }) {
+function FooterCol({ title, links }: { title: string; links: FooterLink[] }) {
   return (
-    <div>
+    <nav aria-label={title}>
       <h4 className="mb-3 text-[#0F1C2E] font-semibold">{title}</h4>
       <ul className="space-y-2 text-sm text-[#2F3E4C]/90">
-        {items.map((x) => (
-          <li key={x} className="hover:text-[#00A9B7] transition">
-            {x}
+        {links.map((link) => (
+          <li key={link.label}>
+            <Link href={link.href} className="transition hover:text-[#00A9B7]">
+              {link.label}
+            </Link>
           </li>
         ))}
       </ul>
-    </div>
+    </nav>
   );
 }

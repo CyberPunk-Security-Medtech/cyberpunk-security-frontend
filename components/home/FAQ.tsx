@@ -53,7 +53,7 @@ export default function FAQSection() {
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Centered Header */}
-        <h2 className="text-[28px] md:text-[34px] font-bold text-[#0F1C2E] mb-14 text-center">
+        <h2 className="text-[28px] md:text-[34px] font-bold text-[#0F1C2E] mb-12 sm:mb-14 text-center">
           Frequently <span className="text-[#00A9B7]">Asked Questions</span>
         </h2>
 
