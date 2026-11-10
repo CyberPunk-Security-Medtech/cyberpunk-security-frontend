@@ -3,17 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
-
-  const isAboutUs = pathname?.includes("/home/about-us");
-  const buttonText = isAboutUs ? "Join the Waitlist" : "Request Early Access";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -56,24 +51,26 @@ export default function Navbar() {
 
       {/* Right-side buttons */}
       <div className="hidden md:flex items-center gap-4">
-        {/* Two small circle buttons */}
-        <button aria-label="Notifications" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C7D2FE] bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#818CF8] hover:shadow-md">
-          <Image src="/icons/bell.svg" alt="notifications" width={42} height={42} />
-        </button>
-        <button aria-label="Search" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#99E4DF] bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#00A9B7] hover:shadow-md">
-          <Image src="/icons/search.svg" alt="search" width={42} height={42} />
-        </button>
-
-        {/* Main CTA */}
-        <button className="rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md hover:opacity-90 transition">
-          {buttonText}
-        </button>
+        <Link
+          href="/auth/login"
+          className="font-medium text-gray-700 transition hover:text-[#00A9B7]"
+        >
+          Sign in
+        </Link>
+        <Link
+          href="/auth/signup"
+          className="rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md hover:opacity-90 transition"
+        >
+          Get Started
+        </Link>
       </div>
 
       {/* Mobile menu button */}
       <button
         className="md:hidden flex items-center justify-center h-10 w-10 rounded-full border border-gray-300"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isOpen}
       >
         {isOpen ? <X size={22} /> : <Menu size={22} />}
       </button>
@@ -99,17 +96,20 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="flex gap-3 mt-3">
-             <button aria-label="Notifications" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C7D2FE] bg-white shadow-sm transition hover:border-[#818CF8]">
-          <Image src="/icons/bell.svg" alt="notifications" width={42} height={42} />
-        </button>
-        <button aria-label="Search" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#99E4DF] bg-white shadow-sm transition hover:border-[#00A9B7]">
-          <Image src="/icons/search.svg" alt="search" width={42} height={42} />
-        </button>
-              </div>
-              <button className="mt-4 rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md">
-                {buttonText}
-              </button>
+              <Link
+                href="/auth/login"
+                onClick={() => setIsOpen(false)}
+                className="hover:text-[#00A9B7]"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/auth/signup"
+                onClick={() => setIsOpen(false)}
+                className="mt-2 rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-center text-white font-semibold shadow-md"
+              >
+                Get Started
+              </Link>
             </div>
           </motion.div>
         )}

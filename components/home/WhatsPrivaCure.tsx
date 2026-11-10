@@ -37,7 +37,7 @@ export default function WhatsPrivaCure() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-24">
+    <section id="platform" className="relative scroll-mt-24 overflow-hidden bg-white py-20 sm:py-24">
       {/* Background splash (hidden on mobile) */}
       <Image
         src="/vision-splash.svg"
@@ -70,7 +70,7 @@ export default function WhatsPrivaCure() {
       </motion.div>
 
       {/* Features grid */}
-      <div className="relative z-10 mx-auto mt-14 grid w-[92%] max-w-6xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="relative z-10 mx-auto mt-12 sm:mt-14 grid w-[92%] max-w-6xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((f, index) => (
           <motion.div
             key={f.title}
