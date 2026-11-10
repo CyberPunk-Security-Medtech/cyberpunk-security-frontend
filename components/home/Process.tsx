@@ -46,7 +46,7 @@ export default function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mb-16"
+          className="mb-12 sm:mb-14"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
             How<span className="text-[#00A9B7]">  our platform</span> works

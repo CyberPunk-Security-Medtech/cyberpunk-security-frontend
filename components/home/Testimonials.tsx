@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import CountUp from "./CountUp";
 
 export default function TestimonialsSection() {
   const testimonials = [
@@ -21,9 +22,9 @@ export default function TestimonialsSection() {
     },
     {
       name: "Michael K.",
-      role: "Patient’s Son",
+      role: "Lab Technician",
       quote:
-        "When I moved my father from one hospital to another, PrivaCure made the transfer stress-free. We simply approved the data sharing via SMS, and his new doctors had everything they needed instantly.",
+        "Before using PrivaCure, we spent a lot of time confirming patient history and repeating tests because records weren’t accessible. Now, I can quickly view previous lab results from other hospitals, which helps me work faster and avoid duplication. It’s made our workflow more efficient and improved how we support doctors with accurate data.",
       image: "/testimonials/michael.png",
     },
     {
@@ -55,17 +56,14 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.5 }}
           className="text-[28px] md:text-[34px] font-bold text-[#0F1C2E]"
         >
-          Patient <span className="text-[#00A9B7]">Testimonials:</span>
+          <span className="text-[#00A9B7]">Testimonials</span>
         </motion.h2>
-        <p className="text-[18px] font-bold text-[#1F2D3D] mt-1">
-          Hear from Those We’ve Cared For
-        </p>
-        <p className="mt-3 text-sm text-gray-600">
-          Discover the difference we make through the voices of those we’ve served
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[#4A5D6A] sm:text-base">
+          Hear from the doctors, nurses, lab technicians and administrators who use PrivaCure every day.
         </p>
 
         {/* Top 2 testimonials */}
-        <div className="mt-10 grid sm:grid-cols-2 gap-6">
+        <div className="mt-12 sm:mt-14 grid sm:grid-cols-2 gap-6">
           {testimonials.slice(0, 2).map((t, i) => (
             <motion.div
               key={i}
@@ -103,7 +101,7 @@ export default function TestimonialsSection() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
               <p className="text-[28px] md:text-[32px] font-bold text-[#00A9B7]">
-                {s.value}
+                <CountUp value={s.value} />
               </p>
               <p className="text-sm text-gray-700 mt-1">{s.label}</p>
             </motion.div>

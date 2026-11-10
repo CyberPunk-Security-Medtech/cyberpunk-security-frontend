@@ -48,7 +48,7 @@ export default function VisionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-16 sm:mb-20"
+          className="text-center mb-12 sm:mb-14"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4 tracking-tight relative inline-flex items-center justify-center gap-4 sm:gap-6">
             {/* "Our" with splash */}
@@ -83,7 +83,7 @@ export default function VisionSection() {
         </motion.div>
 
         {/* ===== Feature Cards ===== */}
-        <div className="relative flex flex-col md:flex-row justify-center md:justify-between items-center md:items-stretch gap-8 md:gap-6 mb-20 sm:mb-28">
+        <div className="relative flex flex-col md:flex-row justify-center md:justify-between items-center md:items-stretch gap-8 md:gap-6">
           {features.map((item, i) => (
             <motion.div
               key={i}

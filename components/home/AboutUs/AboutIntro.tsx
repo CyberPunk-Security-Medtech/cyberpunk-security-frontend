@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AboutSection() {
   return (
@@ -45,12 +46,18 @@ export default function AboutSection() {
           transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
           className="flex flex-col md:flex-row items-center justify-center gap-4"
         >
-          <button
-            onClick={() => (window.location.href = "/#waitlist")}
+          <Link
+            href="/auth/signup"
             className="px-8 py-3 rounded-md bg-gradient-to-l from-[#00B8A8] to-[#1A2380] text-white font-medium hover:opacity-90 transition-all duration-300 shadow-md"
           >
-            Join the Waitlist
-          </button>
+            Get Started
+          </Link>
+          <Link
+            href="/#partner"
+            className="px-8 py-3 rounded-md border border-[#00A9B7] font-medium text-black hover:bg-[#00A9B710] transition-all duration-300"
+          >
+            Partner with Us
+          </Link>
         </motion.div>
       </div>
     </section>
