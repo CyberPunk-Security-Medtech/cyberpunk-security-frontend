@@ -83,12 +83,11 @@ import { MapPin, Mail, Linkedin } from "lucide-react";
 type FooterLink = { label: string; href: string };
 
 // Only pages and sections that exist; add a link here when its page ships.
+// Auth pages are intentionally not linked from the public site. An empty href renders plain text.
 const FOOTER_COLUMNS: Array<{ title: string; links: FooterLink[] }> = [
   {
     title: "Platform",
     links: [
-      { label: "Get started", href: "/auth/signup" },
-      { label: "Sign in", href: "/auth/login" },
       { label: "Explore the platform", href: "/#platform" },
     ],
   },
@@ -202,9 +201,13 @@ function FooterCol({ title, links }: { title: string; links: FooterLink[] }) {
       <ul className="space-y-2 text-sm text-[#2F3E4C]/90">
         {links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className="transition hover:text-[#00A9B7]">
-              {link.label}
-            </Link>
+            {link.href ? (
+              <Link href={link.href} className="transition hover:text-[#00A9B7]">
+                {link.label}
+              </Link>
+            ) : (
+              <span className="transition hover:text-[#00A9B7]">{link.label}</span>
+            )}
           </li>
         ))}
       </ul>

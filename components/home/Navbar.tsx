@@ -49,22 +49,6 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* Right-side buttons */}
-      <div className="hidden md:flex items-center gap-4">
-        <Link
-          href="/auth/login"
-          className="font-medium text-gray-700 transition hover:text-[#00A9B7]"
-        >
-          Sign in
-        </Link>
-        <Link
-          href="/auth/signup"
-          className="rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-white font-semibold shadow-md hover:opacity-90 transition"
-        >
-          Get Started
-        </Link>
-      </div>
-
       {/* Mobile menu button */}
       <button
         className="md:hidden flex items-center justify-center h-10 w-10 rounded-full border border-gray-300"
@@ -96,20 +80,6 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                href="/auth/login"
-                onClick={() => setIsOpen(false)}
-                className="hover:text-[#00A9B7]"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/auth/signup"
-                onClick={() => setIsOpen(false)}
-                className="mt-2 rounded-md bg-gradient-to-r from-[#0040C1] to-[#00A9B7] px-5 py-2.5 text-center text-white font-semibold shadow-md"
-              >
-                Get Started
-              </Link>
             </div>
           </motion.div>
         )}

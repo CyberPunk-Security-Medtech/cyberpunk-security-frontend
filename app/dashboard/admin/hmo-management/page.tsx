@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import HMOHeader from "@components/dashboard/admin/hmo-management/HMOHeader";
+import AddHmoModal from "@components/dashboard/admin/hmo-management/AddHmoModal";
 import HMOTable from "@components/dashboard/admin/hmo-management/HMOTable";
 import { summarizeHmos, useHmoDirectory } from "@components/dashboard/admin/hmo-management/hmoData";
 import StatCard from "@components/dashboard/admin/report/StatCard";
@@ -13,10 +14,12 @@ export default function HMOManagementPage() {
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
   const year = new Date().getFullYear();
-  const { patients, report, loading, error, reportUnavailable, reload } = useHmoDirectory(orgId, year);
+  const { patients, report, registry, loading, error, reportUnavailable, reload, addToRegistry } =
+    useHmoDirectory(orgId, year);
   const [query, setQuery] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
 
-  const hmos = useMemo(() => summarizeHmos(patients, report), [patients, report]);
+  const hmos = useMemo(() => summarizeHmos(patients, report, registry), [patients, report, registry]);
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return needle ? hmos.filter((hmo) => hmo.key.includes(needle)) : hmos;
@@ -29,12 +32,22 @@ export default function HMOManagementPage() {
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <HMOHeader />
+        <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href="/dashboard/admin/reports"
           className="dashboard-button inline-flex min-h-10 items-center justify-center rounded-md border border-[#051466] px-4 text-sm font-medium text-[#051466] hover:bg-indigo-50"
         >
           Monthly HMO report
         </Link>
+        <button
+          type="button"
+          onClick={() => setAddOpen(true)}
+          className="dashboard-button inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-[#051466] px-4 text-sm font-semibold text-white hover:bg-[#020B44]"
+        >
+          <Plus size={16} aria-hidden="true" />
+          Add an HMO
+        </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -83,11 +96,13 @@ export default function HMOManagementPage() {
             emptyMessage={
               query
                 ? "No HMO matches your search."
-                : "No patients are registered under an HMO yet. HMOs appear here once a patient is registered with HMO coverage."
+                : "No HMOs yet. Add one with the Add an HMO button, or register a patient with HMO coverage."
             }
           />
         </section>
       )}
+
+      <AddHmoModal isOpen={addOpen} onClose={() => setAddOpen(false)} orgId={orgId} onCreated={addToRegistry} />
     </div>
   );
 }
