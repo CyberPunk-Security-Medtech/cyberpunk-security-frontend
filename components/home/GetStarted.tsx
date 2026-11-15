@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Building2, Check, Gift, Handshake } from "lucide-react";
@@ -27,9 +26,10 @@ const cards = [
     id: "get-started",
     icon: Building2,
     title: "Start using PrivaCure",
-    desc: "Register your hospital or clinic and set up your workspace in minutes.",
+    desc: "Bring your hospital or clinic onto one secure, connected care platform.",
     points: ["Invite your doctors, nurses, lab and pharmacy staff", "Records, consultations and transfers in one place"],
-    cta: { label: "Create your workspace", href: "/auth/signup", external: false },
+    // No public sign-up link: the featured card has no button.
+    cta: null,
     featured: true,
   },
   {
@@ -46,7 +46,7 @@ const cards = [
     icon: Gift,
     title: "Refer and earn credit",
     desc: "Know a hospital, clinic or lab that should be on PrivaCure? Refer them and earn credit on your account.",
-    points: ["Credit once they sign up and go live", "No limit on how many you refer"],
+    points: ["Credit once they go live on PrivaCure", "No limit on how many you refer"],
     cta: { label: "Refer an organisation", href: REFERRAL_EMAIL, external: true },
     featured: false,
   },
@@ -74,7 +74,7 @@ export default function GetStarted() {
           PrivaCure is live. <span className="text-[#00A9B7]">Start today.</span>
         </motion.h2>
         <p className="mx-auto mt-3 max-w-2xl px-2 text-sm leading-relaxed text-[#4A5D6A] sm:text-base">
-          Hospitals and clinics can sign up and start using the platform now. Partners and
+          Hospitals and clinics can start using the platform now. Partners and
           referrers help us bring connected, secure care to more patients.
         </p>
 
@@ -124,28 +124,13 @@ export default function GetStarted() {
                 </ul>
                 {/* mt-auto keeps the buttons aligned across cards of different heights. */}
                 <div className="mt-auto pt-7">
-                  {card.cta.external ? (
+                  {card.cta && (
                     <a
                       href={card.cta.href}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[#00A9B7] px-5 py-3 text-sm font-semibold text-[#0F1C2E] transition hover:bg-[#00A9B710] sm:text-base"
                     >
                       {card.cta.label} <ArrowRight size={16} aria-hidden="true" />
                     </a>
-                  ) : (
-                    <Link
-                      href={card.cta.href}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#0040C1] transition hover:opacity-90 sm:text-base"
-                    >
-                      {card.cta.label} <ArrowRight size={16} aria-hidden="true" />
-                    </Link>
-                  )}
-                  {featured && (
-                    <p className="mt-3 text-center text-xs text-white/80">
-                      Already registered?{" "}
-                      <Link href="/auth/login" className="font-semibold text-white underline underline-offset-2">
-                        Sign in
-                      </Link>
-                    </p>
                   )}
                 </div>
               </motion.article>

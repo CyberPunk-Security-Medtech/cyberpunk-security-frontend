@@ -89,12 +89,11 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-// Only the founder and clinical lead are shown for now; uncomment to restore.
+// Only the founder and Dr. Collins are shown for now; uncomment to restore.
 const team = [
   { name: "Godwin Abimbola", role: "CEO / Founder", img: "/godwin-pic.png" },
   // { name: "Israel Adedokun", role: "Capital Strategy and Growth", img: "/financial_advisor_img.jpg" },
-  // { name: "Dr. Chukwuebuka Collins", role: "Head of strategy & Global Partnerships", img: "/collins-pic.png" },
-  { name: "Dr. S. Ekwegbara", role: "Clinical Operations & Health strategy", img: "/dr_somto_img.jpg" },
+  { name: "Dr. Chukwuebuka Collins", role: "Head of strategy & Global Partnerships", img: "/collins-pic.png" },
   // { name: "Prevailer Ndubueze", role: "Security & Infrastructure lead", img: "/prevailer-pic.png" },
   // { name: "Stephen David", role: "Product Lead", img: "/stephen-pic.png" },
   // { name: "Oluchi Faith", role: "Governance, Risk & Compliance (GRC) Lead", img: "/oluchi-pic.png" },

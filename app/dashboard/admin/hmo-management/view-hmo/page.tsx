@@ -33,12 +33,12 @@ function HMOView() {
   const orgId = activeWorkspace?.id ?? null;
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [query, setQuery] = useState("");
-  const { patients, report, loading, error, reportUnavailable, reload } = useHmoDirectory(orgId, year);
+  const { patients, report, registry, loading, error, reportUnavailable, reload } = useHmoDirectory(orgId, year);
 
   const key = providerKey(provider);
   const hmo = useMemo(
-    () => summarizeHmos(patients, report).find((item) => item.key === key) ?? null,
-    [patients, report, key],
+    () => summarizeHmos(patients, report, registry).find((item) => item.key === key) ?? null,
+    [patients, report, registry, key],
   );
 
   // Every month up to now (or the whole year for past years), zero-filled.

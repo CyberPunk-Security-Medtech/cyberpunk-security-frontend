@@ -47,12 +47,6 @@ export default function AboutSection() {
           className="flex flex-col md:flex-row items-center justify-center gap-4"
         >
           <Link
-            href="/auth/signup"
-            className="px-8 py-3 rounded-md bg-gradient-to-l from-[#00B8A8] to-[#1A2380] text-white font-medium hover:opacity-90 transition-all duration-300 shadow-md"
-          >
-            Get Started
-          </Link>
-          <Link
             href="/#partner"
             className="px-8 py-3 rounded-md border border-[#00A9B7] font-medium text-black hover:bg-[#00A9B710] transition-all duration-300"
           >

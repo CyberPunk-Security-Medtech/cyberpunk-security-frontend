@@ -1112,6 +1112,40 @@ export type DoctorMonthlyReport = {
   rows: DoctorMonthlyRow[];
 };
 
+export type Hmo = {
+  id: string;
+  organization_id: string;
+  name: string;
+  code?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type HmoCreatePayload = {
+  /** 1–255 characters. */
+  name: string;
+  /** Up to 50 characters. */
+  code?: string | null;
+  contact_email?: string | null;
+  /** Up to 50 characters. */
+  contact_phone?: string | null;
+};
+
+export const hmoService = {
+  listHmos: async (org_id: string, signal?: AbortSignal): Promise<Hmo[]> => {
+    const response = await api.get(`/api/v1/organizations/${org_id}/hmos`, { signal });
+    const data = unwrap(response.data);
+    return Array.isArray(data) ? (data as Hmo[]) : [];
+  },
+
+  createHmo: async (org_id: string, payload: HmoCreatePayload): Promise<Hmo> => {
+    const response = await api.post(`/api/v1/organizations/${org_id}/hmos`, payload);
+    return unwrap(response.data);
+  },
+};
+
 export const reportService = {
   getHmoConsultationReport: async (
     org_id: string,
