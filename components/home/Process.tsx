@@ -7,7 +7,7 @@ export default function HowItWorks() {
   const steps = [
     {
       title: "Create Your Profile",
-      desc: "Hospitals sign up securely and Admins create staff accounts, assign roles, and set permissions. This ensures every user accesses only what they need.",
+      desc: "Hospitals are onboarded securely and Admins add staff, assign roles, and set permissions. This ensures every user accesses only what they need.",
       icon: "/icons/profile.svg",
     },
     {

@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from "react";
 import {
+  hmoService,
   patientService,
   reportService,
+  type Hmo,
   type HmoConsultationReport,
   type PatientRecord,
 } from "@services/api";
 
-// There is no HMO registry in the backend: an HMO exists in this hospital
-// because patients are registered under it (patient.hmo_provider). Everything
-// here is derived from those patient records plus the HMO consultation report.
+// HMOs come from two places: the hospital's HMO registry (/hmos) and the
+// providers patients are registered under (patient.hmo_provider). They are
+// merged by case-insensitive name, so a newly added HMO appears with zero
+// patients until someone is registered under it.
 
 export type PolicyStatus = "Active" | "Expiring soon" | "Expired" | "No expiry date";
 
@@ -23,6 +26,8 @@ export type HmoSummary = {
   expiredPolicies: number;
   consultations: number;
   lastEnrolledAt: string | null;
+  /** The registry entry, when this HMO was added to the hospital's HMO list. */
+  registered?: Hmo;
 };
 
 const EXPIRING_WINDOW_DAYS = 30;
@@ -63,6 +68,7 @@ const preferredName = (names: string[]) => {
 export const summarizeHmos = (
   patients: PatientRecord[],
   report: HmoConsultationReport | null,
+  registry: Hmo[] = [],
 ): HmoSummary[] => {
   const groups = new Map<string, PatientRecord[]>();
   for (const patient of patients) {
@@ -80,6 +86,14 @@ export const summarizeHmos = (
     reportNames.set(key, row.hmo_provider);
   }
 
+  const registryByKey = new Map<string, Hmo>();
+  for (const hmo of registry) {
+    const key = providerKey(hmo.name);
+    if (!key) continue;
+    registryByKey.set(key, hmo);
+    if (!groups.has(key)) groups.set(key, []);
+  }
+
   return [...groups.entries()]
     .map(([key, members]) => {
       const statuses = members.map(policyStatus);
@@ -89,12 +103,17 @@ export const summarizeHmos = (
         .sort();
       return {
         key,
-        name: preferredName(members.map((patient) => patient.hmo_provider!.trim())) ?? reportNames.get(key) ?? key,
+        name:
+          registryByKey.get(key)?.name.trim() ??
+          preferredName(members.map((patient) => patient.hmo_provider!.trim())) ??
+          reportNames.get(key) ??
+          key,
         patients: members,
         activePolicies: statuses.filter((status) => status !== "Expired").length,
         expiredPolicies: statuses.filter((status) => status === "Expired").length,
         consultations: consultationsByKey.get(key) ?? 0,
         lastEnrolledAt: enrolledDates[enrolledDates.length - 1] ?? null,
+        registered: registryByKey.get(key),
       };
     })
     .sort((a, b) => b.patients.length - a.patients.length || a.name.localeCompare(b.name));
@@ -104,6 +123,7 @@ export const summarizeHmos = (
 export function useHmoDirectory(orgId: string | null | undefined, year: number) {
   const [patients, setPatients] = useState<PatientRecord[]>([]);
   const [report, setReport] = useState<HmoConsultationReport | null>(null);
+  const [registry, setRegistry] = useState<Hmo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reportUnavailable, setReportUnavailable] = useState(false);
@@ -117,7 +137,8 @@ export function useHmoDirectory(orgId: string | null | undefined, year: number) 
     Promise.allSettled([
       patientService.getPatients(orgId),
       reportService.getHmoConsultationReport(orgId, { year }),
-    ]).then(([patientResult, reportResult]) => {
+      hmoService.listHmos(orgId),
+    ]).then(([patientResult, reportResult, registryResult]) => {
       if (cancelled) return;
       if (patientResult.status === "fulfilled") {
         setPatients(Array.isArray(patientResult.value) ? (patientResult.value as PatientRecord[]) : []);
@@ -129,6 +150,10 @@ export function useHmoDirectory(orgId: string | null | undefined, year: number) 
       // Consultation counts are a bonus; the page still works without them.
       setReport(reportResult.status === "fulfilled" ? reportResult.value : null);
       setReportUnavailable(reportResult.status === "rejected");
+      if (registryResult.status === "rejected") {
+        console.error("Failed to load HMO registry", registryResult.reason);
+      }
+      setRegistry(registryResult.status === "fulfilled" ? registryResult.value : []);
       setLoading(false);
     });
     return () => {
@@ -139,9 +164,13 @@ export function useHmoDirectory(orgId: string | null | undefined, year: number) 
   return {
     patients,
     report,
+    registry,
     loading,
     error,
     reportUnavailable,
     reload: () => setReloadKey((key) => key + 1),
+    /** Adds a newly created HMO without refetching everything. */
+    addToRegistry: (hmo: Hmo) =>
+      setRegistry((prev) => (prev.some((item) => item.id === hmo.id) ? prev : [hmo, ...prev])),
   };
 }
