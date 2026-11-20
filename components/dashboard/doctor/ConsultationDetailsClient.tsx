@@ -64,8 +64,8 @@ function ConsultationDetailsContent({ consultationId }: { consultationId: string
     () => [
       { label: "Vitals", content: <VitalsTab /> },
       { label: "Diagnosis", content: <MedicalHistoryTab /> },
-      { label: "Prescription", content: <PatientPrescriptionTab /> },
       { label: "Lab Test", content: <LabTestTab /> },
+      { label: "Prescription", content: <PatientPrescriptionTab /> },
       { label: "Activity Log", content: <ActivityLogTab /> },
     ],
     []
