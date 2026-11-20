@@ -130,8 +130,8 @@ export default function Sidebar({
 
   const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
-    { label: "Staff management", icon: Users, href: "/dashboard/admin/staff-management" },
     { label: "Departments", icon: Building2, href: "/dashboard/admin/departments" },
+    { label: "Staff management", icon: Users, href: "/dashboard/admin/staff-management" },
     { label: "Wards", icon: BedDouble, href: "/dashboard/admin/wards" },
     { label: "In-patients", icon: BedSingle, href: "/dashboard/admin/in-patients" },
     {
