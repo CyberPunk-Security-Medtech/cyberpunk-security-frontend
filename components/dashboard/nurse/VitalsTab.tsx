@@ -153,7 +153,7 @@ export default function VitalsTab() {
     <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-brand-navy">Vitals</h3>
+          <h3 className="text-lg font-semibold text-[#003C36]">Vitals</h3>
           <p className="text-xs text-gray-500">
             Recorded for this consultation.
           </p>
@@ -161,7 +161,7 @@ export default function VitalsTab() {
         <button
           disabled={!isSelectedConsultationActive || !selectedConsultationId}
           onClick={() => setOpen(true)}
-          className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-md bg-[#006B5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
         >
           + Record Vitals
         </button>
@@ -253,7 +253,7 @@ export default function VitalsTab() {
             </button>
             <button
               disabled={submitting || !orgId || !selectedConsultationId}
-              className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              className="rounded-md bg-[#006B5F] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
               type="submit"
             >
               {submitting ? "Submitting..." : "Save Vitals"}

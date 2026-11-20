@@ -52,11 +52,7 @@ export default function PatientPrescriptionTab() {
             <button
               onClick={() => setOpen(true)}
               disabled={!isSelectedConsultationActive || !selectedConsultationId}
-              className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
-                isSelectedConsultationActive && !!selectedConsultationId
-                  ? "bg-[#1A2380] hover:bg-[#00B8A8]"
-                  : "bg-gray-300 cursor-not-allowed"
-              }`}
+              className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
             >
               + Add Prescription
             </button>
