@@ -76,8 +76,10 @@ export default function VitalsTab() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<VitalsForm>(EMPTY_FORM);
 
-  const { orgId, selectedConsultationId, isSelectedConsultationActive } =
+  const { orgId, selectedConsultationId, isSelectedConsultationActive, selectedConsultation } =
     useConsultation();
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
 
   const loadVitals = async () => {
     if (!orgId || !selectedConsultationId) return;
@@ -158,13 +160,15 @@ export default function VitalsTab() {
             Recorded for this consultation.
           </p>
         </div>
-        <button
-          disabled={!isSelectedConsultationActive || !selectedConsultationId}
-          onClick={() => setOpen(true)}
-          className="rounded-md bg-[#006B5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
-        >
-          + Record Vitals
-        </button>
+        {!isCompletedConsultation && (
+          <button
+            disabled={!isSelectedConsultationActive || !selectedConsultationId}
+            onClick={() => setOpen(true)}
+            className="rounded-md bg-[#006B5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
+          >
+            + Record Vitals
+          </button>
+        )}
       </div>
 
       {!isSelectedConsultationActive && (

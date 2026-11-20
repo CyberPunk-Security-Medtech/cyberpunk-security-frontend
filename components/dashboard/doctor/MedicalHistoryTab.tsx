@@ -28,7 +28,10 @@ export default function MedicalHistoryTab() {
     orgId,
     isSelectedConsultationActive,
     selectedConsultationId,
+    selectedConsultation,
   } = useConsultation();
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
 
   const loadDiagnoses = async () => {
     if (!orgId || !patientId) return;
@@ -55,17 +58,15 @@ export default function MedicalHistoryTab() {
       <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-semibold text-[#1A2380]">Diagnosis</h3>
-          <button
-            onClick={() => setOpen(true)}
-            disabled={!isSelectedConsultationActive || !selectedConsultationId}
-            className={`rounded-md px-4 py-2.5 text-sm font-medium text-white transition ${
-              isSelectedConsultationActive && !!selectedConsultationId
-                ? "bg-[#1A2380] hover:bg-[#00B8A8]"
-                : "cursor-not-allowed bg-gray-300"
-            }`}
-          >
-            + Add Diagnosis
-          </button>
+          {!isCompletedConsultation && (
+            <button
+              onClick={() => setOpen(true)}
+              disabled={!isSelectedConsultationActive || !selectedConsultationId}
+              className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            >
+              + Add Diagnosis
+            </button>
+          )}
         </div>
 
         <div className="space-y-4">

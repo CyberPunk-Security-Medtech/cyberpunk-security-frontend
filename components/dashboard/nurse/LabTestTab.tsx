@@ -111,13 +111,15 @@ export default function LabTestTab() {
     <section className="rounded-md border bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-semibold text-[#003C36]">Lab Test</h3>
-        <button
-          disabled={!isSelectedConsultationActive || !selectedConsultationId}
-          onClick={() => setOpen(true)}
-          className="rounded-md bg-[#006B5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
-        >
-          + Order Lab Test
-        </button>
+        {!isCompletedConsultation && (
+          <button
+            disabled={!isSelectedConsultationActive || !selectedConsultationId}
+            onClick={() => setOpen(true)}
+            className="rounded-md bg-[#006B5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#005249] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B8A8] focus-visible:ring-offset-2 motion-reduce:transition-none disabled:opacity-50"
+          >
+            + Order Lab Test
+          </button>
+        )}
       </div>
       {!isSelectedConsultationActive && !isCompletedConsultation && (
         <ConsultationStartNotice role="nurse" workflow="lab-test" />

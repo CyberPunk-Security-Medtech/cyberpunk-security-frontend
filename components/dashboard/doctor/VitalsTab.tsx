@@ -76,8 +76,10 @@ export default function VitalsTab() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<VitalsForm>(EMPTY_FORM);
 
-  const { orgId, selectedConsultationId, isSelectedConsultationActive } =
+  const { orgId, selectedConsultationId, isSelectedConsultationActive, selectedConsultation } =
     useConsultation();
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
 
   const loadVitals = async () => {
     if (!orgId || !selectedConsultationId) return;
@@ -158,13 +160,15 @@ export default function VitalsTab() {
             Recorded for this consultation.
           </p>
         </div>
-        <button
-          disabled={!isSelectedConsultationActive || !selectedConsultationId}
-          onClick={() => setOpen(true)}
-          className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-        >
-          + Record Vitals
-        </button>
+        {!isCompletedConsultation && (
+          <button
+            disabled={!isSelectedConsultationActive || !selectedConsultationId}
+            onClick={() => setOpen(true)}
+            className="rounded-md bg-[#1A2380] hover:bg-[#00B8A8] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+          >
+            + Record Vitals
+          </button>
+        )}
       </div>
 
       {!isSelectedConsultationActive && (
