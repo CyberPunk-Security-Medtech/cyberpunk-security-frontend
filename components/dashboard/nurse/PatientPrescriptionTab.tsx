@@ -1,4 +1,5 @@
 "use client";
+import { newestFirst, recordDate } from "@utils/listFilters";
 
 import { useEffect, useMemo, useState } from "react";
 import { PatientPrescriptionModal } from "./PatientPrescriptionModal";
@@ -24,7 +25,7 @@ export default function PatientPrescriptionTab() {
     if (!orgId || !patientId) return;
     try {
       const result = await patientService.getPatientPrescriptions(orgId, patientId);
-      setPrescriptions(result ?? []);
+      setPrescriptions(newestFirst(result ?? [], recordDate));
     } catch (error) {
       console.error("Failed to load prescriptions", error);
     }

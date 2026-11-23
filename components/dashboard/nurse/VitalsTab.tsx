@@ -1,4 +1,5 @@
 "use client";
+import { newestFirst, recordDate } from "@utils/listFilters";
 
 import { useEffect, useState } from "react";
 import Modal from "@components/Modal";
@@ -86,7 +87,7 @@ export default function VitalsTab() {
     setLoading(true);
     try {
       const result = await consultationService.listVitals(orgId, selectedConsultationId);
-      setVitals(result ?? []);
+      setVitals(newestFirst(result ?? [], recordDate));
     } catch (error) {
       console.error("Failed to load vitals", error);
       toast.error("Failed to load vitals");

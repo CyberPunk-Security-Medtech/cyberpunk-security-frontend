@@ -1,4 +1,5 @@
 "use client";
+import { newestFirst, recordDate } from "@utils/listFilters";
 
 import { useEffect, useMemo, useState } from "react";
 import Modal from "@components/Modal";
@@ -49,7 +50,7 @@ export default function LabTestTab() {
     if (!orgId || !patientId) return;
     try {
       const res = await patientService.getPatientLabTests(orgId, patientId);
-      setTests(res ?? []);
+      setTests(newestFirst(res ?? [], recordDate));
     } catch (error) {
       console.error("Failed to load lab tests", error);
     }

@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import {
   consultationService,
   type ConsultationPage,
+  type ConsultationRecord,
   type ConsultationStatus,
 } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { StatusBadge } from "@components/StatusBadge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { TableSkeleton } from "@components/Skeletons";
+import { SearchInput } from "@components/dashboard/ListToolbar";
+import { useConsultationSearch } from "@components/dashboard/consultations/useConsultationSearch";
 
 type StatusFilter = ConsultationStatus | "All";
 type QueueQuery = { status: StatusFilter; page: number; pageSize: number };
@@ -51,6 +54,20 @@ const toBadgeStatus = (
   return "Pending";
 };
 
+const toRow = (item: ConsultationRecord): ConsultationRow => ({
+  id: item.id,
+  patient_id: item.patient_id,
+  patient_code: item.patient?.patient_code?.trim() || "-",
+  patient_name:
+    `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
+    "Unknown Patient",
+  department_name: item.department?.name ?? "-",
+  priority: item.priority ?? "-",
+  reason_for_visit: item.reason_for_visit ?? "-",
+  status: item.status,
+  updated_at: item.updated_at ?? item.created_at ?? null,
+});
+
 export default function ConsultationsPage() {
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
@@ -70,9 +87,9 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
   const [actionLoadingById, setActionLoadingById] = useState<Record<string, boolean>>({});
   const activeTab = queueQuery.status;
 
+  // The search stays when you switch tabs, so you can look for a patient across statuses.
   const changeQueueQuery = (next: QueueQuery) => {
     setLoading(true);
-    setSearch("");
     setQueueQuery(next);
   };
 
@@ -89,7 +106,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
       setLoading(true);
       setLoadError(null);
       try {
-        const result = await consultationService.listConsultationsPage(
+        const result = await consultationService.listConsultationsPageNewestFirst(
           orgId,
           {
             ...(queueQuery.status === "All" ? {} : { status_filter: queueQuery.status }),
@@ -104,19 +121,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
           setQueueQuery((current) => ({ ...current, page: Math.max(1, result.total_pages) }));
           return;
         }
-        setRows(result.data.map((item) => ({
-          id: item.id,
-          patient_id: item.patient_id,
-          patient_code: item.patient?.patient_code?.trim() || "-",
-          patient_name:
-            `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
-            "Unknown Patient",
-          department_name: item.department?.name ?? "-",
-          priority: item.priority ?? "-",
-          reason_for_visit: item.reason_for_visit ?? "-",
-          status: item.status,
-          updated_at: item.updated_at ?? item.created_at ?? null,
-        })));
+        setRows(result.data.map(toRow));
         setPagination({
           page: result.page,
           page_size: result.page_size,
@@ -138,17 +143,12 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
     return () => controller.abort();
   }, [orgId, queueQuery, refreshVersion]);
 
-  const filteredRows = useMemo(() => {
-    const text = search.trim().toLowerCase();
-    return rows.filter((row) => {
-      const searchPass =
-        text.length === 0 ||
-        row.patient_name.toLowerCase().includes(text) ||
-        row.patient_code.toLowerCase().includes(text) ||
-        row.reason_for_visit.toLowerCase().includes(text);
-      return searchPass;
-    });
-  }, [rows, search]);
+  // With a search typed, results come from every consultation in the tab, not just this page.
+  const searchState = useConsultationSearch(orgId, queueQuery.status, search, refreshVersion);
+  const searchRows = useMemo(() => searchState.matches.map(toRow), [searchState.matches]);
+  const filteredRows = searchState.active ? searchRows : rows;
+  const tableLoading = searchState.active ? searchState.loading : loading;
+  const tableError = searchState.active ? searchState.error : loadError;
 
   const withRowLoading = async (id: string, fn: () => Promise<void>) => {
     setActionLoadingById((prev) => ({ ...prev, [id]: true }));
@@ -268,13 +268,11 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
           })}
         </div>
 
-        <input
-          type="text"
-          aria-label="Search consultations on this page"
+        <SearchInput
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search this page by patient, reason or ID"
-          className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#00B8A8] lg:max-w-sm"
+          onChange={setSearch}
+          placeholder="Search patient, code, reason or department"
+          label="Search all consultations in this tab by patient, patient code, reason, department, or doctor"
         />
       </div>
 
@@ -293,15 +291,15 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
               </tr>
             </thead>
             <tbody>
-              {loading && (
+              {tableLoading && (
                 <TableSkeleton columns={7} />
               )}
 
-              {!loading && loadError && (
+              {!tableLoading && tableError && (
                 <tr>
                   <td className="px-4 py-6 text-gray-600" colSpan={7}>
                     <div className="flex flex-wrap items-center gap-3" role="alert">
-                      <span>{loadError}</span>
+                      <span>{tableError}</span>
                       <button
                         type="button"
                         onClick={() => setRefreshVersion((current) => current + 1)}
@@ -314,13 +312,13 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
                 </tr>
               )}
 
-              {!loading && !loadError && filteredRows.length === 0 && (
+              {!tableLoading && !tableError && filteredRows.length === 0 && (
                 <tr>
                   <td className="px-4 py-6 text-gray-500" colSpan={7}>
                     {!orgId
                       ? "Select an organization workspace to view consultations."
-                      : search.trim()
-                        ? "No matches on this page. Try another page or clear the search."
+                      : searchState.active
+                        ? `No ${activeTab === "All" ? "" : `${activeTab.toLowerCase()} `}consultations match “${search.trim()}”.`
                         : activeTab === "All"
                           ? "No consultations found."
                           : `No ${activeTab.toLowerCase()} consultations found.`}
@@ -328,7 +326,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
                 </tr>
               )}
 
-              {!loading && !loadError &&
+              {!tableLoading && !tableError &&
                 filteredRows.map((row) => {
                   const rowLoading = !!actionLoadingById[row.id];
                   return (
@@ -354,7 +352,22 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
           </table>
         </ResponsiveTableRegion>
 
-        {orgId && (
+        {orgId && searchState.active && (
+          <div role="status" aria-live="polite" className="flex flex-wrap items-center justify-between gap-3 border-t p-4 text-sm text-gray-600">
+            <span>
+              {searchState.loading
+                ? "Searching all consultations…"
+                : `${filteredRows.length} ${filteredRows.length === 1 ? "match" : "matches"} across all ${
+                    activeTab === "All" ? "" : `${activeTab.toLowerCase()} `
+                  }consultations`}
+            </span>
+            <button type="button" onClick={() => setSearch("")} className="font-medium text-[#00B8A8] hover:underline">
+              Clear search
+            </button>
+          </div>
+        )}
+
+        {orgId && !searchState.active && (
           <nav aria-label="Consultation pagination" className="flex flex-col gap-3 border-t p-4 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <label className="flex items-center gap-2 text-gray-600">
               Rows per page

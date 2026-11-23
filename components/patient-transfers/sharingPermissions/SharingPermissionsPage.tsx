@@ -1,4 +1,5 @@
 "use client";
+import { newestFirst, recordDate } from "@utils/listFilters";
 
 import { useEffect, useMemo, useState } from "react";
 import { isAxiosError } from "axios";
@@ -165,7 +166,7 @@ export default function SharingPermissionsPage({
           .catch(() => [] as PatientListRecord[]),
       ]);
 
-      setGrants(grantRows);
+      setGrants(newestFirst(grantRows, recordDate));
       setOrganizations(directoryRows);
       setPatients(Array.isArray(patientRows) ? patientRows : []);
       setSelectedGrant((current) =>

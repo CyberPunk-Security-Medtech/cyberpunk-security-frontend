@@ -1,4 +1,5 @@
 "use client";
+import { newestFirst, recordDate } from "@utils/listFilters";
 
 import { useEffect, useMemo, useState } from "react";
 import { DiagnosisModal } from "./DiagnosisModal";
@@ -37,7 +38,7 @@ export default function MedicalHistoryTab() {
     if (!orgId || !patientId) return;
     try {
       const data = await patientService.getPatientDiagnoses(orgId, patientId);
-      setRows(data ?? []);
+      setRows(newestFirst((data ?? []) as DiagnosisRecord[], recordDate));
     } catch (error) {
       console.error("Failed to load diagnoses", error);
     }

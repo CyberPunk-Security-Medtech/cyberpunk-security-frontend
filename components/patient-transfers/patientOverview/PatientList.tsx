@@ -1,5 +1,6 @@
 "use client";
 
+import { isInteractiveTarget } from "@utils/rowNavigation";
 import { ArrowRight, Plus, SlidersHorizontal } from "lucide-react";
 import { ConsentStatusBadge } from "./Badges";
 import { FilterType, Patient } from "./PatientTransferTypes";
@@ -72,7 +73,7 @@ export default function PatientsList({
 
               <tbody>
                 {patients.map((patient) => (
-                  <tr key={patient.id} className="border-t border-gray-300">
+                  <tr key={patient.id} className="cursor-pointer border-t border-gray-300 hover:bg-gray-50" onClick={(event) => { if (!isInteractiveTarget(event.target)) onOpenPatient(patient); }}>
                     <td className="px-12 py-8">
                       <div className="flex items-center gap-4">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF0FF] font-medium text-[#211783]">
@@ -116,4 +117,4 @@ export default function PatientsList({
       </section>
     </>
   );
-}
+}

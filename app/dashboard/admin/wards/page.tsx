@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "@context/AuthContext";
 import { wardService, type Ward } from "@services/api";
@@ -8,6 +8,21 @@ import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import Button from "@components/Button";
 import { TableSkeleton } from "@components/Skeletons";
 import { getApiErrorMessage } from "@utils/apiError";
+import { FilterSelect, SearchInput } from "@components/dashboard/ListToolbar";
+import { matchesQuery } from "@utils/listFilters";
+
+type WardAvailability = "" | "full" | "available" | "uncapped";
+
+const WARD_AVAILABILITY_OPTIONS = [
+  { value: "available", label: "Beds available" },
+  { value: "full", label: "Full" },
+  { value: "uncapped", label: "No fixed capacity" },
+];
+
+const wardAvailability = (ward: Ward): Exclude<WardAvailability, ""> => {
+  if (ward.capacity == null) return "uncapped";
+  return (ward.occupied ?? 0) >= ward.capacity ? "full" : "available";
+};
 
 const formatDateTime = (value?: string) => {
   if (!value) return "-";
@@ -58,6 +73,17 @@ export default function WardManagementPage() {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [availability, setAvailability] = useState<WardAvailability>("");
+  const visibleWards = useMemo(
+    () =>
+      wards.filter(
+        (ward) =>
+          matchesQuery(searchQuery, ward.name) && (!availability || wardAvailability(ward) === availability),
+      ),
+    [wards, searchQuery, availability],
+  );
+  const hasWardFilters = !!searchQuery.trim() || !!availability;
 
   const loadWards = async () => {
     if (!orgId) {
@@ -180,8 +206,23 @@ export default function WardManagementPage() {
           </section>
 
           <section className="rounded-md border bg-white overflow-hidden">
-            <div className="border-b px-5 py-3">
+            <div className="flex flex-col gap-3 border-b px-5 py-3 lg:flex-row lg:items-center lg:justify-between">
               <h2 className="text-base font-semibold">Wards</h2>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <SearchInput
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder="Search wards"
+                  label="Search wards by name"
+                />
+                <FilterSelect
+                  allLabel="All wards"
+                  label="Filter wards by bed availability"
+                  value={availability}
+                  onChange={(value) => setAvailability(value as WardAvailability)}
+                  options={WARD_AVAILABILITY_OPTIONS}
+                />
+              </div>
             </div>
             <ResponsiveTableRegion label="Wards">
               <table className="w-full min-w-[720px] text-sm">
@@ -195,14 +236,16 @@ export default function WardManagementPage() {
                 <tbody>
                   {loading ? (
                     <TableSkeleton columns={3} />
-                  ) : wards.length === 0 ? (
+                  ) : visibleWards.length === 0 ? (
                     <tr>
                       <td className="px-5 py-4 text-slate-600" colSpan={3}>
-                        No wards yet. Create one above to start admitting patients.
+                        {hasWardFilters
+                          ? "No wards match these filters."
+                          : "No wards yet. Create one above to start admitting patients."}
                       </td>
                     </tr>
                   ) : (
-                    wards.map((ward) => (
+                    visibleWards.map((ward) => (
                       <tr key={ward.id} className="border-t">
                         <td className="bg-white px-5 py-4 font-medium">{ward.name}</td>
                         <td className="px-5 py-4">

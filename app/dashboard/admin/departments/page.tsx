@@ -6,6 +6,8 @@ import { organizationService } from "@services/api";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import Button from "@components/Button";
 import { TableSkeleton } from "@components/Skeletons";
+import { SearchInput } from "@components/dashboard/ListToolbar";
+import { matchesQuery } from "@utils/listFilters";
 
 type Department = {
   id: string;
@@ -32,6 +34,11 @@ export default function DepartmentManagementPage() {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const visibleDepartments = useMemo(
+    () => departments.filter((department) => matchesQuery(searchQuery, department.name, department.department_code)),
+    [departments, searchQuery],
+  );
 
   const canCreate = useMemo(() => name.trim().length > 0 && !creating, [name, creating]);
 
@@ -118,8 +125,14 @@ export default function DepartmentManagementPage() {
               </section>
 
               <section className="rounded-md border bg-white overflow-hidden">
-                <div className="border-b px-5 py-3">
+                <div className="flex flex-col gap-3 border-b px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <h2 className="text-base font-semibold">Departments</h2>
+                  <SearchInput
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder="Search by name or code"
+                    label="Search departments by name or department code"
+                  />
                 </div>
                 <ResponsiveTableRegion label="Departments">
                   <table className="w-full min-w-[720px] text-sm">
@@ -133,14 +146,14 @@ export default function DepartmentManagementPage() {
                     <tbody>
                       {loading ? (
                         <TableSkeleton columns={3} />
-                      ) : departments.length === 0 ? (
+                      ) : visibleDepartments.length === 0 ? (
                         <tr>
                           <td className="px-5 py-4 text-slate-600" colSpan={3}>
-                            No departments found.
+                            {searchQuery.trim() ? `No departments match “${searchQuery.trim()}”.` : "No departments found."}
                           </td>
                         </tr>
                       ) : (
-                        departments.map((department) => (
+                        visibleDepartments.map((department) => (
                           <tr key={department.id} className="border-t">
                             <td className="bg-white px-5 py-4">{department.name}</td>
                             <td className="px-5 py-4 font-mono text-xs">{department.department_code?.trim() || "-"}</td>

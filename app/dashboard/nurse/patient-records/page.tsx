@@ -2,7 +2,7 @@
 
 import Button from '@components/Button'
 import PatientTable from '@components/dashboard/nurse/PatientTable'
-import AddPatientRecordModal from '@components/dashboard/nurse/AddPatientRecords';
+import AddPatientModal from '@components/dashboard/doctor/AddPatientModal';
 import { useState } from 'react';
 
 
@@ -31,7 +31,7 @@ export default function PatientsRecords() {
           + Add New Patient Record
         </Button>
 
-        <AddPatientRecordModal
+        <AddPatientModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onCreated={handlePatientCreated}

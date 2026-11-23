@@ -203,7 +203,7 @@ export default function CreateTestOrderModal({ open, onClose, onOrderCreated }: 
       setLoadingPage(true);
       setLoadError(false);
       try {
-        const response = await consultationService.listConsultationsPage(
+        const response = await consultationService.listConsultationsPageNewestFirst(
           orgId,
           { status_filter: status, page: nextPage, page_size: PAGE_SIZE },
           controller.signal,
