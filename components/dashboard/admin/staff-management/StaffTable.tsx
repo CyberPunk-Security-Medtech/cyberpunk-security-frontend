@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ListToolbar, { FilterSelect, SearchInput } from "@components/dashboard/ListToolbar";
+import { matchesOption, matchesQuery, optionsFrom } from "@utils/listFilters";
 import { invitationService, type OrganizationInvitation } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
@@ -20,6 +22,28 @@ export default function StaffTable() {
   const { activeWorkspace } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const roleOptions = useMemo(() => optionsFrom(invitations.map((inv) => inv.role)), [invitations]);
+  const statusOptions = useMemo(() => optionsFrom(invitations.map((inv) => inv.status)), [invitations]);
+  const filteredInvitations = useMemo(
+    () =>
+      invitations.filter(
+        (inv) =>
+          matchesQuery(searchQuery, inv.email, inv.role) &&
+          matchesOption(roleFilter, inv.role) &&
+          matchesOption(statusFilter, inv.status),
+      ),
+    [invitations, searchQuery, roleFilter, statusFilter],
+  );
+  const hasActiveFilters = !!searchQuery.trim() || !!roleFilter || !!statusFilter;
+
+  // Go back to the first page whenever the filters change.
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, roleFilter, statusFilter]);
 
   useEffect(() => {
     if (!activeWorkspace?.id) return;
@@ -88,14 +112,42 @@ const handleResend = async (inv: Invitation) => {
   }
 };
 
-  const totalPages = Math.max(1, Math.ceil(invitations.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filteredInvitations.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pagedInvitations = invitations.slice(
+  const pagedInvitations = filteredInvitations.slice(
     (safePage - 1) * PAGE_SIZE,
     safePage * PAGE_SIZE,
   );
 
   return (
+    <>
+    <div className="px-4 pt-4">
+      <ListToolbar
+        search={
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search by email"
+            label="Search staff invitations by email or role"
+          />
+        }
+        filters={
+          <>
+            <FilterSelect allLabel="All roles" label="Filter by role" value={roleFilter} onChange={setRoleFilter} options={roleOptions} />
+            <FilterSelect allLabel="All statuses" label="Filter by invitation status" value={statusFilter} onChange={setStatusFilter} options={statusOptions} />
+          </>
+        }
+        shown={filteredInvitations.length}
+        total={invitations.length}
+        active={hasActiveFilters}
+        onClear={() => {
+          setSearchQuery("");
+          setRoleFilter("");
+          setStatusFilter("");
+        }}
+        noun="staff"
+      />
+    </div>
     <ResponsiveTableRegion label="Staff invitations">
     <table className="w-full min-w-[760px] text-sm">
       <thead>
@@ -161,9 +213,9 @@ const handleResend = async (inv: Invitation) => {
       </tbody>
     </table>
 
-    {invitations.length === 0 && (
+    {filteredInvitations.length === 0 && (
       <p className="px-4 py-8 text-center text-sm text-slate-500">
-        No staff invitations yet.
+        {hasActiveFilters ? "No staff match these filters." : "No staff invitations yet."}
       </p>
     )}
 
@@ -173,5 +225,6 @@ const handleResend = async (inv: Invitation) => {
       </div>
     )}
     </ResponsiveTableRegion>
+    </>
   );
 }

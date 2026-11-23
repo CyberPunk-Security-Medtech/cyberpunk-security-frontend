@@ -43,7 +43,27 @@ import { useAuth } from "@context/AuthContext";
 import { inventoryService } from "@services/api";
 import { toast } from "react-toastify";
 import BreadcrumbHeading from "./BreadcrumbHeading";
-import { collectionFromResponse, InventoryItem } from "./pharmacyUtils";
+import {
+  getInventoryQuantity,
+  getStockLevel,
+  InventoryItem,
+  isPlaceholderItem,
+  loadInventoryWithStock,
+  LOW_STOCK_THRESHOLD,
+  STOCK_LEVEL_CLASS,
+  STOCK_LEVEL_LABEL,
+  type StockLevel,
+} from "./pharmacyUtils";
+import ListToolbar, { FilterSelect, SearchInput } from "@components/dashboard/ListToolbar";
+import { matchesQuery } from "@utils/listFilters";
+
+const STOCK_FILTER_OPTIONS: { value: StockLevel; label: string }[] = [
+  { value: "out", label: STOCK_LEVEL_LABEL.out },
+  { value: "low", label: `${STOCK_LEVEL_LABEL.low} (${LOW_STOCK_THRESHOLD} or fewer)` },
+  { value: "ok", label: STOCK_LEVEL_LABEL.ok },
+];
+
+const STOCK_SORT_ORDER: Record<StockLevel, number> = { out: 0, low: 1, unknown: 2, ok: 3 };
 
 export default function InventoryListClient() {
   const { activeWorkspace } = useAuth();
@@ -51,6 +71,13 @@ export default function InventoryListClient() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [stockFilter, setStockFilter] = useState<StockLevel | "">("");
+
+  // Cards elsewhere link here as ?stock=out or ?stock=low.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("stock");
+    if (requested === "out" || requested === "low" || requested === "ok") setStockFilter(requested);
+  }, []);
 
   useEffect(() => {
     if (!orgId) {
@@ -62,8 +89,12 @@ export default function InventoryListClient() {
     const load = async () => {
       setLoading(true);
       try {
-        const allItems = collectionFromResponse<InventoryItem>(await inventoryService.listInventoryItems(orgId));
-        setItems(allItems.filter((item) => !item.name?.startsWith("[Group Placeholder]")));
+        const allItems = await loadInventoryWithStock(
+          orgId,
+          (id) => inventoryService.listInventoryItems(id),
+          (id, itemId) => inventoryService.getInventoryItem(id, itemId),
+        );
+        setItems(allItems.filter((item) => !isPlaceholderItem(item)));
       } catch (cause) {
         console.error("Failed to load inventory items", cause);
         toast.error("Failed to load inventory items");
@@ -75,11 +106,27 @@ export default function InventoryListClient() {
     void load();
   }, [orgId]);
 
-  const filteredItems = useMemo(() => {
-    const normalisedQuery = query.trim().toLowerCase();
-    if (!normalisedQuery) return items;
-    return items.filter((item) => (item.name ?? "").toLowerCase().includes(normalisedQuery));
-  }, [items, query]);
+  const filteredItems = useMemo(
+    () =>
+      items
+        .filter(
+          (item) =>
+            matchesQuery(query, item.name, item.form, item.strength, item.unit) &&
+            (!stockFilter || getStockLevel(item) === stockFilter),
+        )
+        // Items that need attention come first.
+        .sort((a, b) => STOCK_SORT_ORDER[getStockLevel(a)] - STOCK_SORT_ORDER[getStockLevel(b)]),
+    [items, query, stockFilter],
+  );
+
+  const attention = useMemo(
+    () => ({
+      out: items.filter((item) => getStockLevel(item) === "out").length,
+      low: items.filter((item) => getStockLevel(item) === "low").length,
+    }),
+    [items],
+  );
+  const hasActiveFilters = !!query.trim() || !!stockFilter;
 
   if (loading) {
     return (
@@ -97,23 +144,57 @@ export default function InventoryListClient() {
         <Link href="/dashboard/pharmacy/inventory/new" className="inline-flex items-center gap-1 self-start rounded-md bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]">+ Add item</Link>
       </div>
 
+      {(attention.out > 0 || attention.low > 0) && (
+        <div role="alert" className="flex flex-col gap-2 rounded-md border border-[#F7D799] bg-[#FFF7E6] p-4 text-sm text-[#7C4A03] sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            {attention.out > 0 && <><strong>{attention.out}</strong> item{attention.out === 1 ? " is" : "s are"} out of stock. </>}
+            {attention.low > 0 && <><strong>{attention.low}</strong> item{attention.low === 1 ? " is" : "s are"} running low ({LOW_STOCK_THRESHOLD} units or fewer). </>}
+            Restock before they run out.
+          </p>
+          <div className="flex gap-3">
+            {attention.out > 0 && <button type="button" onClick={() => setStockFilter("out")} className="font-medium underline">Show out of stock</button>}
+            {attention.low > 0 && <button type="button" onClick={() => setStockFilter("low")} className="font-medium underline">Show running low</button>}
+          </div>
+        </div>
+      )}
+
       <div className="rounded-md border border-[#D8DEE8] bg-white p-3">
-        <label className="block text-sm text-[#2D3648]">
-          <span className="mb-2 block font-medium">Search items</span>
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by item name"
-            className="h-11 w-full rounded-md border border-[#CED7E3] px-3"
-          />
-        </label>
+        <ListToolbar
+          search={
+            <SearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Search by name, form or strength"
+              label="Search inventory items by name, form, strength, or unit"
+            />
+          }
+          filters={
+            <FilterSelect
+              allLabel="All stock levels"
+              label="Filter by stock level"
+              value={stockFilter}
+              onChange={(value) => setStockFilter(value as StockLevel | "")}
+              options={STOCK_FILTER_OPTIONS}
+            />
+          }
+          shown={filteredItems.length}
+          total={items.length}
+          active={hasActiveFilters}
+          onClear={() => {
+            setQuery("");
+            setStockFilter("");
+          }}
+          noun="items"
+        />
       </div>
 
       {filteredItems.length === 0 ? (
         <div className="rounded-md border border-dashed border-gray-300 bg-slate-50 p-8 text-center">
-          <p className="text-lg font-medium text-[#1E2433]">No items match your search.</p>
+          <p className="text-lg font-medium text-[#1E2433]">
+            {hasActiveFilters ? "No items match these filters." : "No inventory items yet."}
+          </p>
           <p className="mt-2 text-sm text-[#5B6478]">
-            Try another item name or add a new inventory item to get started.
+            {hasActiveFilters ? "Try another search or stock level." : "Add a new inventory item to get started."}
           </p>
           <div className="mt-4 flex justify-center">
             <Link
@@ -129,7 +210,7 @@ export default function InventoryListClient() {
           <table className="min-w-[840px] w-full table-auto">
             <thead className="border-b border-[#D8DEE8] text-left text-sm font-medium text-[#2D3648]">
               <tr>
-                {['Item name', 'Unit', 'Form', 'Strength'].map((label) => (
+                {['Item name', 'Unit', 'Form', 'Strength', 'Stock'].map((label) => (
                   <th key={label} className="whitespace-nowrap px-6 py-4">
                     <span className="inline-flex items-center gap-2">{label}<ArrowUpDown size={13} className="text-[#8792A8]" /></span>
                   </th>
@@ -144,6 +225,19 @@ export default function InventoryListClient() {
                   <td className="px-6 py-4">{item.unit || "—"}</td>
                   <td className="px-6 py-4">{item.form || "—"}</td>
                   <td className="px-6 py-4">{item.strength || "—"}</td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    {(() => {
+                      const level = getStockLevel(item);
+                      return (
+                        <span className="inline-flex items-center gap-2">
+                          {level !== "unknown" && <span className="tabular-nums">{getInventoryQuantity(item)}</span>}
+                          <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STOCK_LEVEL_CLASS[level]}`}>
+                            {STOCK_LEVEL_LABEL[level]}
+                          </span>
+                        </span>
+                      );
+                    })()}
+                  </td>
                   <td className="px-6 py-4 text-right">
                     <Link href={`/dashboard/pharmacy/inventory/items/${item.id}`} className="inline-flex items-center gap-1 text-[#2D3648] hover:text-[#00796B]">
                       View details <ChevronRight size={13} />
@@ -157,4 +251,4 @@ export default function InventoryListClient() {
       )}
     </section>
   );
-}
+}

@@ -114,7 +114,7 @@ export default function WalkInPatientPicker({ orgId, value, onChange }: Props) {
       });
       toast.success(
         result.status === "linked_existing"
-          ? "This patient already had a platform record — it's now linked to your lab."
+          ? "This patient already had a platform record — it's now linked to this facility."
           : "Patient registered.",
       );
     } catch (error) {

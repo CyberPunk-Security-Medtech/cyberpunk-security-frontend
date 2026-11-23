@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   consultationService,
   type ConsultationPage,
+  type ConsultationRecord,
   type ConsultationStatus,
 } from "@services/api";
 import { useAuth } from "@context/AuthContext";
@@ -12,6 +13,8 @@ import { StatusBadge } from "@components/StatusBadge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { CreateConsultationModal } from "@components/dashboard/nurse/ConsultationModal";
 import { TableSkeleton } from "@components/Skeletons";
+import { SearchInput } from "@components/dashboard/ListToolbar";
+import { useConsultationSearch } from "@components/dashboard/consultations/useConsultationSearch";
 
 type StatusFilter = ConsultationStatus | "All";
 type QueueQuery = { status: StatusFilter; page: number; pageSize: number };
@@ -52,6 +55,20 @@ const toBadgeStatus = (
   return "Pending";
 };
 
+const toRow = (item: ConsultationRecord): ConsultationRow => ({
+  id: item.id,
+  patient_id: item.patient_id,
+  patient_code: item.patient?.patient_code?.trim() || "-",
+  patient_name:
+    `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
+    "Unknown Patient",
+  department_name: item.department?.name ?? "-",
+  priority: item.priority ?? "-",
+  reason_for_visit: item.reason_for_visit ?? "-",
+  status: item.status,
+  updated_at: item.updated_at ?? item.created_at ?? null,
+});
+
 export default function ConsultationsPage() {
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
@@ -69,7 +86,15 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const activeTab = query.status;
+
+  // With a search typed, results come from every consultation in the tab, not just this page.
+  const searchState = useConsultationSearch(orgId, query.status, search, refreshVersion);
+  const searchRows = useMemo(() => searchState.matches.map(toRow), [searchState.matches]);
+  const visibleRows = searchState.active ? searchRows : rows;
+  const tableLoading = searchState.active ? searchState.loading : loading;
+  const tableError = searchState.active ? searchState.error : loadError;
 
   const changeQuery = (next: QueueQuery) => {
     setLoading(true);
@@ -89,7 +114,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
       setLoading(true);
       setLoadError(null);
       try {
-        const result = await consultationService.listConsultationsPage(
+        const result = await consultationService.listConsultationsPageNewestFirst(
           orgId,
           {
             ...(query.status === "All" ? {} : { status_filter: query.status }),
@@ -105,20 +130,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
           setQuery((current) => ({ ...current, page: Math.max(1, result.total_pages) }));
           return;
         }
-        setRows(result.data.map((item) => ({
-          id: item.id,
-          patient_id: item.patient_id,
-          patient_code: item.patient?.patient_code?.trim() || "-",
-          patient_name:
-            `${item.patient?.first_name ?? ""} ${item.patient?.last_name ?? ""}`.trim() ||
-            "Unknown Patient",
-          department_name: item.department?.name ?? "-",
-          priority: item.priority ?? "-",
-          reason_for_visit: item.reason_for_visit ?? "-",
-          status: item.status,
-          updated_at: item.updated_at ?? item.created_at ?? null,
-        })));
-        // Preserve the API's oldest-first order across every page.
+        setRows(result.data.map(toRow));
         setPagination({
           page: result.page,
           page_size: result.page_size,
@@ -173,7 +185,7 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
         </button>
       </div>
 
-      <div className="min-w-0">
+      <div className="min-w-0 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap gap-2">
           {STATUS_TABS.map((tab) => {
             const isActive = activeTab === tab;
@@ -196,6 +208,13 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
             );
           })}
         </div>
+
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search patient, code, reason or department"
+          label="Search all consultations in this tab by patient, patient code, reason, department, or doctor"
+        />
       </div>
 
       <div className="min-w-0 rounded-md border border-gray-200 bg-white shadow-sm">
@@ -213,15 +232,15 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
               </tr>
             </thead>
             <tbody>
-              {loading && (
+              {tableLoading && (
                 <TableSkeleton columns={7} />
               )}
 
-              {!loading && loadError && (
+              {!tableLoading && tableError && (
                 <tr>
                   <td className="px-4 py-6 text-gray-600" colSpan={7}>
                     <div className="flex flex-wrap items-center gap-3" role="alert">
-                      <span>{loadError}</span>
+                      <span>{tableError}</span>
                       <button
                         type="button"
                         onClick={() => setRefreshVersion((current) => current + 1)}
@@ -234,20 +253,22 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
                 </tr>
               )}
 
-              {!loading && !loadError && rows.length === 0 && (
+              {!tableLoading && !tableError && visibleRows.length === 0 && (
                 <tr>
                   <td className="px-4 py-6 text-gray-500" colSpan={7}>
                     {!orgId
                       ? "Select an organization workspace to view consultations."
-                      : activeTab === "All"
+                      : searchState.active
+                        ? `No ${activeTab === "All" ? "" : `${activeTab.toLowerCase()} `}consultations match “${search.trim()}”.`
+                        : activeTab === "All"
                         ? "No consultations found."
                         : `No ${activeTab.toLowerCase()} consultations found.`}
                   </td>
                 </tr>
               )}
 
-              {!loading && !loadError &&
-                rows.map((row) => {
+              {!tableLoading && !tableError &&
+                visibleRows.map((row) => {
                   return (
                     <tr key={row.id} className="border-b hover:bg-gray-50">
                       <td className="bg-white px-4 py-3">
@@ -271,7 +292,22 @@ function ConsultationQueue({ orgId }: { orgId: string | null }) {
           </table>
         </ResponsiveTableRegion>
 
-        {orgId && (
+        {orgId && searchState.active && (
+          <div role="status" aria-live="polite" className="flex flex-wrap items-center justify-between gap-3 border-t p-4 text-sm text-gray-600">
+            <span>
+              {searchState.loading
+                ? "Searching all consultations…"
+                : `${visibleRows.length} ${visibleRows.length === 1 ? "match" : "matches"} across all ${
+                    activeTab === "All" ? "" : `${activeTab.toLowerCase()} `
+                  }consultations`}
+            </span>
+            <button type="button" onClick={() => setSearch("")} className="font-medium text-[#006B5F] hover:underline">
+              Clear search
+            </button>
+          </div>
+        )}
+
+        {orgId && !searchState.active && (
           <nav aria-label="Consultation pagination" className="flex flex-col gap-3 border-t p-4 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <label className="flex items-center gap-2 text-gray-600">
               Rows per page

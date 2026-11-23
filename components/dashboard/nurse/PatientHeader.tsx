@@ -1,6 +1,5 @@
 "use client";
 
-import { StatusBadge } from "@components/StatusBadge";
 import Button from "@components/Button";
 import { useState } from "react";
 import AdmittedBadge from "@components/dashboard/admissions/AdmittedBadge";
@@ -8,11 +7,10 @@ import { buildDisplayName } from "@utils/helper";
 import { useConsultation } from "./ConsultationContext";
 import { CreateConsultationModal } from "./ConsultationModal";
 
-const parseVitals = (raw?: string | null): Array<{ label: string; value: string; status: "Normal" | "High" | "Low" }> => {
-  if (!raw) {
-    return [{ label: "Vitals", value: "Not recorded", status: "Low" }];
-  }
-  return [{ label: "Vitals", value: raw, status: "Normal" }];
+// Only show vitals that were actually recorded. No reading is assessed here, so no Normal/High/Low badge.
+const parseVitals = (raw?: string | null): Array<{ label: string; value: string }> => {
+  const value = raw?.trim();
+  return value ? [{ label: "Vitals", value }] : [];
 };
 
 export default function PatientHeader() {
@@ -80,15 +78,16 @@ export default function PatientHeader() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {vitals.map((v) => (
-          <div key={v.label} className="border rounded-md p-4 text-center">
-            <p className="break-words font-semibold text-[#003C36]">{v.value}</p>
-            <p className="text-sm text-gray-500">{v.label}</p>
-            <div className="mt-2"><StatusBadge status={v.status} /></div>
-          </div>
-        ))}
-      </div>
+      {vitals.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {vitals.map((v) => (
+            <div key={v.label} className="border rounded-md p-4 text-center">
+              <p className="break-words font-semibold text-[#003C36]">{v.value}</p>
+              <p className="text-sm text-gray-500">{v.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       <CreateConsultationModal
         open={isCreateModalOpen}

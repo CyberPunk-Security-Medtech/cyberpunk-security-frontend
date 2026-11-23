@@ -1473,6 +1473,55 @@ export const consultationService = {
     // Keep the response envelope: unwrapping data would discard pagination.
     return response.data;
   },
+
+  /**
+   * Same as listConsultationsPage, but newest first.
+   *
+   * The API returns consultations oldest first and has no sort parameter, so the
+   * newest records sit on its last page. This reads the requested slice from the
+   * end (one or two server pages) and reverses it. Remove it once the backend
+   * can sort newest first.
+   */
+  listConsultationsPageNewestFirst: async (
+    org_id: string,
+    params: ConsultationPageParams,
+    signal?: AbortSignal,
+  ): Promise<ConsultationPage> => {
+    const fetchPage = async (page: number) =>
+      (
+        await api.get<ConsultationPage>(`/api/v1/organizations/${org_id}/consultations`, {
+          params: { ...params, page, page_size: params.page_size },
+          signal,
+        })
+      ).data;
+
+    // The first page tells us the total; it often also holds the slice we need.
+    const first = await fetchPage(1);
+    const { total, page_size: size } = first;
+    const totalPages = Math.max(1, Math.ceil(total / size));
+    const page = Math.min(Math.max(1, params.page), totalPages);
+
+    // Indices (0 = oldest) of the newest-first page asked for.
+    const high = total - 1 - (page - 1) * size;
+    const low = Math.max(0, total - page * size);
+    if (high < 0) return { ...first, data: [], page, total_pages: totalPages };
+
+    const firstServerPage = Math.floor(low / size) + 1;
+    const lastServerPage = Math.floor(high / size) + 1;
+    const pages: ConsultationPage[] = [];
+    for (let serverPage = firstServerPage; serverPage <= lastServerPage; serverPage += 1) {
+      pages.push(serverPage === 1 ? first : await fetchPage(serverPage));
+    }
+
+    const offset = (firstServerPage - 1) * size;
+    const records = pages.flatMap((item) => item.data).slice(low - offset, high - offset + 1);
+    const time = (record: ConsultationRecord) =>
+      new Date(record.created_at ?? record.updated_at ?? 0).getTime() || 0;
+    // Reverse, then sort by date in case the server's order isn't strictly by creation time.
+    const data = records.reverse().sort((a, b) => time(b) - time(a));
+
+    return { data, page, page_size: size, total, total_pages: totalPages };
+  },
   createConsultation: async (
     org_id: string,
     payload: {

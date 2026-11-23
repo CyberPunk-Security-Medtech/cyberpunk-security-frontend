@@ -74,11 +74,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ChevronRight, Package, Pill } from "lucide-react";
+import { AlertTriangle, ChevronRight, Package, Pill, TrendingDown } from "lucide-react";
 import { inventoryService } from "@services/api";
 import { useAuth } from "@context/AuthContext";
 import { toast } from "react-toastify";
-import { collectionFromResponse, getInventoryGroup, getInventoryQuantity, InventoryItem } from "./pharmacyUtils";
+import { collectionFromResponse, getInventoryGroup, getStockLevel, InventoryItem } from "./pharmacyUtils";
 
 export default function InventoryOverviewClient() {
   const { activeWorkspace } = useAuth();
@@ -118,14 +118,16 @@ export default function InventoryOverviewClient() {
       medicines: realItems.length,
       // We still use all items to calculate groups so empty groups appear in the count
       groups: new Set(items.map(getInventoryGroup).filter(Boolean)).size,
-      shortages: realItems.filter((item) => item.stockKnown && getInventoryQuantity(item) <= 0).length,
+      shortages: realItems.filter((item) => getStockLevel(item) === "out").length,
+      runningLow: realItems.filter((item) => getStockLevel(item) === "low").length,
     }
   }, [items]);
 
   const cards = [
     { title: "Items available", value: summary.medicines, action: "View full list", href: "/dashboard/pharmacy/inventory/items", icon: Package, iconColor: "text-[#2F80ED]", iconBg: "bg-[#EBF4FF]" },
     { title: "Item groups", value: summary.groups, action: "View groups", href: "/dashboard/pharmacy/inventory/groups", icon: Pill, iconColor: "text-[#00A86B]", iconBg: "bg-[#EAFBF2]" },
-    { title: "Out of stock", value: summary.shortages, action: "Review inventory", href: "/dashboard/pharmacy/inventory/items", icon: AlertTriangle, iconColor: "text-[#EF4444]", iconBg: "bg-[#FFF1F2]" },
+    { title: "Running low", value: summary.runningLow, action: "Restock soon", href: "/dashboard/pharmacy/inventory/items?stock=low", icon: TrendingDown, iconColor: "text-[#D97706]", iconBg: "bg-[#FFF7E6]" },
+    { title: "Out of stock", value: summary.shortages, action: "Review out of stock", href: "/dashboard/pharmacy/inventory/items?stock=out", icon: AlertTriangle, iconColor: "text-[#EF4444]", iconBg: "bg-[#FFF1F2]" },
   ];
 
   return (
@@ -134,18 +136,18 @@ export default function InventoryOverviewClient() {
         <div><h1 className="text-[36px] font-semibold leading-none text-[#151D48]">Inventory</h1><p className="mt-2 text-sm text-[#737791]">Manage items and their available stock.</p></div>
         <Link href="/dashboard/pharmacy/inventory/new" className="inline-flex self-start rounded-md bg-[#00796B] px-4 py-2 text-xs font-medium text-white hover:bg-[#00695F]">Add item</Link>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-[780px] lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-[1040px] lg:grid-cols-4">
         {cards.map(({ title, value, action, href, icon: Icon, iconColor, iconBg }) => (
-          <article key={title} className="overflow-hidden rounded-md border border-[#DDE3ED] bg-white">
+          <Link key={title} href={href} aria-label={`${title}: ${action}`} className="group block overflow-hidden rounded-md border border-[#DDE3ED] bg-white transition hover:border-[#00796B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00796B]">
             <div className="px-5 py-4 text-center">
               <span className={`mx-auto mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full ${iconBg}`}><Icon size={15} className={iconColor} /></span>
               {loading ? <div className="mx-auto mt-3 h-8 w-12 animate-pulse rounded bg-slate-200" /> : <p className="text-2xl font-semibold text-[#23272E]">{value}</p>}
               <p className="mt-2 text-xs text-[#8A93A5]">{title}</p>
             </div>
-            <Link href={href} className="flex items-center justify-center gap-1 border-t border-[#E8ECF3] px-3 py-2 text-xs font-medium text-[#00796B] hover:bg-[#F0FFFA]">{action}<ChevronRight size={12} /></Link>
-          </article>
+            <span className="flex items-center justify-center gap-1 border-t border-[#E8ECF3] px-3 py-2 text-xs font-medium text-[#00796B] group-hover:bg-[#F0FFFA]">{action}<ChevronRight size={12} /></span>
+          </Link>
         ))}
       </div>
     </section>
   );
-}
+}

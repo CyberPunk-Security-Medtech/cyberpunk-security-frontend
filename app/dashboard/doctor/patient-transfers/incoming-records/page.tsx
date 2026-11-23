@@ -1,4 +1,5 @@
 "use client";
+import { newestFirst } from "@utils/listFilters";
 
 import { useCallback, useEffect, useState } from "react";
 import { isAxiosError } from "axios";
@@ -396,7 +397,7 @@ export default function IncomingRecordsPage({
         );
 
         const enrichedRecords = await Promise.all(
-          rows.map(async (referral) => {
+          newestFirst(rows, (referral) => referral.created_at).map(async (referral) => {
             const [patient, grant] = await Promise.all([
               getSafe(() => patientService.getPatient(orgId, referral.patient_id)),
               getSafe(() =>

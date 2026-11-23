@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, FileText, Users } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { isInteractiveTarget } from "@utils/rowNavigation";
 import { useAuth } from "@context/AuthContext";
 import { patientService } from "@services/api";
 import { getTimeGreeting } from "@utils/greeting";
@@ -14,6 +16,7 @@ import {
   type RecordStaffPatientRow,
 } from "./patientDisplay";
 import { TableSkeleton } from "@components/Skeletons";
+import { newestFirst } from "@utils/listFilters";
 
 const firstName = (name: string) =>
   name.split(" ").filter(Boolean)[0] || "there";
@@ -27,6 +30,7 @@ const formatDashboardDate = (date: Date = new Date()) =>
   }).format(date);
 
 export default function RecordStaffDashboardPage() {
+  const router = useRouter();
   const { user, activeWorkspace, hydrated } = useAuth();
   const [patients, setPatients] = useState<RecordStaffPatientRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +55,7 @@ export default function RecordStaffDashboardPage() {
       setError("");
       const data = await patientService.getPatients(activeWorkspace.id);
       const patientList = Array.isArray(data) ? data : [];
-      setPatients(patientList.map(mapRecordStaffPatient));
+      setPatients(newestFirst(patientList.map(mapRecordStaffPatient), (p) => p.createdAt));
     } catch (fetchError) {
       console.error("Failed to fetch record staff patients", fetchError);
       setError("Unable to load patient records. Please try again.");
@@ -163,7 +167,7 @@ export default function RecordStaffDashboardPage() {
 
               {!loading &&
                 patients.map((record) => (
-                  <tr key={record.id} className="border-t border-slate-100">
+                  <tr key={record.id} className={`border-t border-slate-100 ${record.id ? "cursor-pointer hover:bg-slate-50" : ""}`} onClick={(event) => { if (record.id && !isInteractiveTarget(event.target)) router.push(`/dashboard/record-staff/patient/${record.id}`); }}>
                     <td className="bg-white px-5 py-4 font-mono text-xs text-slate-600">
                       {record.patientCode}
                     </td>

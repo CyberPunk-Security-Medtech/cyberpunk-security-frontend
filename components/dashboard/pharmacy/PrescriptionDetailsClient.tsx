@@ -6,7 +6,8 @@ import { prescriptionService } from "@services/api";
 import { toast } from "react-toastify";
 import DispensePrescriptionModal from "@components/dashboard/pharmacy/DispensePrescriptionModal";
 import BreadcrumbHeading from "./BreadcrumbHeading";
-import { collectionFromResponse, Prescription } from "./pharmacyUtils";
+import { collectionFromResponse, Prescription, type StockAllocation } from "./pharmacyUtils";
+import { dispenseWithStock, type DispensePayload } from "./pharmacyStock";
 
 export default function PrescriptionDetailsClient({
   prescriptionId,
@@ -76,21 +77,26 @@ export default function PrescriptionDetailsClient({
     setModalOpen(true);
   };
 
-  const handleConfirmDispense = async (payload: {
-    quantity: string;
-    batch_number?: string;
-    expiry_date?: string;
-    substitution_note?: string;
-    counseling_notes?: string;
-  }) => {
+  const handleConfirmDispense = async (payload: DispensePayload, plan: StockAllocation[] | null) => {
     if (!orgId || !prescription) return;
 
     if (modalMode === "edit") {
+      // The stock link can't change after dispensing, so corrections only update the record.
       await prescriptionService.correctDispenseRecord(orgId, prescription.id, payload);
       toast.success("Dispense record corrected.");
     } else {
-      await prescriptionService.dispensePrescription(orgId, prescription.id, payload);
-      toast.success("Prescription marked as completed.");
+      const { failedBatches } = await dispenseWithStock(orgId, prescription.id, payload, plan);
+      const deducted = plan?.reduce((total, allocation) => total + allocation.units, 0) ?? 0;
+      toast.success(
+        deducted > 0 ? `Prescription dispensed. ${deducted} units taken from stock.` : "Prescription marked as completed.",
+      );
+      if (failedBatches.length > 0) {
+        toast.warn(
+          `Dispensed, but ${failedBatches.reduce((total, a) => total + a.units, 0)} units couldn't be taken from batch ${failedBatches
+            .map((a) => a.batch.batch_number || a.batch.id)
+            .join(", ")}. Adjust that batch in inventory.`,
+        );
+      }
     }
 
     setModalOpen(false);
@@ -192,6 +198,7 @@ export default function PrescriptionDetailsClient({
         isOpen={modalOpen}
         mode={modalMode}
         initialRecord={initialRecord}
+        orgId={orgId}
         onClose={() => {
           setModalOpen(false);
           setInitialRecord(null);

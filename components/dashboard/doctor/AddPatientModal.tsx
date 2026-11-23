@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent, type InputHTMLAttributes } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent, type InputHTMLAttributes } from "react";
 import Modal from "@components/Modal";
 import { FieldLabel, Input, Select, Textarea } from "@components/Field";
-import { patientService, type PatientCreatePayload } from "@services/api";
+import { hmoService, patientService, type Hmo, type PatientCreatePayload } from "@services/api";
 import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@context/AuthContext";
@@ -127,6 +127,27 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
   const [formData, setFormData] = useState<FormState>(emptyForm);
   const [coverageType, setCoverageType] = useState<CoverageType | "">("");
   const [submitting, setSubmitting] = useState(false);
+  // HMOs come from the organisation's HMO Management list, never a hard-coded one.
+  const [hmos, setHmos] = useState<Hmo[]>([]);
+  const [hmosLoaded, setHmosLoaded] = useState(false);
+
+  useEffect(() => {
+    const orgId = activeWorkspace?.id;
+    if (!isOpen || !orgId) return;
+    const controller = new AbortController();
+    hmoService
+      .listHmos(orgId, controller.signal)
+      .then((result) => setHmos([...(result ?? [])].sort((a, b) => a.name.localeCompare(b.name))))
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        console.warn("Unable to load HMOs; falling back to a free-text provider field", error);
+        setHmos([]);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setHmosLoaded(true);
+      });
+    return () => controller.abort();
+  }, [isOpen, activeWorkspace?.id]);
 
   // handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -398,8 +419,35 @@ export default function AddPatientModal({ isOpen, onClose, onCreated }: AddPatie
 
           {coverageType === "hmo" && (
             <div className="grid grid-cols-1 gap-4 rounded-md border border-gray-200 bg-gray-50/60 p-4 md:grid-cols-2">
-              {textField("hmo_provider", "HMO provider *", { required: true, placeholder: "e.g. Avon HMO" })}
-              {textField("hmo_plan", "HMO plan *", { required: true })}
+              {hmos.length > 0 ? (
+                <div>
+                  <FieldLabel htmlFor="add-patient-hmo_provider">HMO provider *</FieldLabel>
+                  <Select
+                    id="add-patient-hmo_provider"
+                    name="hmo_provider"
+                    value={formData.hmo_provider}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select HMO provider</option>
+                    {hmos.map((hmo) => (
+                      <option key={hmo.id} value={hmo.name}>
+                        {hmo.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              ) : (
+                <div>
+                  {textField("hmo_provider", "HMO provider *", { required: true, placeholder: "Enter HMO name" })}
+                  {hmosLoaded && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      No HMOs have been set up for this hospital yet. An admin can add them under HMO Management.
+                    </p>
+                  )}
+                </div>
+              )}
+              {textField("hmo_plan", "HMO plan *", { required: true, placeholder: "As written on the HMO card" })}
               {textField("hmo_number", "Enrollee number *", { required: true })}
               {textField("enrollee_type", "Enrollee type", { placeholder: "e.g. Principal, Dependant" })}
               {textField("policy_start_date", "Policy start date", { type: "date" })}

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { isInteractiveTarget } from "@utils/rowNavigation";
 import { ArrowRight } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import {
@@ -56,6 +58,7 @@ const mapPatient = (patient: PatientListRecord): PatientRow => {
 };
 
 export default function NewPatientsAwaitingTriage() {
+  const router = useRouter();
   const { activeWorkspace } = useAuth();
   const orgId = activeWorkspace?.id ?? null;
 
@@ -184,7 +187,7 @@ export default function NewPatientsAwaitingTriage() {
             </thead>
             <tbody>
               {visiblePatients.map((patient) => (
-                <tr key={patient.id} className="border-b last:border-b-0">
+                <tr key={patient.id} className="cursor-pointer border-b last:border-b-0 hover:bg-gray-50" onClick={(event) => { if (!isInteractiveTarget(event.target)) router.push(`/dashboard/nurse/patient/${patient.id}`); }}>
                   <td className="bg-white px-4 py-3">
                     <div className="flex items-center gap-3 font-medium text-[#003C36]">
                       <div className="grid h-8 w-8 place-items-center rounded-full bg-[#E6F8F7] text-xs font-semibold text-[#00B8A8]">

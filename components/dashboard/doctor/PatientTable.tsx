@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import {
@@ -12,6 +12,15 @@ import { useAuth } from "@context/AuthContext";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { LoaderIcon } from "@components/Skeletons";
+import ListToolbar, { FilterSelect, SearchInput } from "@components/dashboard/ListToolbar";
+import {
+  DATE_RANGE_OPTIONS,
+  isWithinDateRange,
+  newestFirst,
+  matchesOption,
+  optionsFrom,
+  type DateRange,
+} from "@utils/listFilters";
 
 interface Patient {
   id: string;
@@ -22,7 +31,9 @@ interface Patient {
   gender: string;
   condition: string;
   status: string;
+  department: string;
   date: string;
+  rawDate: string | null;
 }
 
 const statusClassName = (status: string) => {
@@ -35,15 +46,16 @@ const statusClassName = (status: string) => {
   return "text-[#6B7280] bg-[#F3F4F6] border-[#E5E7EB]";
 };
 
-type PatientTableProps = {
-  searchQuery?: string;
-};
-
-export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
+export default function PatientTable() {
   const router = useRouter();
   const { activeWorkspace } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [department, setDepartment] = useState("");
+  const [status, setStatus] = useState("");
+  const [gender, setGender] = useState("");
+  const [lastVisit, setLastVisit] = useState<DateRange>("");
   const patientCacheRef = useRef<{ orgId: string; records: PatientListRecord[] } | null>(null);
 
   useEffect(() => {
@@ -89,6 +101,8 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
           gender: p.gender || "-",
           condition: p.symptoms || "N/A",
           status: p.status || "Active",
+          department: p.department?.trim() || "",
+          rawDate: p.created_at ?? null,
           date: p.created_at
             ? new Date(p.created_at).toLocaleDateString("en-US", {
                 month: "short",
@@ -98,7 +112,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
             : "-",
         }));
 
-        if (!cancelled) setPatients(mappedPatients);
+        if (!cancelled) setPatients(newestFirst(mappedPatients, (p) => p.rawDate));
       } catch (requestError) {
         console.error("Failed to fetch patients:", requestError);
         if (!cancelled) {
@@ -121,22 +135,101 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
     };
   }, [activeWorkspace?.id, searchQuery]);
 
+  // Search runs on the server (name, phone, email, NIN); the dropdowns narrow those results here.
+  const departmentOptions = useMemo(() => optionsFrom(patients.map((p) => p.department)), [patients]);
+  const statusOptions = useMemo(() => optionsFrom(patients.map((p) => p.status)), [patients]);
+  const genderOptions = useMemo(() => optionsFrom(patients.map((p) => p.gender)), [patients]);
+
+  const visiblePatients = useMemo(
+    () =>
+      patients.filter(
+        (p) =>
+          matchesOption(department, p.department) &&
+          matchesOption(status, p.status) &&
+          matchesOption(gender, p.gender) &&
+          isWithinDateRange(p.rawDate, lastVisit),
+      ),
+    [patients, department, status, gender, lastVisit],
+  );
+
+  const hasSearch = searchQuery.trim().length >= 2;
+  const hasActiveFilters = hasSearch || !!department || !!status || !!gender || !!lastVisit;
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDepartment("");
+    setStatus("");
+    setGender("");
+    setLastVisit("");
+  };
+
+  const toolbar = (
+    <ListToolbar
+      search={
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by name, phone, email or NIN"
+          label="Search patients by name, phone number, email, or NIN"
+        />
+      }
+      filters={
+        <>
+          {departmentOptions.length > 0 && (
+            <FilterSelect
+              allLabel="All departments"
+              label="Filter by department"
+              value={department}
+              onChange={setDepartment}
+              options={departmentOptions}
+            />
+          )}
+          <FilterSelect allLabel="All statuses" label="Filter by status" value={status} onChange={setStatus} options={statusOptions} />
+          <FilterSelect allLabel="All genders" label="Filter by gender" value={gender} onChange={setGender} options={genderOptions} />
+          <FilterSelect
+            allLabel="Any visit date"
+            label="Filter by last visit"
+            value={lastVisit}
+            onChange={(value) => setLastVisit(value as DateRange)}
+            options={DATE_RANGE_OPTIONS}
+          />
+        </>
+      }
+      shown={visiblePatients.length}
+      total={hasSearch ? undefined : patients.length}
+      active={hasActiveFilters && !loading}
+      onClear={clearFilters}
+      noun="patients"
+    />
+  );
+
   if (loading) {
     return (
-      <div className="rounded-md border border-gray-200 bg-white p-6 shadow-sm">
-        <LoaderIcon />
-      </div>
+      <>
+        {toolbar}
+        <div className="rounded-md border border-gray-200 bg-white p-6 shadow-sm">
+          <LoaderIcon />
+        </div>
+      </>
     );
   }
-  if (!loading && patients.length === 0) {
+  if (visiblePatients.length === 0) {
     return (
-      <p className="p-4 text-gray-500">
-        {searchQuery.trim().length >= 2 ? `No patients found for “${searchQuery.trim()}”.` : "No patients found."}
-      </p>
+      <>
+        {toolbar}
+        <p className="p-4 text-gray-500">
+          {hasActiveFilters
+            ? hasSearch
+              ? `No patients found for “${searchQuery.trim()}” with these filters.`
+              : "No patients match these filters."
+            : "No patients found."}
+        </p>
+      </>
     );
   }
 
   return (
+    <>
+    {toolbar}
     <div className="rounded-md border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
       <ResponsiveTableRegion label="Doctor patient records">
         <table className="w-full min-w-[920px] border-collapse text-left text-sm">
@@ -152,7 +245,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
             </tr>
           </thead>
           <tbody>
-            {patients.map((patient) => (
+            {visiblePatients.map((patient) => (
               <tr
                 key={patient.id}
                 className="group cursor-pointer border-b bg-white hover:bg-gray-50"
@@ -189,7 +282,7 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
       </ResponsiveTableRegion>
 
       <div className="hidden">
-        {patients.map((patient) => (
+        {visiblePatients.map((patient) => (
           <button
             key={`mobile-${patient.id}`}
             type="button"
@@ -233,5 +326,6 @@ export default function PatientTable({ searchQuery = "" }: PatientTableProps) {
         ))}
       </div>
     </div>
+    </>
   );
 }

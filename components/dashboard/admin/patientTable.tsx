@@ -1,22 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { isInteractiveTarget } from "@utils/rowNavigation";
 import { useAuth } from "@context/AuthContext";
 import { patientService, type PatientListRecord } from "@services/api";
 import { resolvePatientAge } from "@utils/patientAge";
 import ResponsiveTableRegion from "@components/dashboard/ResponsiveTableRegion";
 import { TableSkeleton } from "@components/Skeletons";
+import ListToolbar, { FilterSelect, SearchInput } from "@components/dashboard/ListToolbar";
+import {
+  DATE_RANGE_OPTIONS,
+  isWithinDateRange,
+  newestFirst,
+  matchesOption,
+  matchesQuery,
+  optionsFrom,
+  type DateRange,
+} from "@utils/listFilters";
 
 type AdminPatient = {
   id: string;
   patientCode: string;
   name: string;
   ageGender: string;
+  gender: string;
   hospital: string;
   status: "active" | "follow-up";
   date: string;
+  rawDate: string | null;
+  createdAt: string | null;
 };
+
+const STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "follow-up", label: "Follow-up" },
+];
 
 const formatDate = (value?: string | null): string => {
   if (!value) return "-";
@@ -30,9 +50,14 @@ type PatientTableProps = {
 };
 
 export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) {
+  const router = useRouter();
   const { activeWorkspace } = useAuth();
   const [patients, setPatients] = useState<AdminPatient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [status, setStatus] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange>("");
 
   useEffect(() => {
     const orgId = activeWorkspace?.id;
@@ -50,12 +75,15 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
           patientCode: p.patient_code?.trim() || "Not recorded",
           name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unknown Patient",
           ageGender: `${resolvePatientAge(p.age, p.dob ?? p.date_of_birth)} / ${p.gender ?? "-"}`,
+          gender: p.gender ?? "",
           hospital: activeWorkspace?.name ?? "Hospital",
           status: p.symptoms ? "follow-up" : "active",
           date: formatDate(p.updated_at),
+          rawDate: p.updated_at ?? null,
+          createdAt: p.created_at ?? null,
         }));
 
-        setPatients(normalized);
+        setPatients(newestFirst(normalized, (p) => p.createdAt ?? p.rawDate));
       } catch (error) {
         console.error("Failed to load admin patients", error);
       } finally {
@@ -69,11 +97,59 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
     };
   }, [activeWorkspace?.id, activeWorkspace?.name, refreshVersion]);
 
+  const genderOptions = useMemo(() => optionsFrom(patients.map((p) => p.gender)), [patients]);
+  const visiblePatients = useMemo(
+    () =>
+      patients.filter(
+        (p) =>
+          matchesQuery(searchQuery, p.name, p.patientCode) &&
+          matchesOption(status, p.status) &&
+          matchesOption(gender, p.gender) &&
+          isWithinDateRange(p.rawDate, dateRange),
+      ),
+    [patients, searchQuery, status, gender, dateRange],
+  );
+  const hasActiveFilters = !!searchQuery.trim() || !!status || !!gender || !!dateRange;
+
   return (
     <section className="rounded-md border bg-white p-4 shadow-sm sm:p-5">
       <h2 className="mb-4 border-b-2 border-[#051466] pb-1 text-sm font-semibold text-[#051466]">
         Patient Records
       </h2>
+
+      <ListToolbar
+        search={
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search by name or patient code"
+            label="Search patients by name or patient code"
+          />
+        }
+        filters={
+          <>
+            <FilterSelect allLabel="All statuses" label="Filter by status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+            <FilterSelect allLabel="All genders" label="Filter by gender" value={gender} onChange={setGender} options={genderOptions} />
+            <FilterSelect
+              allLabel="Any date"
+              label="Filter by last updated date"
+              value={dateRange}
+              onChange={(value) => setDateRange(value as DateRange)}
+              options={DATE_RANGE_OPTIONS}
+            />
+          </>
+        }
+        shown={visiblePatients.length}
+        total={patients.length}
+        active={hasActiveFilters && !loading}
+        onClear={() => {
+          setSearchQuery("");
+          setStatus("");
+          setGender("");
+          setDateRange("");
+        }}
+        noun="patients"
+      />
 
       <ResponsiveTableRegion label="Admin patient records">
         <table className="w-full min-w-[1120px] text-sm">
@@ -94,16 +170,16 @@ export default function PatientTable({ refreshVersion = 0 }: PatientTableProps) 
               <TableSkeleton columns={7} />
             )}
 
-            {!loading && patients.length === 0 && (
+            {!loading && visiblePatients.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-center text-slate-500" colSpan={7}>
-                  No patients found.
+                  {hasActiveFilters ? "No patients match these filters." : "No patients found."}
                 </td>
               </tr>
             )}
 
-            {patients.map((p, i) => (
-              <tr key={p.id} className={`group border-b ${i % 2 ? "bg-slate-50/50" : "bg-white"}`}>
+            {!loading && visiblePatients.map((p, i) => (
+              <tr key={p.id} className={`group cursor-pointer border-b hover:bg-slate-100 ${i % 2 ? "bg-slate-50/50" : "bg-white"}`} onClick={(event) => { if (!isInteractiveTarget(event.target)) router.push(`/dashboard/admin/patient/${p.id}`); }}>
                 <td className="bg-inherit px-4 py-3">
                   <span>{p.name}</span>
                 </td>

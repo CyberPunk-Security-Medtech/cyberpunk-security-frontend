@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { SearchInput } from "@components/dashboard/ListToolbar";
+import { matchesQuery, newestFirst } from "@utils/listFilters";
 import { useAuth } from "@context/AuthContext";
 import {
   admissionService,
@@ -86,6 +89,33 @@ export default function InPatientsList({ patientHref }: InPatientsListProps) {
     void loadWards();
   };
 
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const visibleAdmissions = useMemo(
+    () =>
+      newestFirst(
+        admissions.filter((admission) =>
+          matchesQuery(
+            searchQuery,
+            admission.patient?.first_name,
+            admission.patient?.last_name,
+            admission.patient?.patient_code,
+            admission.ward?.name,
+            admission.bed_number,
+            admission.reason,
+          ),
+        ),
+        (admission) => admission.admitted_at,
+      ),
+    [admissions, searchQuery],
+  );
+
+  // Clicking anywhere on a row opens the patient, except on the row's own links and buttons.
+  const openPatientFromRow = (event: React.MouseEvent<HTMLTableRowElement>, patientId: string) => {
+    if ((event.target as HTMLElement).closest("a, button")) return;
+    router.push(patientHref(patientId));
+  };
+
   const isAdmittedView = status === "Admitted";
   const columns = 6;
 
@@ -131,8 +161,23 @@ export default function InPatientsList({ patientHref }: InPatientsListProps) {
                 ))}
               </Select>
             </div>
+            <div className="sm:flex-1 sm:max-w-sm">
+              <label htmlFor="inpatients-search" className="mb-1 block text-xs font-medium text-slate-600">
+                Search
+              </label>
+              <SearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Patient, code, bed or reason"
+                label="Search in-patients by name, patient code, ward, bed, or reason"
+              />
+            </div>
             <p className="text-sm text-slate-500 sm:ml-auto" aria-live="polite">
-              {loading ? "" : `${admissions.length} ${admissions.length === 1 ? "patient" : "patients"}`}
+              {loading
+                ? ""
+                : searchQuery.trim()
+                  ? `${visibleAdmissions.length} of ${admissions.length} ${admissions.length === 1 ? "patient" : "patients"}`
+                  : `${admissions.length} ${admissions.length === 1 ? "patient" : "patients"}`}
             </p>
           </div>
 
@@ -167,21 +212,27 @@ export default function InPatientsList({ patientHref }: InPatientsListProps) {
                 <tbody>
                   {loading ? (
                     <TableSkeleton columns={columns} />
-                  ) : admissions.length === 0 ? (
+                  ) : visibleAdmissions.length === 0 ? (
                     <tr>
                       <td colSpan={columns} className="px-5 py-6 text-center text-slate-500">
-                        {isAdmittedView
-                          ? "No patients are currently admitted."
-                          : "No discharged admissions found."}
+                        {searchQuery.trim()
+                          ? `No in-patients match “${searchQuery.trim()}”.`
+                          : isAdmittedView
+                            ? "No patients are currently admitted."
+                            : "No discharged admissions found."}
                       </td>
                     </tr>
                   ) : (
-                    admissions.map((admission) => {
+                    visibleAdmissions.map((admission) => {
                       const name =
                         `${admission.patient?.first_name ?? ""} ${admission.patient?.last_name ?? ""}`.trim() ||
                         "Patient";
                       return (
-                        <tr key={admission.id} className="border-t align-top">
+                        <tr
+                          key={admission.id}
+                          className="cursor-pointer border-t align-top hover:bg-slate-50"
+                          onClick={(event) => openPatientFromRow(event, admission.patient_id)}
+                        >
                           <td className="px-5 py-4">
                             <Link
                               href={patientHref(admission.patient_id)}

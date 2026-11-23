@@ -14,7 +14,12 @@ const formatDateTime = (value: string) => {
 };
 
 export default function ConsultationNotesPanel() {
-  const { orgId, selectedConsultationId } = useConsultation();
+  const { orgId, selectedConsultationId, selectedConsultation, isSelectedConsultationActive } =
+    useConsultation();
+  const isCompletedConsultation =
+    String(selectedConsultation?.status ?? "").toLowerCase() === "completed";
+  // Notes are written during the consultation; after completion they become addenda.
+  const canWrite = !!selectedConsultationId && (isSelectedConsultationActive || isCompletedConsultation);
   const [notes, setNotes] = useState<ConsultationNote[]>([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,19 +59,19 @@ export default function ConsultationNotesPanel() {
 
   const handleSave = async () => {
     const content = draft.trim();
-    if (!orgId || !selectedConsultationId || !content || saving) return;
+    if (!orgId || !selectedConsultationId || !content || saving || !canWrite) return;
 
     setSaving(true);
     try {
       const savedNote = await consultationService.addConsultationNote(
         orgId,
         selectedConsultationId,
-        content,
+        isCompletedConsultation ? `Addendum: ${content}` : content,
       );
       setNotes((current) => [...current, savedNote]);
       setDraft("");
       setError(null);
-      toast.success("Note saved");
+      toast.success(isCompletedConsultation ? "Addendum saved" : "Note saved");
     } catch (requestError) {
       console.error("Failed to save consultation note", requestError);
       toast.error(
@@ -136,12 +141,23 @@ export default function ConsultationNotesPanel() {
 
       <div className="mt-6 border-t pt-5">
         <label htmlFor="consultation-note" className="text-sm font-semibold text-gray-800">
-          Add a note
+          {isCompletedConsultation ? "Add addendum" : "Add a note"}
         </label>
+        {isCompletedConsultation && (
+          <p className="mt-1 text-xs text-gray-500">
+            This consultation is completed. Addenda are saved with today&apos;s date and marked as an addendum.
+          </p>
+        )}
         <textarea
           id="consultation-note"
-          placeholder="Enter a clinical note"
-          disabled={!selectedConsultationId || saving}
+          placeholder={
+            isCompletedConsultation
+              ? "e.g. late lab result, follow-up call"
+              : canWrite
+                ? "Enter a clinical note"
+                : "Start the consultation to add notes"
+          }
+          disabled={!canWrite || saving}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           className="mt-2 w-full resize-y rounded-md border border-gray-200 p-3 text-sm outline-none focus:border-[#00B8A8] focus:ring-2 focus:ring-[#00B8A8]/20 disabled:bg-gray-50"
@@ -152,10 +168,10 @@ export default function ConsultationNotesPanel() {
           <Button
             type="button"
             onClick={handleSave}
-            disabled={!selectedConsultationId || !draft.trim() || saving}
-            className="bg-[#1A2380] text-white hover:bg-[#00B8A8] disabled:bg-gray-300"
+            disabled={!canWrite || !draft.trim() || saving}
+            className="bg-[#1A2380] text-white hover:bg-[#00B8A8] disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Note"}
+            {saving ? "Saving..." : isCompletedConsultation ? "Save Addendum" : "Save Note"}
           </Button>
         </div>
       </div>
